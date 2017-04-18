@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Plugins StackSize="50">
+  <Plugin Assembly="Plugin.Test.dll" Type="Plugin.Test.TestPlugin" Version="1.0.0" Singletone="false" AutoStart ="true" PluginDirectory="Test">
+    <Instance Id="i1" Name=""/>
+    <Instance Id="i2" Name=""/>
+  </Plugin>
+  <Plugin Type="Plugin2" Version="1.*" Singletone="false" AutoStart ="true" PluginConfig="\\Plugin2Config.xml"/>
+</Plugins>

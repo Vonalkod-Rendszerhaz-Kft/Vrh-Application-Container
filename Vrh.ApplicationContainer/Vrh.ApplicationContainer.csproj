@@ -4,17 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{1F47D82A-1730-41E2-B164-DE5BBAAA4CD3}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{0F167592-DCC8-4CF5-9737-6F0B86D0F76F}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Vrh.ApplicationContainert.ConsoleHost</RootNamespace>
-    <AssemblyName>Vrh.ApplicationContainert.ConsoleHost</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <RootNamespace>Vrh.ApplicationContainer</RootNamespace>
+    <AssemblyName>Vrh.ApplicationContainer</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -22,9 +21,9 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -33,13 +32,22 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Diagnostics.Runtime, Version=0.8.31.1, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Diagnostics.Runtime.Latest.0.8.31.3\lib\net45\Microsoft.Diagnostics.Runtime.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.10.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Configuration" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.ComponentModel.Composition.registration" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Reflection.Context" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -60,7 +68,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="ApplicationContainer.cs" />
+    <Compile Include="ApplicationContainer.Config.cs" />
+    <Compile Include="ApplicationContainerService.cs" />
+    <Compile Include="Exceptions.cs" />
+    <Compile Include="IApplicationContainer.cs" />
+    <Compile Include="IInstanceFactory.cs" />
+    <Compile Include="InstanceDefinition.cs" />
+    <Compile Include="IPlugin.cs" />
+    <Compile Include="MessageStackEntry.cs" />
+    <Compile Include="PluginDefinition.cs" />
+    <Compile Include="PluginEventHandlers.cs" />
+    <Compile Include="PluginStatus.cs" />
+    <Compile Include="Properties\CommonAssemblyInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -71,20 +91,7 @@
     <None Include="Vrh.NugetModuls.Documentations\Vrh.Logger\ReadMe.md" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\InstanceFactory.Fake\InstanceFactory.Fake.csproj">
-      <Project>{8fda2d43-ed1d-4352-8d5a-ccd4f8c73aa7}</Project>
-      <Name>InstanceFactory.Fake</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\InstanceFactory.FromXMLConfig\InstanceFactory.FromXML.csproj">
-      <Project>{e993c7d1-bea9-4eb1-8012-46065e29ae10}</Project>
-      <Name>InstanceFactory.FromXML</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Vrh.ApplicationContainer\Vrh.ApplicationContainer.csproj">
-      <Project>{0f167592-dcc8-4cf5-9737-6f0b86d0f76f}</Project>
-      <Name>Vrh.ApplicationContainer</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
+    <Content Include="ApplicationContainer.Config.xml" />
     <Content Include="LogConfig.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

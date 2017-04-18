@@ -4,17 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{1F47D82A-1730-41E2-B164-DE5BBAAA4CD3}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{E993C7D1-BEA9-4EB1-8012-46065E29AE10}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Vrh.ApplicationContainert.ConsoleHost</RootNamespace>
-    <AssemblyName>Vrh.ApplicationContainert.ConsoleHost</AssemblyName>
+    <RootNamespace>InstanceFactory.FromXML</RootNamespace>
+    <AssemblyName>InstanceFactory.FromXML</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -38,6 +35,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -60,25 +58,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="IntsnceFactoryFromXML.cs" />
+    <Compile Include="Plugins.Config.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config" />
-    <None Include="Vrh.NugetModuls.Documentations\VRH.Common\ReadMe.md" />
-    <None Include="Vrh.NugetModuls.Documentations\Vrh.LinqXMLProcessor.Base\ReadMe.md" />
-    <None Include="Vrh.NugetModuls.Documentations\Vrh.Logger\ReadMe.md" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\InstanceFactory.Fake\InstanceFactory.Fake.csproj">
-      <Project>{8fda2d43-ed1d-4352-8d5a-ccd4f8c73aa7}</Project>
-      <Name>InstanceFactory.Fake</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\InstanceFactory.FromXMLConfig\InstanceFactory.FromXML.csproj">
-      <Project>{e993c7d1-bea9-4eb1-8012-46065e29ae10}</Project>
-      <Name>InstanceFactory.FromXML</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Vrh.ApplicationContainer\Vrh.ApplicationContainer.csproj">
       <Project>{0f167592-dcc8-4cf5-9737-6f0b86d0f76f}</Project>
       <Name>Vrh.ApplicationContainer</Name>
@@ -88,8 +72,21 @@
     <Content Include="LogConfig.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Plugins.Config.xml">
+      <SubType>Designer</SubType>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="Vrh.NugetModuls.Documentations\VRH.Common\ReadMe.md" />
+    <None Include="Vrh.NugetModuls.Documentations\Vrh.LinqXMLProcessor.Base\ReadMe.md" />
+    <None Include="Vrh.NugetModuls.Documentations\Vrh.Logger\ReadMe.md" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /Y /R "$(SolutionDir)InstanceFactory.FromXMLConfig\bin\$(ConfigurationName)\InstanceFactory.FromXML.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)"
+</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

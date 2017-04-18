@@ -4,17 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{1F47D82A-1730-41E2-B164-DE5BBAAA4CD3}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{13AA79BE-E374-41DE-96A7-F4B725377BA2}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Vrh.ApplicationContainert.ConsoleHost</RootNamespace>
-    <AssemblyName>Vrh.ApplicationContainert.ConsoleHost</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <RootNamespace>IVConnector.Plugin</RootNamespace>
+    <AssemblyName>IVConnector.Plugin</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -40,6 +37,8 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -60,36 +59,71 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="IVConnector.Config.cs" />
+    <Compile Include="IVConnector.cs" />
+    <Compile Include="IVConnectorPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Service References\InterventionService\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config" />
-    <None Include="Vrh.NugetModuls.Documentations\VRH.Common\ReadMe.md" />
-    <None Include="Vrh.NugetModuls.Documentations\Vrh.LinqXMLProcessor.Base\ReadMe.md" />
-    <None Include="Vrh.NugetModuls.Documentations\Vrh.Logger\ReadMe.md" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\InstanceFactory.Fake\InstanceFactory.Fake.csproj">
-      <Project>{8fda2d43-ed1d-4352-8d5a-ccd4f8c73aa7}</Project>
-      <Name>InstanceFactory.Fake</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\InstanceFactory.FromXMLConfig\InstanceFactory.FromXML.csproj">
-      <Project>{e993c7d1-bea9-4eb1-8012-46065e29ae10}</Project>
-      <Name>InstanceFactory.FromXML</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Vrh.ApplicationContainer\Vrh.ApplicationContainer.csproj">
       <Project>{0f167592-dcc8-4cf5-9737-6f0b86d0f76f}</Project>
       <Name>Vrh.ApplicationContainer</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+    <None Include="Service References\InterventionService\Arrays.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\InterventionService\DTM.WCF.InterventionService.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\InterventionService\IVConnector.Plugin.InterventionService.InterventionDefination.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\InterventionService\IVConnector.Plugin.InterventionService.InterventionedObject.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\InterventionService\service.wsdl" />
+    <None Include="Service References\InterventionService\service.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\InterventionService\service1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Vrh.NugetModuls.Documentations\VRH.Common\ReadMe.md" />
+    <None Include="Vrh.NugetModuls.Documentations\Vrh.LinqXMLProcessor.Base\ReadMe.md" />
+    <None Include="Vrh.NugetModuls.Documentations\Vrh.Logger\ReadMe.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="IVConnector.Config.xml" />
     <Content Include="LogConfig.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Service References\InterventionService\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Service References\InterventionService\configuration.svcinfo" />
+    <None Include="Service References\InterventionService\configuration91.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadataStorage Include="Service References\InterventionService\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /Y /R "$(SolutionDir)IVConnector.Plugin\bin\$(ConfigurationName)\IVConnector.Plugin.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\IVConnector"
+xcopy /Y /R "$(SolutionDir)IVConnector.Plugin\IVConnector.Config.xml" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\IVConnector"</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

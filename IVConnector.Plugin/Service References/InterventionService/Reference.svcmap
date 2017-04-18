@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="2047d6fc-e78e-4a03-bece-f1d198c9edac" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings />
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="net.pipe://localhost/DTMInterventionService/mex" Protocol="mex" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="service.wsdl" MetadataType="Wsdl" ID="e1089135-2ebb-4c8c-9105-516e80723c67" SourceId="1" SourceUrl="net.pipe://localhost/DTMInterventionService/mex" />
+    <MetadataFile FileName="service.xsd" MetadataType="Schema" ID="bc5f8edb-be49-4021-8eca-2717884c97a3" SourceId="1" SourceUrl="net.pipe://localhost/DTMInterventionService/mex" />
+    <MetadataFile FileName="service1.xsd" MetadataType="Schema" ID="45f6f770-a6b2-473d-b5b7-ddc2120996f2" SourceId="1" SourceUrl="net.pipe://localhost/DTMInterventionService/mex" />
+    <MetadataFile FileName="DTM.WCF.InterventionService.xsd" MetadataType="Schema" ID="3f26db37-5e4c-4530-85b2-eee9b7d98b40" SourceId="1" SourceUrl="net.pipe://localhost/DTMInterventionService/mex" />
+    <MetadataFile FileName="Arrays.xsd" MetadataType="Schema" ID="0a5206c2-1184-4621-9622-1a669a0f7f64" SourceId="1" SourceUrl="net.pipe://localhost/DTMInterventionService/mex" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

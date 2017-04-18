@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<IVConnectorConfig>
+  <Configuration 	IP="127.0.0.1" Port="3200"
+        MessagePrefix="" MessageSuffix="\x0D0A" IVIDSeparator="#$" ParameterSeparator="@" Ack="\x06" />
+  <!-- egy beavatkozás üzenet formája:
+					[MessagePrefix][AssemblyLineName][IVIDSeparator]
+					[MessageId]
+					[ParameterSeparator][Parameter1]
+					[ParameterSeparator][Parameter2]
+					[ParameterSeparator][Parameter3]
+					[MessageSuffix] -->
+  <!-- IP = ezen az IP-n várja a csatlakozást a szerver -->
+  <!-- Port = ezen a porton várja a csatlakozást a szerver -->
+  <!-- MessagePrefix = a feldolgozandó üzeneteknek ezzel a prefix-szel kell kezdődni -->
+  <!-- MessageSuffix = a feldolgozandó üzeneteknek ezzel a suffix-szel kell végződni -->
+  <!-- IVIDSeparator = a beavatkozás azonosítót a paraméterektől elválasztó karakter sorozat -->
+  <!-- ParameterSeparator = a beavatkozás paramétereket egymástól elválasztó karakter sorozat -->
+  <!-- Ack = Az üzenet sikeres feldolgozása után visszaküüldendő karaktersorozat -->
+  <!-- ha ezek a karaktersorozatok \x-szel kezdődnek, akkor utána hexadecimálisan van leírva a tartalom, tehát \x0D0A a CR-LF karakterek küldését jelenti -->
+  <HandledMessages UserGuid="B4A6BFAD-ECFA-46E3-9CFF-813DCEF76845">
+    <!--
+      ivACTIVATE
+      ivDEACTIVATE
+      ivSET_NUMOFWORKERS
+      ivSET_pEXP
+      ivSET_tNOR
+      ivSET_PARTNUMBER
+      ivSET_MACHINESUPERVISOR
+      ivSHIFTCHANGE
+      ivSHIFTEXTEND
+      ivBREAK_CANCELNEXT
+      ivBREAK_START
+      ivBREAK_STOP
+      ivDTR_SET
+      ivREFRESH
+      ivNEXTPARTNUMBER
+      ivPNCOMPLETED
+      ivEWSACTIVATE
+      ivEWSINACTIVATE
+      ivEWSNEXTSTART
+      ivSET_EPN1QTY
+      ivSET_PRODCOUNT
+      ivLATENEXTPARTNUMBER
+      ivLOGIN
+      ivLOGOUT
+      ivCycle
+      ivSetOnOff
+      ivSetTeam
+      ivPCSTART
+      ivPCEND
+      ivPCPack
+      ivPCPackClose
+      ivWaste
+      ivSuspendOn
+      ivSuspendOff
+      ivANDONSET
+      ivANDONCLEAR
+      ivANDONINI
+      ivSPMPlanGenerate
+    -->
+    <Message MessageId="IVPC" Intervention="ivPCPackClose"/>
+    <Message MessageId="IVPP" Intervention="ivPCPack"/>
+  </HandledMessages>
+</IVConnectorConfig>

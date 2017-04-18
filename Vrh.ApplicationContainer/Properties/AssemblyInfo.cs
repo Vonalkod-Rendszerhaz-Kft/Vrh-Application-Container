@@ -5,13 +5,9 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Vrh.ApplicationContainer.ConsoleHost")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Vrh.ApplicationContainer")]
+[assembly: AssemblyDescription("Application Container Frame")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Vrh.ApplicationContainer.ConsoleHost")]
-[assembly: AssemblyCopyright("Copyright ©  2017")]
-[assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
@@ -20,7 +16,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("1f47d82a-1730-41e2-b164-de5bbaaa4cd3")]
+[assembly: Guid("0f167592-dcc8-4cf5-9737-6f0b86d0f76f")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -32,5 +28,3 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
