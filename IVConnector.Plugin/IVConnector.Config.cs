@@ -37,13 +37,24 @@ namespace IVConnector.Plugin
         }
 
         /// <summary>
+        /// A connector típusa 
+        /// </summary>
+        public IVConnectorType ConnectorType
+        {
+            get
+            {
+                return GetEnumAttributeValue<IVConnectorType>(GetXElement(CONFIGURATION_ELEMENT_NAME), TYPE_ATTRIBUTE_IN_CONFIGURATION_ELEMENT, IVConnectorType.TCP);
+            }
+        }
+
+        /// <summary>
         /// IV Connecrtor Listener IP
         /// </summary>
         public string IP
         {
             get
             {
-                return GetAttribute<string>(GetXElement(CONFIGURATION_ELEMENT_NAME), IP_ATTRIBUTE_IN_CONFIGURATION_ELEMENT, "127.0.0.1");
+                return GetElementValue<string>(GetXElement(CONFIGURATION_ELEMENT_NAME, IP_ELEMENT_NAME), "127.0.0.1");
             }
         }
 
@@ -54,7 +65,7 @@ namespace IVConnector.Plugin
         {
             get
             {
-                return GetAttribute<int>(GetXElement(CONFIGURATION_ELEMENT_NAME), PORT_ATTRIBUTE_IN_CONFIGURATION_ELEMENT, 1981);
+                return GetElementValue<int>(GetXElement(CONFIGURATION_ELEMENT_NAME, PORT_ELEMENT_NAME), 1981);
             }
         }
 
@@ -65,7 +76,7 @@ namespace IVConnector.Plugin
         {
             get
             {
-                return GetAttribute<string>(GetXElement(CONFIGURATION_ELEMENT_NAME), MESSAGEPREFIX_ATTRIBUTE_IN_CONFIGURATION_ELEMENT, String.Empty).FromHexOrThis();
+                return GetElementValue<string>(GetXElement(CONFIGURATION_ELEMENT_NAME, MESSAGEPREFIX_ELEMENT_NAME), String.Empty).FromHexOrThis();
             }
         }
 
@@ -76,7 +87,7 @@ namespace IVConnector.Plugin
         {
             get
             {
-                return GetAttribute<string>(GetXElement(CONFIGURATION_ELEMENT_NAME), MESSAGESUFFIX_ATTRIBUTE_IN_CONFIGURATION_ELEMENT, "\x0D0A").FromHexOrThis();
+                return GetElementValue<string>(GetXElement(CONFIGURATION_ELEMENT_NAME, MESSAGESUFFIX_ELEMENT_NAME), @"\x0D0A").FromHexOrThis();
             }
         }
 
@@ -87,7 +98,7 @@ namespace IVConnector.Plugin
         {
             get
             {
-                return GetAttribute<string>(GetXElement(CONFIGURATION_ELEMENT_NAME), IVIDSEPARATOR_ATTRIBUTE_IN_CONFIGURATION_ELEMENT, "#$").FromHexOrThis();
+                return GetElementValue<string>(GetXElement(CONFIGURATION_ELEMENT_NAME, IVIDSEPARATOR_ELEMENT_NAME), "#$").FromHexOrThis();
             }
         }
 
@@ -98,7 +109,7 @@ namespace IVConnector.Plugin
         {
             get
             {
-                return GetAttribute<string>(GetXElement(CONFIGURATION_ELEMENT_NAME), PARAMETERSEPARATOR_ATTRIBUTE_IN_CONFIGURATION_ELEMENT, "@").FromHexOrThis();
+                return GetElementValue<string>(GetXElement(CONFIGURATION_ELEMENT_NAME, PARAMETERSEPARATOR_ELEMENT_NAME), "@").FromHexOrThis();
             }
         }
 
@@ -109,7 +120,62 @@ namespace IVConnector.Plugin
         {
             get
             {
-                return GetAttribute<string>(GetXElement(CONFIGURATION_ELEMENT_NAME), ACK_ATTRIBUTE_IN_CONFIGURATION_ELEMENT, "\x06").FromHexOrThis();
+                return GetElementValue<string>(GetXElement(CONFIGURATION_ELEMENT_NAME, ACK_ELEMENT_NAME), "\x06").FromHexOrThis();
+            }
+        }
+
+        /// <summary>
+        /// Bejövő MSMQ címe
+        /// </summary>
+        public string InQueue
+        {
+            get
+            {
+                return GetElementValue<string>(GetXElement(CONFIGURATION_ELEMENT_NAME, INQUEUE_ELEMENT_NAME), "");
+            }
+        }
+
+        /// <summary>
+        /// Válasz MSMQ címe
+        /// </summary>
+        public string ResponseQueue
+        {
+            get
+            {
+                return GetElementValue<string>(GetXElement(CONFIGURATION_ELEMENT_NAME, RESPONSEQUEUE_ELEMENT_NAME), "");
+            }
+        }
+
+        /// <summary>
+        /// Csak a megadott Filtereknek megfelelő label-lel rendelkező üzeneteket dolgozza fel 
+        /// </summary>
+        public string LabelFilters
+        {
+            get
+            {
+                return GetElementValue<string>(GetXElement(CONFIGURATION_ELEMENT_NAME, LABELFILTER_ELEMENT_NAME), "");
+            }
+        }
+
+        /// <summary>
+        /// Megmondja, milyen Id kezelés van konfigurálva
+        /// </summary>
+        public MSMQIdHandling IdHandling
+        {
+            get
+            {
+                return GetEnumValue<MSMQIdHandling>(GetXElement(CONFIGURATION_ELEMENT_NAME, IDHANDLING_ELEMENT_NAME), MSMQIdHandling.None);
+            }
+        }
+
+        /// <summary>
+        /// Válasz MSMQ üzenet címkéje
+        /// </summary>
+        public string ResponseLabel
+        {
+            get
+            {
+                return GetElementValue<string>(GetXElement(CONFIGURATION_ELEMENT_NAME, RESPONSELABEL_ELEMENT_NAME), "");
             }
         }
 
@@ -158,13 +224,20 @@ namespace IVConnector.Plugin
 
         private const string IVCONNECTORCONFIG_ELEMENT_NAME = "IVConnectorConfig";
         private const string CONFIGURATION_ELEMENT_NAME = "Configuration";
-        private const string IP_ATTRIBUTE_IN_CONFIGURATION_ELEMENT = "IP";
-        private const string PORT_ATTRIBUTE_IN_CONFIGURATION_ELEMENT = "Port";
-        private const string MESSAGEPREFIX_ATTRIBUTE_IN_CONFIGURATION_ELEMENT = "MessagePrefix";
-        private const string MESSAGESUFFIX_ATTRIBUTE_IN_CONFIGURATION_ELEMENT = "MessageSuffix";
-        private const string IVIDSEPARATOR_ATTRIBUTE_IN_CONFIGURATION_ELEMENT = "IVIDSeparator";
-        private const string PARAMETERSEPARATOR_ATTRIBUTE_IN_CONFIGURATION_ELEMENT = "ParameterSeparator";
-        private const string ACK_ATTRIBUTE_IN_CONFIGURATION_ELEMENT = "Ack";
+        private const string TYPE_ATTRIBUTE_IN_CONFIGURATION_ELEMENT = "Type";
+        private const string IP_ELEMENT_NAME = "IP";
+        private const string PORT_ELEMENT_NAME = "Port";
+        private const string MESSAGEPREFIX_ELEMENT_NAME = "MessagePrefix";
+        private const string MESSAGESUFFIX_ELEMENT_NAME = "MessageSuffix";
+        private const string IVIDSEPARATOR_ELEMENT_NAME = "IVIDSeparator";
+        private const string PARAMETERSEPARATOR_ELEMENT_NAME = "ParameterSeparator";
+        private const string ACK_ELEMENT_NAME = "Ack";
+        private const string INQUEUE_ELEMENT_NAME = "InQueue";
+        private const string RESPONSEQUEUE_ELEMENT_NAME = "ResponseQueue";
+        private const string LABELFILTER_ELEMENT_NAME = "LabelFilter";
+        private const string IDHANDLING_ELEMENT_NAME = "IdHandling";
+        private const string RESPONSELABEL_ELEMENT_NAME = "ResponseLabel";
+
         private const string HANDLEDMESSAGES_ELEMENT_NAME = "HandledMessages";
         private const string USERGUID_ATTRIBUTE_IN_HANDLEDMESSAGES_ELEMENT = "UserGuid";        
         private const string MESSAGE_ELEMENT_NAME = "Message";

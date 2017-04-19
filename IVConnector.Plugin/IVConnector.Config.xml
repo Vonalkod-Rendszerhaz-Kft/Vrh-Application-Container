@@ -1,7 +1,26 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <IVConnectorConfig>
-  <Configuration 	IP="127.0.0.1" Port="3200"
-        MessagePrefix="" MessageSuffix="\x0D0A" IVIDSeparator="#$" ParameterSeparator="@" Ack="\x06" />
+  <Configuration Type="MSMQ">
+    <InQueue>.\private$\TEST</InQueue>  
+    <ResponseQueue>.\private$\Out</ResponseQueue>
+    <LabelFilter>!Response</LabelFilter>
+    <ResponseLabel>Response {0}</ResponseLabel>
+    <!-- CorrelationId, Label, None -->
+    <IdHandling>CorrelationId</IdHandling>
+    <IVIDSeparator>#$</IVIDSeparator>
+    <ParameterSeparator>@</ParameterSeparator>
+  </Configuration>
+  <!--
+  <Configuration Type="TCP">
+    <IP>127.0.0.1</IP>
+    <Port>3200</Port>
+    <MessagePrefix></MessagePrefix>
+    <MessageSuffix>\x0D0A</MessageSuffix>
+    <IVIDSeparator>#$</IVIDSeparator>
+    <ParameterSeparator>@</ParameterSeparator>
+    <Ack>\x06</Ack>
+  </Configuration>
+  -->
   <!-- egy beavatkozás üzenet formája:
 					[MessagePrefix][AssemblyLineName][IVIDSeparator]
 					[MessageId]

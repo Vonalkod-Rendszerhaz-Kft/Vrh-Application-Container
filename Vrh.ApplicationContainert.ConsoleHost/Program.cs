@@ -9,6 +9,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Vrh.ApplicationContainer;
 using Vrh.Logger;
+using System.Messaging;
+using System.IO;
 
 namespace Vrh.ApplicationContainer.ConsoleHost
 {
@@ -16,6 +18,25 @@ namespace Vrh.ApplicationContainer.ConsoleHost
     {
         static void Main(string[] args)
         {
+            //var mq = new MessageQueue(@".\private$\Test");
+            //mq.Formatter = new ActiveXMessageFormatter();
+            ////MessageQueue.Exists();
+            ////mq.Peek()
+
+            
+            //Message msg = new Message();
+            
+            ////msg.ResponseQueue = this.responseQueue;
+            //msg.Formatter = new ActiveXMessageFormatter();
+            //msg.Label = "Test";
+            //msg.BodyStream = new MemoryStream(Encoding.UTF8.GetBytes("AS01#$IVPC@1"));
+            //msg.UseDeadLetterQueue = true;
+            //mq.MessageReadPropertyFilter.CorrelationId = true;
+            ////msg.CorrelationId = "1".PadLeft(20, '0');
+            ////msg.TimeToBeReceived = TimeSpan.FromMinutes(settings.MSMQReceiveTimout);
+            //mq.Send(msg);
+            ////this.collerationId = msg.Id;
+
             ApplicationContainer appC = null;
             try
             {
