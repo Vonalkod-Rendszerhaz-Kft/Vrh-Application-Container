@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.Test", "Plugin.Test\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IVConnector.Plugin", "IVConnector.Plugin\IVConnector.Plugin.csproj", "{13AA79BE-E374-41DE-96A7-F4B725377BA2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iSchedulerMonitor", "iSchedulerMonitor\iSchedulerMonitor.csproj", "{E2EE1A88-D8A2-4031-9A8A-CFF111E87FB3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,10 @@ Global
 		{13AA79BE-E374-41DE-96A7-F4B725377BA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{13AA79BE-E374-41DE-96A7-F4B725377BA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{13AA79BE-E374-41DE-96A7-F4B725377BA2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E2EE1A88-D8A2-4031-9A8A-CFF111E87FB3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2EE1A88-D8A2-4031-9A8A-CFF111E87FB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2EE1A88-D8A2-4031-9A8A-CFF111E87FB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2EE1A88-D8A2-4031-9A8A-CFF111E87FB3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -56,5 +62,6 @@ Global
 		{8FDA2D43-ED1D-4352-8D5A-CCD4F8C73AA7} = {DFAA4713-DE67-4DF8-A7E3-DC992C935CD3}
 		{B0B86A2A-7F39-40C4-82C5-FEA9ADC1D62B} = {DFAA4713-DE67-4DF8-A7E3-DC992C935CD3}
 		{13AA79BE-E374-41DE-96A7-F4B725377BA2} = {DFAA4713-DE67-4DF8-A7E3-DC992C935CD3}
+		{E2EE1A88-D8A2-4031-9A8A-CFF111E87FB3} = {DFAA4713-DE67-4DF8-A7E3-DC992C935CD3}
 	EndGlobalSection
 EndGlobal
