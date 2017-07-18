@@ -495,9 +495,6 @@ Az alábbi szabályok és elvek elvárások a Pluginnal szemben:
 <hr></hr>
 
 # Version History:
-## V1.1.1 (2017.04.05)      
-### Patches:
-1. Objektum unboxing a Log hívás összes paramétereire, hogy ne írják felül a referenciák
 ## V1.1.0 (2017.03.21)      
 ### Compatibility API changes:
 1. LogHelper.GetExceptionData bevezetése

@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Plugins>
+
+	<Plugin Description="Scheduler Monitor" Assembly="iSchedulerMonitor.dll" 
+			Type="iSchedulerMonitor.MonitorPlugin" Version="1.0.0-alpha" Singletone="false" AutoStart ="true" PluginDirectory="iSchedulerMonitor">
+		<Instance	Id="Monitor1" 
+					Name="SchedulerMonitor_for_LearALM" 
+					Description="Időzített feladatok figyelése a LearALM-ben." 
+					InstanceConfig="d:\Google Drive\!Dev\VRH\iScheduler\Vrh.iScheduler\App_Data\iScheduler\iScheduler.xml"/>
+	</Plugin>  
+	
+</Plugins>	

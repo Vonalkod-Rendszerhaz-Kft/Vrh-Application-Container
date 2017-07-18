@@ -4,5 +4,6 @@
     <InstanceFactoryAssembly>InstanceFactory.FromXMLConfig.dll</InstanceFactoryAssembly>
     <InstanceFactoryType>InstanceFactory.FromXMLConfig.IntsnceFactoryFromXMLConfig</InstanceFactoryType>
     <InstanceFactoryVersion>0.1.0-preAlpha</InstanceFactoryVersion>
+    <MessageStackSize>1000</MessageStackSize>
   </Config>
 </Vrh.ApplicationContainer>

@@ -44,6 +44,7 @@ namespace iSchedulerMonitor
             }
             string pluginConfig = String.IsNullOrEmpty(_myData.InstanceConfig) ? _myData.Type.PluginConfig : _myData.InstanceConfig;
             _monitor = new Monitor();
+
             try
             {
                 //_monitor.Start();

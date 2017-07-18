@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Vrh.Logger>
-  <LogLevel>Verbose</LogLevel>
+  <LogLevel>Warning</LogLevel>
   <EnableConsoleLogging>True</EnableConsoleLogging>
   <EnableDebuggerLogging>True</EnableDebuggerLogging>
   <UsedLogger>DefaultLogger</UsedLogger>
