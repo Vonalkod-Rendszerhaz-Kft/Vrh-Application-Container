@@ -24,16 +24,18 @@ namespace iSchedulerMonitor
         /// <summary>
         /// iSchedulerMonitor időzítés figyelő osztály.
         /// </summary>
-        /// <param name="xmlpath">iScheduler.xml elérési helye a névvel együtt.</param>
-        public Monitor(string xmlpath)
+        /// <param name="localPath">iScheduler.xml elérési helye a névvel együtt a plugin futtató környezetében.</param>
+        /// <param name="remotePath">ScheduleExecute akció által használt iScheduler.xml elérési helye a névvel együtt
+        /// a távoli gépen. Ha egy gépen fut, akkor nem kötelező.</param>
+        public Monitor(string localPath, string remotePath = null)
         {
-            log($"PREPARATION: xmlpath={xmlpath}");
+            log($"PREPARATION: xmlpath={localPath}");
 
-            m_xmlp = new iSchedulerXMLProcessor(xmlpath);
+            m_xmlp = new iSchedulerXMLProcessor(localPath, remotePath);
 
             log($"PREPARATION: Set timer! CheckInterval={m_xmlp.CheckInterval}s");
-            //m_timer = new Timer(m_xmlp.CheckInterval * 1000); // !!! Ez itt a jó sor !!!
-            m_timer = new Timer(5000); // !!! Ez meg itt a debug !!!
+            m_timer = new Timer(m_xmlp.CheckInterval * 1000); // !!! Ez itt a jó sor !!!
+            //m_timer = new Timer(5000); // !!! Ez meg itt a debug !!!
             m_timer.Elapsed += OnExamination;
 
             log("PREPARATION ready.", LogLevel.Verbose);
@@ -99,7 +101,7 @@ namespace iSchedulerMonitor
                                     {
                                         log($"Scheduled job execute started. id = {id}", LogLevel.Verbose);
                                         string execurl = m_xmlp.ExecuteUrl.GetUrl();
-                                        execurl = execurl.Replace("@PATH@", m_xmlp.XmlFilePath);
+                                        execurl = execurl.Replace("@PATH@", m_xmlp.XmlRemotePath);
                                         execurl = execurl.Replace("@ID@", id.ToString());
                                         log($"EXAMINATION: ScheduleExecute url = {execurl}");
 

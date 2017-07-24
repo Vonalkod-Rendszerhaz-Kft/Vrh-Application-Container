@@ -125,21 +125,24 @@
 
         public int CheckIntervalMaximum { get; private set; }
 
-        public string XmlFilePath { get; private set; }
+        public string XmlLocalPath { get; private set; }
+
+        public string XmlRemotePath { get; private set; }
 
         #endregion Properties
 
-        public iSchedulerXMLProcessor(string xmlPath) : base()
+        public iSchedulerXMLProcessor(string localPath, string remotePath = null) : base()
         {
             try
             {
                 _xmlNameSpace = String.Empty;
-                _xmlFileDefinition = "@" + xmlPath;
+                _xmlFileDefinition = "@" + localPath;
 
                 this.LCID = "en-US";    //fix érték, mert nincs honnan megtudni a beállítást!
                 this.CheckIntervalMinimum = 60; // 1 perc
                 this.CheckIntervalMaximum = 86400; // 1 nap
-                this.XmlFilePath = xmlPath;
+                this.XmlLocalPath = localPath;
+                this.XmlRemotePath = String.IsNullOrEmpty(remotePath) ? localPath : remotePath;
 
                 _CheckInterval = -1 ;    // annak jelzésére, hogy a beállítás nem történt meg.
 

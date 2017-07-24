@@ -89,9 +89,10 @@ namespace iSchedulerMonitor
             if (_monitor != null) _monitor.Dispose();
 
             string pluginConfig = String.IsNullOrEmpty(_myData.InstanceConfig) ? _myData.Type.PluginConfig : _myData.InstanceConfig;
-            System.Diagnostics.Debug.WriteLine($"MonitorPlugin pluginConfig={pluginConfig}");
+            string pluginData = _myData.InstanceData == null ? null : (string)_myData.InstanceData; 
+            System.Diagnostics.Debug.WriteLine($"MonitorPlugin pluginConfig={pluginConfig};pluginData={pluginData}");
 
-            _monitor = new Monitor(pluginConfig);
+            _monitor = new Monitor(pluginConfig, pluginData);
 
             try
             {
