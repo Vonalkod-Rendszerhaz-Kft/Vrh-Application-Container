@@ -10,75 +10,16 @@ namespace iSchedulerMonitor
 {
     public class MonitorPlugin : PluginAncestor
     {
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        private MonitorPlugin()
-        {
-            EndLoad();
-        }
+        #region Privates
 
         /// <summary>
-        /// Factory
+        /// iSchedulerMonitor példány
         /// </summary>
-        /// <param name="instanceDefinition">A példány definiciója</param>
-        /// <param name="instanceData">Not used in this plugin</param>
-        /// <returns></returns>
-        public static MonitorPlugin MonitorPluginFactory(InstanceDefinition instanceDefinition, Object instanceData)
-        {
-            var instance = new MonitorPlugin();
-            instance._myData = instanceDefinition;
-            return instance;
-        }
+        private Monitor _monitor;
 
-        /// <summary>
-        /// IPlugin.Start
-        /// </summary>
-        public override void Start()
-        {
-            BeginStart();
-            // Implement Plugin logic here
-            if (_monitor!= null)
-            {
-                _monitor.Dispose();
-            }
-            string pluginConfig = String.IsNullOrEmpty(_myData.InstanceConfig) ? _myData.Type.PluginConfig : _myData.InstanceConfig;
-            _monitor = new Monitor();
+        #endregion Privates
 
-            try
-            {
-                //_monitor.Start();
-                base.Start();
-            }
-            catch (Exception ex)
-            {
-                SetErrorState(ex);
-            }
-        }
-
-        /// <summary>
-        /// IPlugin.Stop
-        /// </summary>
-        public override void Stop()
-        {
-            BeginStop();
-            try
-            {
-                // Implement stop logic here
-                if (_monitor != null)
-                {
-                    //_monitor.Stop();
-                    _monitor.Dispose();
-                    _monitor = null;
-                }
-                base.Stop();
-            }
-            catch (Exception ex)
-            {
-                SetErrorState(ex);
-            }
-
-        }
+        #region Properties
 
         /// <summary>
         /// Plugin Instance azonosító
@@ -102,10 +43,93 @@ namespace iSchedulerMonitor
             }
         }
 
+        #endregion Properties
+
+        #region Constructor
+
         /// <summary>
-        /// IScheduler példány
+        /// Constructor
         /// </summary>
-        private Monitor _monitor;
+        private MonitorPlugin()
+        {
+            EndLoad();
+        }
+
+        #endregion Constructor
+
+        /// <summary>
+        /// Factory
+        /// </summary>
+        /// <param name="instanceDefinition">A példány definiciója</param>
+        /// <param name="instanceData">Not used in this plugin</param>
+        /// <returns></returns>
+        public static MonitorPlugin MonitorPluginFactory(InstanceDefinition instanceDefinition, Object instanceData)
+        {
+            var instance = new MonitorPlugin();
+            instance._myData = instanceDefinition;
+            return instance;
+        }
+
+        #region Public override methods
+
+        #region Start override method
+        /// <summary>
+        /// base.BeginStart meghívása, valamint a plugin elindítása.
+        /// Vagy példányosítással, vagy egy olyan metódussal, ami elindítja.
+        /// Célszerűen ha a példányosítás nem sikerül, az FATAL ERROR.
+        /// De ha csak a plugin elindítása nem sikerül, akkor csak HIBA állapotba kerül a plugin.
+        /// </summary>
+        public override void Start()
+        {
+            System.Diagnostics.Debug.WriteLine("MonitorPlugin START.");
+            BeginStart();
+            
+            // Implement Plugin logic here
+            // Ha netán újra indítják, akkor az előzőt el kell dobni!
+            if (_monitor != null) _monitor.Dispose();
+
+            string pluginConfig = String.IsNullOrEmpty(_myData.InstanceConfig) ? _myData.Type.PluginConfig : _myData.InstanceConfig;
+            System.Diagnostics.Debug.WriteLine($"MonitorPlugin pluginConfig={pluginConfig}");
+
+            _monitor = new Monitor(pluginConfig);
+
+            try
+            {
+                System.Diagnostics.Debug.WriteLine($"MonitorPlugin _monitor.Start");
+                _monitor.Start();
+                base.Start();
+            }
+            catch (Exception ex)
+            {
+                SetErrorState(ex);
+            }
+        }
+        #endregion Start override method
+
+        #region Stop override method
+        /// <summary>
+        /// base.BeginStop és a Dispose meghívása.
+        /// </summary>
+        public override void Stop()
+        {
+            base.BeginStop();
+            try
+            {
+                // Implement stop logic here
+                if (_monitor != null)
+                {
+                    _monitor.Stop();
+                    _monitor.Dispose();
+                    _monitor = null;
+                }
+                base.Stop();
+            }
+            catch (Exception ex)
+            {
+                SetErrorState(ex);
+            }
+        }
+        #endregion
 
         #region IDisposable Support
         protected override void Dispose(bool disposing)
@@ -145,7 +169,8 @@ namespace iSchedulerMonitor
             // TODO: uncomment the following line if the finalizer is overridden above.
             // GC.SuppressFinalize(this);
         }
-        #endregion
+        #endregion IDisposable Support
 
+        #endregion Public override methods
     }
 }
