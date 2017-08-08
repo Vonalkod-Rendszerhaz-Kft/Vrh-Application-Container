@@ -46,7 +46,7 @@ namespace iSchedulerMonitor
         public void Start()
         {
             log("iSchedulerMonitor started.", LogLevel.Information);
-            Examination(DateTime.Now);
+            //Examination(DateTime.Now);
             m_timer.Start();
         }
         public void Stop()
