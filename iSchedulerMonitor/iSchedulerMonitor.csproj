@@ -50,6 +50,10 @@
     <Reference Include="Vrh.Common.Serialization.Structures">
       <HintPath>..\Vrh.StandardReferences\Vrh.Common.Serialization.Structures\Vrh.Common.Serialization.Structures.dll</HintPath>
     </Reference>
+    <Reference Include="VRH.ConnectionStringStore, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\VRH.ConnectionStringStore.1.3.0\lib\net45\VRH.ConnectionStringStore.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Vrh.LinqXMLProcessor.Base, Version=1.2.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Vrh.LinqXMLProcessor.Base.1.2.2\lib\net40\Vrh.LinqXMLProcessor.Base.dll</HintPath>
       <Private>True</Private>
@@ -87,6 +91,7 @@
   <PropertyGroup>
     <PostBuildEvent>xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\iSchedulerMonitor.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\iSchedulerMonitor"
 xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\Vrh.Common.Serialization.Structures.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)"
+xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\VRH.ConnectionStringStore.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)"
 xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\iSchedulerMonitor.Config.xml" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\iSchedulerMonitor"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

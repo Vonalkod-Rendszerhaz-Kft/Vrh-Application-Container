@@ -29,10 +29,14 @@
         private class Elements
         {
             public const string DATABASECONNECTIONSTRING = "DatabaseConnectionString";
+            public const string OBJECTTYPE = "ObjectType";
+            public const string GROUPID = "GroupId";
+
             public const string MONITORSERVICE = "MonitorService";
             public const string EXECUTEURL = "ExecuteUrl";
             public const string LOGINURL = "LoginUrl";
             public const string CHECKINTERVAL = "CheckInterval";
+            public const string RESPONSETIMEOUT = "ResponseTimeout";
         }
 
         private class Attributes
@@ -60,7 +64,51 @@
         /// </summary>
         public List<StringElement> ConnectionStrings { get; private set; }
 
+        /// <summary>
+        /// Az adatbázishoz való kapcsolódás adatai.
+        /// A ConnectionStringStore által feloldott érték, ha nem tudta feloldani akkor ami az xml-ben van.
+        /// </summary>
         public string DatabaseConnectionString { get; private set; }
+
+        /// <summary>
+        /// Az xml-ben található object type.
+        /// </summary>
+        public string ObjectType { get; private set; }
+
+        /// <summary>
+        /// Az xml-ben található GroupId érték.
+        /// </summary>
+        public string GroupId { get; private set; }
+
+        #region ResponseTimeout property
+        /// <summary>
+        /// CookieWebClient request timeout értékét ennyire kell beállítani másodpercben.
+        /// Minimum: 10 sec, maximum: 3600 sec (1óra).
+        /// Ha a tulajdonság nem létezik, vagy értelmezhetetlen, akkor 0 lesz az értéke,
+        /// ami azt jelenti a CookieWebClient számára, hogy marad az alapértelmezés.
+        /// </summary>
+        private int _ResponseTimeout;
+        public int ResponseTimeout
+        {
+            get
+            {
+                if (_ResponseTimeout < 0)
+                {
+                    string respint = GetElementValue(GetXElement(Elements.MONITORSERVICE, Elements.RESPONSETIMEOUT), "");
+                    if (String.IsNullOrWhiteSpace(respint))
+                    {
+                        _ResponseTimeout = 0;
+                    }
+                    else
+                    {
+                        if (!Int32.TryParse(respint, out _ResponseTimeout)) _ResponseTimeout = 0;
+                    }
+                    _ResponseTimeout = Math.Min(Math.Max(_ResponseTimeout, this.CheckIntervalMinimum), this.CheckIntervalMaximum);
+                }
+                return _ResponseTimeout;
+            }
+        }
+        #endregion ResponseTimeout properties
 
         #region ExecuteUrl property
         private UrlElement _ExecuteUrl;
@@ -105,7 +153,7 @@
             {
                 if (_CheckInterval < this.CheckIntervalMinimum)
                 {
-                    string chckint = GetElementValue(GetXElement(Elements.MONITORSERVICE,Elements.CHECKINTERVAL), "");
+                    string chckint = GetElementValue(GetXElement(Elements.MONITORSERVICE, Elements.CHECKINTERVAL), "");
                     if (String.IsNullOrEmpty(chckint))
                     {
                         _CheckInterval = this.CheckIntervalMinimum;
@@ -114,16 +162,20 @@
                     {
                         if (!Int32.TryParse(chckint, out _CheckInterval)) _CheckInterval = this.CheckIntervalMinimum;
                     }
-                    _CheckInterval = Math.Min(Math.Max(_CheckInterval, this.CheckIntervalMinimum),this.CheckIntervalMaximum);
+                    _CheckInterval = Math.Min(Math.Max(_CheckInterval, this.CheckIntervalMinimum), this.CheckIntervalMaximum);
                 }
                 return _CheckInterval;
             }
         }
-        #endregion Properties
+        #endregion CheckInterval properties
 
         public int CheckIntervalMinimum { get; private set; }
 
         public int CheckIntervalMaximum { get; private set; }
+
+        public int ResponseTimeoutMinimum { get; private set; }
+
+        public int ResponseTimeoutMaximum { get; private set; }
 
         public string XmlLocalPath { get; private set; }
 
@@ -141,10 +193,13 @@
                 this.LCID = "en-US";    //fix érték, mert nincs honnan megtudni a beállítást!
                 this.CheckIntervalMinimum = 60; // 1 perc
                 this.CheckIntervalMaximum = 86400; // 1 nap
+                this.ResponseTimeoutMinimum = 10; // 10 másodperc
+                this.ResponseTimeoutMaximum = 3600; // 1 óra
                 this.XmlLocalPath = localPath;
                 this.XmlRemotePath = String.IsNullOrEmpty(remotePath) ? localPath : remotePath;
 
-                _CheckInterval = -1 ;    // annak jelzésére, hogy a beállítás nem történt meg.
+                this._CheckInterval = -1;   // annak jelzése, hogy a beállítás még nem történt meg.
+                this._ResponseTimeout = -1; // annak jelzése, hogy a beállítás még nem történt meg.
 
                 #region strings load
                 this.Strings = new List<StringElement>();
@@ -180,16 +235,36 @@
                 #region DatabaseConnectionString parser
 
                 this.DatabaseConnectionString = GetElementValue(GetXElement(Elements.DATABASECONNECTIONSTRING), "");
-                if (String.IsNullOrEmpty(this.DatabaseConnectionString))
+                if (String.IsNullOrWhiteSpace(this.DatabaseConnectionString))
                 {
                     AddErr($"The <{Elements.DATABASECONNECTIONSTRING}> element is missing or empty!");
                 }
                 else
                 {
-                    this.DatabaseConnectionString = StringElement.FindString(this.ConnectionStrings, this.DatabaseConnectionString, this.LCID);
+                    string constr = StringElement.FindString(this.ConnectionStrings, this.DatabaseConnectionString, this.LCID);
+                    try { this.DatabaseConnectionString = VRH.ConnectionStringStore.VRHConnectionStringStore.GetConnectionString(constr, false); }
+                    catch (Exception) { this.DatabaseConnectionString = constr; }
                 }
 
                 #endregion Database parser
+
+                #region ObjectType parser
+
+                this.ObjectType = GetElementValue(GetXElement(Elements.OBJECTTYPE), "");
+                if (String.IsNullOrWhiteSpace(this.ObjectType)) AddErr($"The <{Elements.OBJECTTYPE}> element is missing or empty!");
+
+                #endregion ObjectType parser
+
+                #region GroupId parser
+
+                this.GroupId = GetElementValue(GetXElement(Elements.GROUPID), "");
+                if (String.IsNullOrWhiteSpace(this.GroupId)) AddErr($"The <{Elements.GROUPID}> element is missing or empty!");
+                else if (this.GroupId.Trim() == "*") AddErr($"The value of the <{Elements.GROUPID}> element can not equal '*'!");
+
+                #endregion GroupId parser
+
+                #region ResponseTimeout parser
+                #endregion ResponseTimeout parser
 
                 if (this.ErrorMessage != String.Empty) throw new ApplicationException(this.ErrorMessage);
             }
