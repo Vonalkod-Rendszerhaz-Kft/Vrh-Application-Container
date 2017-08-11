@@ -32,6 +32,7 @@ namespace iSchedulerMonitor
             log($"PREPARATION: xmlpath={localPath}");
 
             m_xmlp = new iSchedulerXMLProcessor(localPath, remotePath);
+            log($"PREPARATION: XMLProcesszor OK. ObjectType={m_xmlp.ObjectType}, GroupId={m_xmlp.GroupId}, ResponseTimeout={m_xmlp.ResponseTimeout}s");
 
             log($"PREPARATION: Set timer! CheckInterval={m_xmlp.CheckInterval}s");
             m_timer = new Timer(m_xmlp.CheckInterval * 1000); // !!! Ez itt a jó sor !!!
@@ -46,7 +47,6 @@ namespace iSchedulerMonitor
         public void Start()
         {
             log("iSchedulerMonitor started.", LogLevel.Information);
-            //Examination(DateTime.Now);
             m_timer.Start();
         }
         public void Stop()
@@ -65,11 +65,16 @@ namespace iSchedulerMonitor
         }
 
         #region Examination
+        /// <summary>
+        /// Időzített események megkeresése, és végrehajtása.
+        /// </summary>
+        /// <param name="signalTime"></param>
         private void Examination(DateTime signalTime)
         {
             try
             {
                 log($"Examination START. Signal time = {signalTime:HH:mm:ss}", LogLevel.Verbose);
+                log($"EXAMINATION: DatabaseConnectionString={m_xmlp.DatabaseConnectionString}");
 
                 using (SqlConnection cnn = new SqlConnection(m_xmlp.DatabaseConnectionString))
                 {
@@ -88,7 +93,8 @@ namespace iSchedulerMonitor
                             Uri loginUri = new Uri(m_xmlp.LoginUrl.GetUrl());
                             using (CookieWebClient wc = new CookieWebClient(loginUri, "Developer", "Dev123"))
                             {
-                                log($"EXAMINATION: Login success.");
+                                if (m_xmlp.ResponseTimeout > 0) wc.Timeout = m_xmlp.ResponseTimeout * 1000; // itt millisecundumban kell
+                                log($"EXAMINATION: Login success. WebClient.Timeout={wc.Timeout}");
 
                                 int ixID = rdr.GetOrdinal("Id");
 
