@@ -78,10 +78,17 @@ namespace iSchedulerMonitor
 
                 using (SqlConnection cnn = new SqlConnection(m_xmlp.DatabaseConnectionString))
                 {
-                    string scmd = $"select * from iScheduler.Schedules where State = 0 and OperationTime < @now order by OperationTime";
+                    string scmd = String.Concat(
+                        " select *",
+                        " from iScheduler.Schedules s",
+                        "    inner join iScheduler.ScheduleObjects so on s.ScheduleObjectId = so.Id",
+                        " where s.[State] = 0 and s.OperationTime < @signalTime",
+                        "   and so.ObjectType = @objectType and so.ObjectGroupId = @groupId");
                     using (SqlCommand cmd = new SqlCommand(scmd, cnn))
                     {
-                        cmd.Parameters.Add(new SqlParameter("now", signalTime));
+                        cmd.Parameters.Add(new SqlParameter("signalTime", signalTime));
+                        cmd.Parameters.Add(new SqlParameter("objectType", m_xmlp.ObjectType));
+                        cmd.Parameters.Add(new SqlParameter("groupId", m_xmlp.GroupId));
                         cnn.Open();
                         log($"EXAMINATION: Connection opened.");
 
