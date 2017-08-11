@@ -3,6 +3,7 @@
   <LogLevel>Warning</LogLevel>
   <EnableConsoleLogging>True</EnableConsoleLogging>
   <EnableDebuggerLogging>True</EnableDebuggerLogging>
+  <EnableFileLogging LogDirectory="Log" LogFile="Vrh.Logger.TxtLog.log">True</EnableFileLogging>
   <UsedLogger>DefaultLogger</UsedLogger>
   <LoggerErrorLogDirectory>Log</LoggerErrorLogDirectory>
   <LoggerErrorLogFile>Vrh.Logger.Errors.log</LoggerErrorLogFile>

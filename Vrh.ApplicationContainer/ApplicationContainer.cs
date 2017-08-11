@@ -62,110 +62,110 @@ namespace Vrh.ApplicationContainer
             LogThis(String.Format("Vrh.ApplicationContainer {0} started.", this.GetType().Assembly.Version()), data, null, LogLevel.Information);
         }
 
-        private void TestDiagnostic()
-        {
-            ulong address = 0;
-            unsafe
-            {
-                Object o = (Object)_pluginContainer.FirstOrDefault().Value;
-                TypedReference tr = __makeref(o);
-                IntPtr ptr = **(IntPtr**)(&tr);
-                address = (ulong)ptr;
-            }
-            using (DataTarget target = DataTarget.AttachToProcess(
-                Process.GetCurrentProcess().Id, 5000, AttachFlag.Passive))
-            {
-                ClrRuntime runtime = target.ClrVersions.First().CreateRuntime();
-                //foreach (var item in runtime.AppDomains)
-                //{
-                //    Console.WriteLine("Appdomain info:");
-                //    Console.WriteLine("Name: {0}\nAddress: {1}\n {2},ApplicationBase: {3}\nId: {4}",
-                //    item.Name, item.Address, item.ApplicationBase, item.ConfigurationFile, item.Id);
-                //    foreach (var module in item.Modules)
-                //    {
-                //        //Console.WriteLine(module.AssemblyName);
-                //    }
-                //}
-                ClrHeap heap = runtime.GetHeap();
-                foreach (var item in runtime.Threads)
-                {
-                    Console.WriteLine(item.OSThreadId);
-                }
-                var c = Process.GetCurrentProcess();
-                var t = c.Threads;
-                foreach (ProcessThread item in t)
-                {
-                    if (item.TotalProcessorTime == new TimeSpan(0, 0, 0))
-                    {
-                        continue;
-                    }
-                    Console.WriteLine("__________________________________");
-                    ClrThread clrT = runtime.Threads.FirstOrDefault(x => x.OSThreadId == item.Id);
-                    if (clrT != null)
-                    {
-                        Console.WriteLine(clrT.EnumerateStackTrace().FirstOrDefault()?.DisplayString);
-                        Console.WriteLine(clrT.EnumerateStackTrace().LastOrDefault()?.DisplayString);
-                    }
-                    //Console.WriteLine();
-                    Console.WriteLine("ID: {0} StartTime: {1} State: {2} TotalPT: {3} UserPT: {4}, PrivilegedPT: {5} WR: {6}"
-                        , item.Id, item.StartTime, item.ThreadState, item.TotalProcessorTime, item.UserProcessorTime, item.PrivilegedProcessorTime, item.ThreadState == System.Diagnostics.ThreadState.Wait ? item.WaitReason.ToString() : "");
-                }
-                Console.WriteLine(heap.TotalHeapSize);
-                ClrType type = heap.GetObjectType(address);
-                foreach (var item in type.Fields)
-                {
-                    Console.WriteLine("{0}: {1}", item.Name, item.GetAddress(address));
-                }
+        //private void TestDiagnostic()
+        //{
+        //    ulong address = 0;
+        //    unsafe
+        //    {
+        //        Object o = (Object)_pluginContainer.FirstOrDefault().Value;
+        //        TypedReference tr = __makeref(o);
+        //        IntPtr ptr = **(IntPtr**)(&tr);
+        //        address = (ulong)ptr;
+        //    }
+        //    using (DataTarget target = DataTarget.AttachToProcess(
+        //        Process.GetCurrentProcess().Id, 5000, AttachFlag.Passive))
+        //    {
+        //        ClrRuntime runtime = target.ClrVersions.First().CreateRuntime();
+        //        //foreach (var item in runtime.AppDomains)
+        //        //{
+        //        //    Console.WriteLine("Appdomain info:");
+        //        //    Console.WriteLine("Name: {0}\nAddress: {1}\n {2},ApplicationBase: {3}\nId: {4}",
+        //        //    item.Name, item.Address, item.ApplicationBase, item.ConfigurationFile, item.Id);
+        //        //    foreach (var module in item.Modules)
+        //        //    {
+        //        //        //Console.WriteLine(module.AssemblyName);
+        //        //    }
+        //        //}
+        //        ClrHeap heap = runtime.GetHeap();
+        //        foreach (var item in runtime.Threads)
+        //        {
+        //            Console.WriteLine(item.OSThreadId);
+        //        }
+        //        var c = Process.GetCurrentProcess();
+        //        var t = c.Threads;
+        //        foreach (ProcessThread item in t)
+        //        {
+        //            if (item.TotalProcessorTime == new TimeSpan(0, 0, 0))
+        //            {
+        //                continue;
+        //            }
+        //            Console.WriteLine("__________________________________");
+        //            ClrThread clrT = runtime.Threads.FirstOrDefault(x => x.OSThreadId == item.Id);
+        //            if (clrT != null)
+        //            {
+        //                Console.WriteLine(clrT.EnumerateStackTrace().FirstOrDefault()?.DisplayString);
+        //                Console.WriteLine(clrT.EnumerateStackTrace().LastOrDefault()?.DisplayString);
+        //            }
+        //            //Console.WriteLine();
+        //            Console.WriteLine("ID: {0} StartTime: {1} State: {2} TotalPT: {3} UserPT: {4}, PrivilegedPT: {5} WR: {6}"
+        //                , item.Id, item.StartTime, item.ThreadState, item.TotalProcessorTime, item.UserProcessorTime, item.PrivilegedProcessorTime, item.ThreadState == System.Diagnostics.ThreadState.Wait ? item.WaitReason.ToString() : "");
+        //        }
+        //        Console.WriteLine(heap.TotalHeapSize);
+        //        ClrType type = heap.GetObjectType(address);
+        //        foreach (var item in type.Fields)
+        //        {
+        //            Console.WriteLine("{0}: {1}", item.Name, item.GetAddress(address));
+        //        }
 
-                Console.WriteLine("{0}: {1}, {2}", type.Name, type.GetSize(address), type.IsFinalizable);
+        //        Console.WriteLine("{0}: {1}, {2}", type.Name, type.GetSize(address), type.IsFinalizable);
 
 
 
-                //if (!heap.CanWalkHeap)
-                //{
-                //    Console.WriteLine("Cannot walk the heap!");
-                //}
-                //else
-                //{
-                //    foreach (var item in heap.Segments)
-                //    {
-                //        Console.WriteLine(item.Length);
-                //        foreach (ulong obj in item.EnumerateObjectAddresses())
-                //        {                                
-                //            ClrType type = heap.GetObjectType(obj);
-                //            if (type == null)
-                //                continue;
-                //            if (type.Name.Contains("System.Collections.Generic.Dictionary<Vrh.ApplicationContainer.InstanceDefinition,Vrh.ApplicationContainer.IPlugin"))
-                //            {                                    
-                //                Console.WriteLine("{0}: {1}", type.Name, type.GetSize(obj));
-                //            }
-                //        }
-                //    }
-                //    //foreach (ClrType item in heap.EnumerateTypes().OrderBy(x => x.Name))
-                //    //{
-                //    //    if (item.Name.Contains("Plugin"))
-                //    //        Console.WriteLine(item.Name);
-                //    //}
-                //    //foreach (ulong obj in heap.EnumerateObjectAddresses())
-                //    //{
-                //    //    get type = heap.GetObjectType(obj);
+        //        //if (!heap.CanWalkHeap)
+        //        //{
+        //        //    Console.WriteLine("Cannot walk the heap!");
+        //        //}
+        //        //else
+        //        //{
+        //        //    foreach (var item in heap.Segments)
+        //        //    {
+        //        //        Console.WriteLine(item.Length);
+        //        //        foreach (ulong obj in item.EnumerateObjectAddresses())
+        //        //        {                                
+        //        //            ClrType type = heap.GetObjectType(obj);
+        //        //            if (type == null)
+        //        //                continue;
+        //        //            if (type.Name.Contains("System.Collections.Generic.Dictionary<Vrh.ApplicationContainer.InstanceDefinition,Vrh.ApplicationContainer.IPlugin"))
+        //        //            {                                    
+        //        //                Console.WriteLine("{0}: {1}", type.Name, type.GetSize(obj));
+        //        //            }
+        //        //        }
+        //        //    }
+        //        //    //foreach (ClrType item in heap.EnumerateTypes().OrderBy(x => x.Name))
+        //        //    //{
+        //        //    //    if (item.Name.Contains("Plugin"))
+        //        //    //        Console.WriteLine(item.Name);
+        //        //    //}
+        //        //    //foreach (ulong obj in heap.EnumerateObjectAddresses())
+        //        //    //{
+        //        //    //    get type = heap.GetObjectType(obj);
 
-                //    //    // If heap corruption, continue past this object.
-                //    //    if (type == null)
-                //    //        continue;
+        //        //    //    // If heap corruption, continue past this object.
+        //        //    //    if (type == null)
+        //        //    //        continue;
 
-                //    //    ulong size = type.GetSize(obj);
-                //    //    Console.WriteLine("{0,12:X} {1,8:n0} {2,1:n0} {3}", obj, size, heap.GetObjectGeneration(obj), type.Name);
-                //    //}
-                //}
-            }
-        }
+        //        //    //    ulong size = type.GetSize(obj);
+        //        //    //    Console.WriteLine("{0,12:X} {1,8:n0} {2,1:n0} {3}", obj, size, heap.GetObjectGeneration(obj), type.Name);
+        //        //    //}
+        //        //}
+        //    }
+        //}
 
         public ApplicationContainerInfo MyInfo
         {
             get
             {
-                TestDiagnostic();
+                //TestDiagnostic();
                 ApplicationContainerInfo myInfo = new ApplicationContainerInfo()
                 {
                     RunningDirectory = Path.GetDirectoryName(this.GetType().Assembly.Location),

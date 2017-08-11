@@ -1,5 +1,5 @@
 ﻿# Vrh.Logger
-Ez a leírás a komponens **v1.1.0** kiadásáig bezáróan naprakész.
+Ez a leírás a komponens **v1.2.0** kiadásáig bezáróan naprakész.
 Igényelt minimális framework verzió: **4.0**
 Teljes funkcionalitás és hatékonyság kihasználásához szükséges legalacsonyabb framework verzió: **4.5**
 ### A komponens arra szolgál, hogy egységes és egyszerű megvalósítása legyen a Logolásnak.
@@ -251,11 +251,14 @@ A Vrh.Logger konfigurációjának megadásához kétféle módszert támogat:
 #### Config XML használata:
 Az alábbi XML-t érti meg, mint konfigurációt:
 ```xml
- <Vrh.Logger>
+<Vrh.Logger>
   <LogLevel>Warning</LogLevel>
   <EnableConsoleLogging>True</EnableConsoleLogging>
   <EnableDebuggerLogging>True</EnableDebuggerLogging>
-  <UsedLogger>MyCustomLoggerPlugin</UsedLogger>
+  <EnableFileLogging LogDirectory="Log" LogFile="Vrh.Logger.TxtLog.log">True</EnableFileLogging>
+  <UsedLogger>DefaultLogger</UsedLogger>
+  <LoggerErrorLogDirectory>Log</LoggerErrorLogDirectory>
+  <LoggerErrorLogFile>Vrh.Logger.Errors.log</LoggerErrorLogFile>
 </Vrh.Logger>
 ```
 Az XML-t alapesetben az alkalmazástér futási könyvtárában keresi LogConfig.xml néven.
@@ -279,7 +282,8 @@ Mindkét esetben a "használandó XML fájlt specifikáló string"-re az alábbi
             <LogLevel>Warning</LogLevel>
             <EnableConsoleLogging>True</EnableConsoleLogging>
             <EnableDebuggerLogging>True</EnableDebuggerLogging>
-            <UsedLogger>MyCustomLoggerPlugin</UsedLogger>
+            <EnableFileLogging LogDirectory="Log" LogFile="Vrh.Logger.TxtLog.log">True</EnableFileLogging>
+            <UsedLogger>DefaultLogger</UsedLogger>
             <LoggerErrorLogDirectory>Log</LoggerErrorLogDirectory>
             <LoggerErrorLogFile>Vrh.Logger.Errors.log</LoggerErrorLogFile>
         </LoggerConfiguration>
@@ -296,12 +300,16 @@ Ekkor a szabványos config állomáynban szabványos appSettings kulcsok megadá
 
 ```xml
     <appSettings>      
+      <add key="Vrh.Logger:Config" value="@D:\Temp\_t\LogConfig.xml/Vrh.Logger"/>
       <add key="Vrh.Logger:LogLevel" value="debug"/>
       <add key="Vrh.Logger:EnableConsoleLogging" value="True"/>
       <add key="Vrh.Logger:EnableDebuggerLogging" value="True"/>
-      <add key="Vrh.Logger:UsedLogger" value="YourSelectedLogger"/>
+      <add key="Vrh.Logger:UsedLogger" value="DefaultLogger"/>
       <add key="Vrh.Logger:LoggerErrorLogDirectory" value="@D:\Temp\_t\Log"/>
-      <add key="Vrh.Logger:LoggerErrorLogFile" value="Vrh.Logger.Errors.log"/>
+      <add key="Vrh.Logger:LoggerErrorLogFile" value="Vrh.Logger.Errors.log"/>      
+      <add key="Vrh.Logger:EnableFileLogging" value="True"/>
+      <add key="Vrh.Logger:LogDirectory" value="Log"/>
+      <add key="Vrh.Logger:LogFile" value="Vrh.Logger.TxtLog.log"/>
     </appSettings>
 ```
 #### Mi mit jelent fentiekből?
@@ -318,6 +326,9 @@ A fenti beállítások konkrét értelmezése:
 >* **None**: Ez nem egy valódi log szint. Segítségével teljesen kikapcsolható a logolás.
 * **EnableConsoleLogging**: Segítségével azt lehet előírni a Vrh.Logger-nek, hogy a benne található DefultLogger implementációt is üzemeltesse és az alkalmazás Console-ra is jelenítse meg a log bejegyzéseket. Egy logikai érték. Az igaz (True) értéket a true, yes, 1 értékek jelentik (a kis és nagybetűk közt nem tesz különbséget). Minden ezektől eltérő érték hamis értéket (False) jelent. Az alapértelmezett érték a False, ha a beállítás nincs jelen.
 * **EnableDebuggerLogging**: Segítségével azt lehet előítrni a Vrh.Logger-nek, hogy a benne található DefultLogger implementációt is üzemeltesse és az alkalmazáshoz csatlakoztatott Debugger outputján is jelenítse meg a log bejegyzéseket. Egy logikai érték. Az igaz (True) értéket a true, yes, 1 értékek jelentik (a kis és nagybetük közt nem tesz különbséget). Minden ezektől eltérő érték hamis értéket (False) jelenet. Az alapértelmezett érték a False, ha a beállítás nincs jelen.
+* **EnablEFileLogging**: Segítségével azt lehet előítrni a Vrh.Logger-nek, hogy a benne található DefultLogger implementációt is üzemeltesse és egy txt log fájlba írja ki a log bejegyzéseket. Egy logikai érték. Az igaz (True) értéket a true, yes, 1 értékek jelentik (a kis és nagybetük közt nem tesz különbséget). Minden ezektől eltérő érték hamis értéket (False) jelenet. Az alapértelmezett érték a False, ha a beállítás nincs jelen.
+* **LogDirectory**: Ha a txt log file írás engedélyezve van, akkor az itt megadott könyvtárat használja a Log file célkönyvtáraként. Ha a könyvtár nem létezik, akkor létrehozza. Ha nincs megadva, akkor az alkalmazás futási könyvtárában keletkezik a fájl.
+* **LogFile**: Segítségével lehet definiálni, hogy a fent leírt text log fájlt milyen néven hozza létre a Vrh.Logger. Ha nincs megadva, akkor a fájl Vrh.Logger.TxtLog.log néven jön létre.
 * **UsedLogger**: Ha a Vrh.Logger működési környezetében több Logger plugin is található. Akkor ennek segítségével írhatjuk elő, hogy ezek közül melyiket használja  a konfiguráció logolásra. Ha ez a beállítás nincs jelen, akkor mindig azt a plugint használja maleiket először megtalál a működési környezetben. Így egyetlen plugin jelenléte esetén a beállítást nem szükséges megadni. Az értéknek  a használandó plugin pontos osztály nevét, vagy teljes (névterekkel együtt) osztálynevét kell megadni, ezt mindig az adott Plugin dokumentációjából derül ki.
 * **LoggerErrorLogDirectory**: Ha a Vrh.Logger működésében valami hiba lép fel, amely meggátolja a logolást, akkor egy saját text fájlba írja a hiba tényét, és az üzenet segítségével a hiba oka kideríthető. Magasabb logolási szinteken bejegyzéseket készít egyéb információkról is ide, a Logger indulásáról, leállásáról, a használt plugin betöltéséről. Ez a beállítás mondja, meg, hogy melyik könyvtárba kerüljön ez a txt Log. Ha nincs megadva, akkor az alkalmazás futási könyvtárában keletkezik a fájl. 
 * **LoggerErrorLogFile**: Segítségével lehet definiálni, hogy a fent leírt saját hiba text fájlt milyen néven hozza létre a Vrh.Logger. Ha nincs megadva, akkor a fájl Vrh.Logger.Errors.log néven jön létre.
@@ -495,6 +506,14 @@ Az alábbi szabályok és elvek elvárások a Pluginnal szemben:
 <hr></hr>
 
 # Version History:
+## V1.2.0 (2017.08.10)
+### Compatibility API changes:
+1. DefaultLogger kiegészítése TXT log file írási kéápességgel
+2. Lehetséges app settings kulcsok kezelésének beépítése a default plugin txt file logolás képesség konfigurációjához (Kulcsok: "Vrh.Logger:EnableFileLogging", "Vrh.Logger:LogDirectory" "Vrh.Logger:LogFile")
+3. LogConfig.xml (config xml) feldolgozó kiegészítése a default plugin txt file logolás képesség kapcsán szükésge súj beállítások kezelésével (Tag: EnableFileLogging (Extended boolean: true|yes|1/false|no|0) lehetséges attríbutumai: LogDirectory="Log" LogFile="Vrh.Logger.TxtLog.log)
+### Patches:
+1. LoggerErrorLogFile beállítást valóban figyelembe vegye a belső error log file elnevezésében
+2. A Default logger valóban figyelembe veszi a három leheteséges log target-re engedélyezés van-e konfigurálva, és csak arra ír, amelyikre igen
 ## V1.1.0 (2017.03.21)      
 ### Compatibility API changes:
 1. LogHelper.GetExceptionData bevezetése
