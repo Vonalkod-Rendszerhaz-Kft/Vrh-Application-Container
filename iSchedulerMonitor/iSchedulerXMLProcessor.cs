@@ -70,15 +70,44 @@
         /// </summary>
         public string DatabaseConnectionString { get; private set; }
 
+        #region ObjectType property
+        private string _ObjectType = null;
         /// <summary>
         /// Az xml-ben található object type.
         /// </summary>
-        public string ObjectType { get; private set; }
+        public string ObjectType
+        {
+            get
+            {
+                if (_ObjectType == null)
+                {
+                    _ObjectType = GetElementValue(GetXElement(Elements.OBJECTTYPE), "");
+                    if (String.IsNullOrWhiteSpace(_ObjectType)) throw new ApplicationException($"The <{Elements.OBJECTTYPE}> element is missing or empty!");
+                }
+                return _ObjectType;
+            }
+        }
+        #endregion ObjectType property
 
+        #region GroupId property
+        private string _GroupId = null;
         /// <summary>
         /// Az xml-ben található GroupId érték.
         /// </summary>
-        public string GroupId { get; private set; }
+        public string GroupId
+        {
+            get
+            {
+                if (_GroupId == null)
+                {
+                    _GroupId = GetElementValue(GetXElement(Elements.GROUPID), "");
+                    if (String.IsNullOrWhiteSpace(_GroupId)) throw new ApplicationException($"The <{Elements.GROUPID}> element is missing or empty!");
+                    else if (_GroupId.Trim() == "*") throw new ApplicationException($"The value of the <{Elements.GROUPID}> element can not equal '*'!");
+                }
+                return _GroupId;
+            }
+        }
+        #endregion GroupId property
 
         #region ResponseTimeout property
         /// <summary>
@@ -103,7 +132,7 @@
                     {
                         if (!Int32.TryParse(respint, out _ResponseTimeout)) _ResponseTimeout = 0;
                     }
-                    _ResponseTimeout = Math.Min(Math.Max(_ResponseTimeout, this.CheckIntervalMinimum), this.CheckIntervalMaximum);
+                    _ResponseTimeout = Math.Min(Math.Max(_ResponseTimeout, this.ResponseTimeoutMinimum), this.ResponseTimeoutMaximum);
                 }
                 return _ResponseTimeout;
             }
@@ -244,27 +273,10 @@
                     string constr = StringElement.FindString(this.ConnectionStrings, this.DatabaseConnectionString, this.LCID);
                     try { this.DatabaseConnectionString = VRH.ConnectionStringStore.VRHConnectionStringStore.GetConnectionString(constr, false); }
                     catch (Exception) { this.DatabaseConnectionString = constr; }
+                    //this.DatabaseConnectionString = constr;
                 }
 
                 #endregion Database parser
-
-                #region ObjectType parser
-
-                this.ObjectType = GetElementValue(GetXElement(Elements.OBJECTTYPE), "");
-                if (String.IsNullOrWhiteSpace(this.ObjectType)) AddErr($"The <{Elements.OBJECTTYPE}> element is missing or empty!");
-
-                #endregion ObjectType parser
-
-                #region GroupId parser
-
-                this.GroupId = GetElementValue(GetXElement(Elements.GROUPID), "");
-                if (String.IsNullOrWhiteSpace(this.GroupId)) AddErr($"The <{Elements.GROUPID}> element is missing or empty!");
-                else if (this.GroupId.Trim() == "*") AddErr($"The value of the <{Elements.GROUPID}> element can not equal '*'!");
-
-                #endregion GroupId parser
-
-                #region ResponseTimeout parser
-                #endregion ResponseTimeout parser
 
                 if (this.ErrorMessage != String.Empty) throw new ApplicationException(this.ErrorMessage);
             }

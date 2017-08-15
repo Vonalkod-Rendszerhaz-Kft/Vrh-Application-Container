@@ -1,22 +1,33 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Plugins>
 
-	<Plugin Description="Scheduler Monitor" Assembly="iSchedulerMonitor.dll" 
-			Type="iSchedulerMonitor.MonitorPlugin" Version="1.0.0-alpha" Singletone="false" AutoStart ="true" PluginDirectory="iSchedulerMonitor">
-    <!--ANTI: Ha nem azonos gépen fut a WebServer és a plugin, akkor az 
-              InstanceConfig a plugint futtató gépen az xml helye; InstanceData a távoli gépen az xml helye. 
-              Ha azonos gépen fut, akkor az InstanceData nem kötelező. 
+	<Plugin Description="Scheduler Monitor" 
+          Assembly="iSchedulerMonitor.dll" 
+			    Type="iSchedulerMonitor.MonitorPlugin" 
+          Version="1.0.0-alpha" Singletone="false" AutoStart ="true" 
+          PluginDirectory="iSchedulerMonitor">
+			
+    <!-- ANTI: Ha nem azonos gépen fut a WebServer és a plugin, akkor az 
+               InstanceConfig a plugint futtató gépen az xml helye; InstanceData a távoli gépen az xml helye. 
+               Ha azonos gépen fut, akkor az InstanceData nem kötelező. 
     -->
+    <Instance	Id="Monitor1"
+				Name="SchedulerMonitor_for_LearALM"
+				Description="Időzített feladatok figyelése a LearALM-ben."
+				InstanceConfig="d:\Google Drive\!Dev\VRH\iScheduler\Vrh.iScheduler\App_Data\iScheduler\iScheduler.xml"
+				InstanceData="~/App_Data/iScheduler/iScheduler.xml">
+      <Parameters>
+        ....
+      </Parameters>
+    </Instance>
+    <!--VRH-->
+    <!--
     <Instance	Id="Monitor1"
 					Name="SchedulerMonitor_for_LearALM"
 					Description="Időzített feladatok figyelése a LearALM-ben."
-					InstanceConfig="d:\Google Drive\!Dev\VRH\iScheduler\Vrh.iScheduler\App_Data\iScheduler\iScheduler.xml"
-          InstanceData="~/App_Data/iScheduler/iScheduler.xml"/>
-    <!--VRH-->>
-    <!--<Instance	Id="Monitor1"
-					Name="SchedulerMonitor_for_LearALM"
-					Description="Időzített feladatok figyelése a LearALM-ben."
-					InstanceConfig="c:\ALM\wwwroot\App_Data\iScheduler\iScheduler.xml"/>-->
+					InstanceConfig="c:\ALM\wwwroot\App_Data\iScheduler\iScheduler.xml"/>
+    -->
+
   </Plugin>  
 	
-</Plugins>	
+</Plugins>

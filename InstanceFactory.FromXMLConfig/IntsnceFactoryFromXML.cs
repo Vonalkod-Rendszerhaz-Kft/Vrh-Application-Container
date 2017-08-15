@@ -70,7 +70,7 @@ namespace InstanceFactory.FromXML
                         { "Version", item.Version },
                         { "Description", item.Description },
                     };
-                    LogThis("This plugin alrready defined with this version!!!", data, null, Vrh.Logger.LogLevel.Error);                    
+                    LogThis("This plugin already defined with this version!!!", data, null, Vrh.Logger.LogLevel.Error);                    
                     continue;
                 }
                 else

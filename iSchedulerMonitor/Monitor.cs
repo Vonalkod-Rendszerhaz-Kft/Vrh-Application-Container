@@ -123,7 +123,8 @@ namespace iSchedulerMonitor
                                         ReturnInfoJSON ri = JsonConvert.DeserializeObject<ReturnInfoJSON>(resp);
                                         log("EXAMINATION: JsonConvert.DeserializeObject OK.");
 
-                                        using (SqlCommand upd = new SqlCommand($"update iScheduler.Schedules set State = 1 where Id = {id}", cnn))
+                                        int state = ri.ReturnValue == 0 ? 1 : 2;    //0 sikeres, akkor success(1), ha nem 0, akkor failed(2) 
+                                        using (SqlCommand upd = new SqlCommand($"update iScheduler.Schedules set State = {state} where Id = {id}", cnn))
                                         {
                                             log($"EXAMINATION: updatesql={upd.CommandText}");
                                             int affect = upd.ExecuteNonQuery();

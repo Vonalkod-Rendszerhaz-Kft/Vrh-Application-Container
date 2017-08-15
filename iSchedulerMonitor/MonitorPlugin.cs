@@ -81,9 +81,9 @@ namespace iSchedulerMonitor
         /// </summary>
         public override void Start()
         {
-            System.Diagnostics.Debug.WriteLine("MonitorPlugin START.");
             BeginStart();
-            
+            System.Diagnostics.Debug.WriteLine("MonitorPlugin START.");
+
             // Implement Plugin logic here
             // Ha netán újra indítják, akkor az előzőt el kell dobni!
             if (_monitor != null) _monitor.Dispose();
