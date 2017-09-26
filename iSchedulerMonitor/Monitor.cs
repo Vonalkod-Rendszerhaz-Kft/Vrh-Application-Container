@@ -12,6 +12,29 @@ namespace iSchedulerMonitor
 {
     internal class Monitor : IDisposable
     {
+        #region Enums
+        /// <summary>
+        /// Ütemezések lehetséges állapotai.
+        /// </summary>
+        public enum ScheduleStates : byte
+        {
+            /// <summary>
+            /// Az ütemezés végrehajtás előtt van, végrehajtásra várakozik.
+            /// </summary>
+            Active = 0,
+
+            /// <summary>
+            /// Az ütemezés a végrehajtás után, ha a végrehajtás sikeresen ért véget.
+            /// </summary>
+            Success = 1,
+
+            /// <summary>
+            /// Az ütemezés végrehajtás után, ha a végrehajtás hibával ért véget.
+            /// </summary>
+            Failed = 2,
+        }
+        #endregion Enums
+
         #region Privates
 
         private Timer m_timer;
@@ -73,11 +96,15 @@ namespace iSchedulerMonitor
         {
             try
             {
-                log($"Examination START. Signal time = {signalTime:HH:mm:ss}", LogLevel.Verbose);
-                log($"EXAMINATION: DatabaseConnectionString={m_xmlp.DatabaseConnectionString}");
+                string thisfn = "EXAMINATION: ";
+                log($"{thisfn}START. Signal time = {signalTime:HH:mm:ss}", LogLevel.Verbose);
+                log($"{thisfn}DatabaseConnectionString={m_xmlp.DatabaseConnectionString}");
 
                 using (SqlConnection cnn = new SqlConnection(m_xmlp.DatabaseConnectionString))
                 {
+                    cnn.Open();
+                    log($"{thisfn}Connection opened.");
+
                     string scmd = String.Concat(
                         " select *",
                         " from iScheduler.Schedules s",
@@ -89,61 +116,90 @@ namespace iSchedulerMonitor
                         cmd.Parameters.Add(new SqlParameter("signalTime", signalTime));
                         cmd.Parameters.Add(new SqlParameter("objectType", m_xmlp.ObjectType));
                         cmd.Parameters.Add(new SqlParameter("groupId", m_xmlp.GroupId));
-                        cnn.Open();
-                        log($"EXAMINATION: Connection opened.");
 
                         SqlDataReader rdr = cmd.ExecuteReader(System.Data.CommandBehavior.CloseConnection);
                         if (rdr.HasRows)
                         {
-                            log("The examination found scheduled jobs.", LogLevel.Verbose);
+                            log($"{thisfn} Scheduled job is found!", LogLevel.Verbose);
+                            string xmlLoginUrl = m_xmlp.LoginUrl.GetUrl();
+                            log($"{thisfn}xmlLoginUrl= {xmlLoginUrl}");
 
-                            Uri loginUri = new Uri(m_xmlp.LoginUrl.GetUrl());
+                            Uri loginUri = new Uri(xmlLoginUrl);
+                            //log($"{thisfn}loginUri= {loginUri.AbsoluteUri}");
                             using (CookieWebClient wc = new CookieWebClient(loginUri, "Developer", "Dev123"))
                             {
                                 if (m_xmlp.ResponseTimeout > 0) wc.Timeout = m_xmlp.ResponseTimeout * 1000; // itt millisecundumban kell
-                                log($"EXAMINATION: Login success. WebClient.Timeout={wc.Timeout}");
+                                log($"{thisfn}Login success. WebClient.Timeout={wc.Timeout}ms");
 
                                 int ixID = rdr.GetOrdinal("Id");
 
                                 while (rdr.Read())
                                 {
                                     int id = rdr.GetInt32(ixID);
+                                    ScheduleStates state = ScheduleStates.Failed; //pessszimistán hibát feltételezünk
+                                    ReturnInfoJSON ri;
+
+                                    log($"{thisfn}Scheduled job execute started. id = {id}", LogLevel.Verbose);
+                                    string execurl = m_xmlp.ExecuteUrl.GetUrl();
+                                    execurl = execurl.Replace("@PATH@", m_xmlp.XmlRemotePath);
+                                    execurl = execurl.Replace("@ID@", id.ToString());
+                                    log($"{thisfn}ScheduleExecute url = {execurl}");
 
                                     #region Scheduled job is executing
+                                    string supd = String.Concat(
+                                        " update iScheduler.Schedules",
+                                        " set State = @state,",
+                                        "     ReturnValue = @rvalue,",
+                                        "     ReturnMessage = @rmessage",
+                                        " where Id = @id");
                                     try
                                     {
-                                        log($"Scheduled job execute started. id = {id}", LogLevel.Verbose);
-                                        string execurl = m_xmlp.ExecuteUrl.GetUrl();
-                                        execurl = execurl.Replace("@PATH@", m_xmlp.XmlRemotePath);
-                                        execurl = execurl.Replace("@ID@", id.ToString());
-                                        log($"EXAMINATION: ScheduleExecute url = {execurl}");
-
                                         string resp = Encoding.UTF8.GetString(wc.DownloadData(execurl));
-                                        log($"EXAMINATION: ScheduleExecute response = {resp}");
-                                        ReturnInfoJSON ri = JsonConvert.DeserializeObject<ReturnInfoJSON>(resp);
-                                        log("EXAMINATION: JsonConvert.DeserializeObject OK.");
+                                        log($"{thisfn}ScheduleExecute OK response = {resp}");
+                                        ri = JsonConvert.DeserializeObject<ReturnInfoJSON>(resp);
+                                        log($"{thisfn}JsonConvert.DeserializeObject OK. ReturnValue={ri.ReturnValue}");
 
-                                        int state = ri.ReturnValue == 0 ? 1 : 2;    //0 sikeres, akkor success(1), ha nem 0, akkor failed(2) 
-                                        using (SqlCommand upd = new SqlCommand($"update iScheduler.Schedules set State = {state} where Id = {id}", cnn))
+                                        if (ri.ReturnValue == 0)
                                         {
-                                            log($"EXAMINATION: updatesql={upd.CommandText}");
-                                            int affect = upd.ExecuteNonQuery();
-                                            LogLevel ll = ri.ReturnValue == 0 ? LogLevel.Information : LogLevel.Warning;
-                                            log($"Scheduled job (id={id} has executed.\nReturnValue = {ri.ReturnValue}\nReturnMessage = {ri.ReturnMessage}", ll);
+                                            state = ScheduleStates.Success;    //0 sikeres, akkor success(1), ha nem 0, akkor failed(2), azaz marad 
+                                            supd = " update iScheduler.Schedules set State = @state where Id = @id";
                                         }
                                     }
                                     catch (Exception ex)
                                     {
-                                        if (wc.LastException == null) Logger.Log(ex, this.GetType());
-                                        else Logger.Log(wc.LastException, this.GetType());
+                                        Exception rex = wc.LastException == null ? ex : wc.LastException;
+                                        Logger.Log(rex, this.GetType());
+                                        ri = new ReturnInfoJSON()
+                                        {
+                                            ReturnValue = -5,
+                                            ReturnMessage = $"{rex.Message}<br />ScheduleExecute url = {execurl}",
+                                        };
                                     }
                                     #endregion Scheduled job is executing
+
+                                    #region Eredmény bejegyzése az adatbázisba
+                                    using (SqlCommand upd = new SqlCommand(supd, cnn))
+                                    {
+                                        upd.Parameters.Add(new SqlParameter("id", id));
+                                        upd.Parameters.Add(new SqlParameter("state", state));
+                                        if (state == ScheduleStates.Failed)
+                                        {
+                                            upd.Parameters.Add(new SqlParameter("rvalue", ri.ReturnValue));
+                                            upd.Parameters.Add(new SqlParameter("rmessage", ri.ReturnMessage));
+                                        }
+                                        int affect = upd.ExecuteNonQuery();
+
+                                        LogLevel ll = ri.ReturnValue == 0 ? LogLevel.Information : LogLevel.Warning;
+                                        log($"{thisfn}Scheduled job (id={id}) has executed. ReturnValue = {ri.ReturnValue} ReturnMessage = {ri.ReturnMessage}", ll);
+                                    }
+                                    #endregion Eredmény bejegyzése az adatbázisba
+
                                 }
                             }
                         }
                         else
                         {
-                            log("The examination did not find a scheduled job.", LogLevel.Information);
+                            log($"{thisfn}No scheduling job", LogLevel.Information);
                         }
                     }
                 }
