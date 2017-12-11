@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using VRH.Common;
+using Vrh.Logger;
 
 namespace Vrh.ApplicationContainer
 {
@@ -211,7 +212,7 @@ namespace Vrh.ApplicationContainer
                     data.Add(item.Key, item.Value);
                 }
             }
-            Vrh.Logger.Logger.Log<string>(message, data, ex, level, type != null ? type : this.GetType(), caller, line);
+            VrhLogger.Log<string>(message, data, ex, level, type != null ? type : this.GetType(), caller, line);
             MessageStackEntry e = new MessageStackEntry()
             {
                 Body = message,

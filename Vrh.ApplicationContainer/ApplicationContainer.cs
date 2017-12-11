@@ -1072,7 +1072,7 @@ namespace Vrh.ApplicationContainer
 
         private void LogThis(string message, Dictionary<string, string> data, Exception ex, LogLevel level, [CallerMemberName]string caller = "", [CallerLineNumber]int line = 0)
         {
-            Logger.Logger.Log<string>(message, data, ex, level, this.GetType(), caller, line);
+            VrhLogger.Log<string>(message, data, ex, level, this.GetType(), caller, line);
             MessageStackEntry e = new MessageStackEntry()
             {
                 Body = message,

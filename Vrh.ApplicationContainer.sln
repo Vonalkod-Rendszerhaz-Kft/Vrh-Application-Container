@@ -21,8 +21,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iSchedulerMonitor", "iSched
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vrh.ApplicationContainer.WindowsServiceHost", "Vrh.ApplicationContainer.WindowsServiceHost\Vrh.ApplicationContainer.WindowsServiceHost.csproj", "{38529388-3CE3-49D6-A0DB-76647B84EA62}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsService1", "WindowsService1\WindowsService1.csproj", "{CED98D66-2ABB-43CF-8860-ACB5D9C2E2C8}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,10 +59,6 @@ Global
 		{38529388-3CE3-49D6-A0DB-76647B84EA62}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{38529388-3CE3-49D6-A0DB-76647B84EA62}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{38529388-3CE3-49D6-A0DB-76647B84EA62}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CED98D66-2ABB-43CF-8860-ACB5D9C2E2C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CED98D66-2ABB-43CF-8860-ACB5D9C2E2C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CED98D66-2ABB-43CF-8860-ACB5D9C2E2C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CED98D66-2ABB-43CF-8860-ACB5D9C2E2C8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -44,7 +44,7 @@ namespace Vrh.ApplicationContainer.ConsoleHost
             }
             catch (FatalException ex)
             {
-                Logger.Logger.Log(ex, typeof(Program), LogLevel.Fatal);
+                VrhLogger.Log(ex, typeof(Program), LogLevel.Fatal);
             }
             Thread.Sleep(3000);
             Console.WriteLine("Application container Started.");

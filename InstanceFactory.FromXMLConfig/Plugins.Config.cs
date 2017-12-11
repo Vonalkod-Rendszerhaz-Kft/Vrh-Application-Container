@@ -51,7 +51,7 @@ namespace InstanceFactory.FromXML
                         {
                             { "ConfigFile", this._xmlFileDefinition },
                         };
-                        Logger.Log<string>("Config Error! Plugin Type not defined!", data, null, LogLevel.Warning, this.GetType());
+                        VrhLogger.Log<string>("Config Error! Plugin Type not defined!", data, null, LogLevel.Warning, this.GetType());
                         continue;
                     }
                     plugins.Add(plugin);
@@ -92,7 +92,7 @@ namespace InstanceFactory.FromXML
                         {
                             { "ConfigFile", this._xmlFileDefinition },
                         };
-                        Logger.Log<string>("Config Error! Instance Id not defined!", data, null, LogLevel.Warning, this.GetType());
+                        VrhLogger.Log<string>("Config Error! Instance Id not defined!", data, null, LogLevel.Warning, this.GetType());
                         continue;
                     }
                     instances.Add(instance);

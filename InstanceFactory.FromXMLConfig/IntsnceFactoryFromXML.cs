@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.Configuration;
 using VRH.Common;
 using System.Runtime.CompilerServices;
+using Vrh.Logger;
 
 namespace InstanceFactory.FromXML
 {
@@ -145,7 +146,7 @@ namespace InstanceFactory.FromXML
         /// <param name="line">Hivási hely (forrássor)</param>
         private void LogThis(string message, Dictionary<string, string> data, Exception ex, Vrh.Logger.LogLevel level, [CallerMemberName]string caller = "", [CallerLineNumber]int line = 0)
         {
-            Vrh.Logger.Logger.Log<string>(message, data, ex, level, this.GetType(), caller, line);
+            VrhLogger.Log<string>(message, data, ex, level, this.GetType(), caller, line);
             MessageStackEntry e = new MessageStackEntry()
             {
                 Body = message,

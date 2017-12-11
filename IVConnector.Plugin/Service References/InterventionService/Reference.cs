@@ -35,7 +35,7 @@ namespace IVConnector.Plugin.InterventionService {
         private string NameField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private ParameterDefinition[] ParameterListField;
+        private InterventionService.ParameterDefinition[] ParameterListField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
@@ -100,7 +100,7 @@ namespace IVConnector.Plugin.InterventionService {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public ParameterDefinition[] ParameterList {
+        public InterventionService.ParameterDefinition[] ParameterList {
             get {
                 return this.ParameterListField;
             }
@@ -147,7 +147,7 @@ namespace IVConnector.Plugin.InterventionService {
         private string NameField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private DataType ParameterTypeField;
+        private InterventionService.DataType ParameterTypeField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private bool RequiredField;
@@ -228,7 +228,7 @@ namespace IVConnector.Plugin.InterventionService {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public DataType ParameterType {
+        public InterventionService.DataType ParameterType {
             get {
                 return this.ParameterTypeField;
             }
@@ -442,39 +442,39 @@ namespace IVConnector.Plugin.InterventionService {
     public interface IInterventionService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IInterventionService/GetAllIntervention", ReplyAction="http://tempuri.org/IInterventionService/GetAllInterventionResponse")]
-        InterventionDefination[] GetAllIntervention(string languageCode);
+        InterventionService.InterventionDefination[] GetAllIntervention(string languageCode);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IInterventionService/GetAllIntervention", ReplyAction="http://tempuri.org/IInterventionService/GetAllInterventionResponse")]
-        System.Threading.Tasks.Task<InterventionDefination[]> GetAllInterventionAsync(string languageCode);
+        System.Threading.Tasks.Task<InterventionService.InterventionDefination[]> GetAllInterventionAsync(string languageCode);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IInterventionService/GetInterventionedObject", ReplyAction="http://tempuri.org/IInterventionService/GetInterventionedObjectResponse")]
-        InterventionedObject[] GetInterventionedObject(string languageCode);
+        InterventionService.InterventionedObject[] GetInterventionedObject(string languageCode);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IInterventionService/GetInterventionedObject", ReplyAction="http://tempuri.org/IInterventionService/GetInterventionedObjectResponse")]
-        System.Threading.Tasks.Task<InterventionedObject[]> GetInterventionedObjectAsync(string languageCode);
+        System.Threading.Tasks.Task<InterventionService.InterventionedObject[]> GetInterventionedObjectAsync(string languageCode);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IInterventionService/GetCurrentInterventionOnThisObject", ReplyAction="http://tempuri.org/IInterventionService/GetCurrentInterventionOnThisObjectRespons" +
             "e")]
-        InterventionDefination[] GetCurrentInterventionOnThisObject(int objectID, System.Guid userGuid, string languageCode);
+        InterventionService.InterventionDefination[] GetCurrentInterventionOnThisObject(int objectID, System.Guid userGuid, string languageCode);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IInterventionService/GetCurrentInterventionOnThisObject", ReplyAction="http://tempuri.org/IInterventionService/GetCurrentInterventionOnThisObjectRespons" +
             "e")]
-        System.Threading.Tasks.Task<InterventionDefination[]> GetCurrentInterventionOnThisObjectAsync(int objectID, System.Guid userGuid, string languageCode);
+        System.Threading.Tasks.Task<InterventionService.InterventionDefination[]> GetCurrentInterventionOnThisObjectAsync(int objectID, System.Guid userGuid, string languageCode);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IInterventionService/DoIntervention", ReplyAction="http://tempuri.org/IInterventionService/DoInterventionResponse")]
-        string DoIntervention(Intervention intervention, System.Guid userGuid, string languageCode);
+        string DoIntervention(InterventionService.Intervention intervention, System.Guid userGuid, string languageCode);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IInterventionService/DoIntervention", ReplyAction="http://tempuri.org/IInterventionService/DoInterventionResponse")]
-        System.Threading.Tasks.Task<string> DoInterventionAsync(Intervention intervention, System.Guid userGuid, string languageCode);
+        System.Threading.Tasks.Task<string> DoInterventionAsync(InterventionService.Intervention intervention, System.Guid userGuid, string languageCode);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    public interface IInterventionServiceChannel : IInterventionService, System.ServiceModel.IClientChannel {
+    public interface IInterventionServiceChannel : InterventionService.IInterventionService, System.ServiceModel.IClientChannel {
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    public partial class InterventionServiceClient : System.ServiceModel.ClientBase<IInterventionService>, IInterventionService {
+    public partial class InterventionServiceClient : System.ServiceModel.ClientBase<InterventionService.IInterventionService>, InterventionService.IInterventionService {
         
         public InterventionServiceClient() {
         }
@@ -495,35 +495,35 @@ namespace IVConnector.Plugin.InterventionService {
                 base(binding, remoteAddress) {
         }
         
-        public InterventionDefination[] GetAllIntervention(string languageCode) {
+        public InterventionService.InterventionDefination[] GetAllIntervention(string languageCode) {
             return base.Channel.GetAllIntervention(languageCode);
         }
         
-        public System.Threading.Tasks.Task<InterventionDefination[]> GetAllInterventionAsync(string languageCode) {
+        public System.Threading.Tasks.Task<InterventionService.InterventionDefination[]> GetAllInterventionAsync(string languageCode) {
             return base.Channel.GetAllInterventionAsync(languageCode);
         }
         
-        public InterventionedObject[] GetInterventionedObject(string languageCode) {
+        public InterventionService.InterventionedObject[] GetInterventionedObject(string languageCode) {
             return base.Channel.GetInterventionedObject(languageCode);
         }
         
-        public System.Threading.Tasks.Task<InterventionedObject[]> GetInterventionedObjectAsync(string languageCode) {
+        public System.Threading.Tasks.Task<InterventionService.InterventionedObject[]> GetInterventionedObjectAsync(string languageCode) {
             return base.Channel.GetInterventionedObjectAsync(languageCode);
         }
         
-        public InterventionDefination[] GetCurrentInterventionOnThisObject(int objectID, System.Guid userGuid, string languageCode) {
+        public InterventionService.InterventionDefination[] GetCurrentInterventionOnThisObject(int objectID, System.Guid userGuid, string languageCode) {
             return base.Channel.GetCurrentInterventionOnThisObject(objectID, userGuid, languageCode);
         }
         
-        public System.Threading.Tasks.Task<InterventionDefination[]> GetCurrentInterventionOnThisObjectAsync(int objectID, System.Guid userGuid, string languageCode) {
+        public System.Threading.Tasks.Task<InterventionService.InterventionDefination[]> GetCurrentInterventionOnThisObjectAsync(int objectID, System.Guid userGuid, string languageCode) {
             return base.Channel.GetCurrentInterventionOnThisObjectAsync(objectID, userGuid, languageCode);
         }
         
-        public string DoIntervention(Intervention intervention, System.Guid userGuid, string languageCode) {
+        public string DoIntervention(InterventionService.Intervention intervention, System.Guid userGuid, string languageCode) {
             return base.Channel.DoIntervention(intervention, userGuid, languageCode);
         }
         
-        public System.Threading.Tasks.Task<string> DoInterventionAsync(Intervention intervention, System.Guid userGuid, string languageCode) {
+        public System.Threading.Tasks.Task<string> DoInterventionAsync(InterventionService.Intervention intervention, System.Guid userGuid, string languageCode) {
             return base.Channel.DoInterventionAsync(intervention, userGuid, languageCode);
         }
     }

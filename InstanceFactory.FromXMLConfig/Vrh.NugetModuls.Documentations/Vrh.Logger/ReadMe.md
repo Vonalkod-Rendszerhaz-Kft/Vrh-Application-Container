@@ -1,5 +1,5 @@
 ﻿# Vrh.Logger
-Ez a leírás a komponens **v1.2.0** kiadásáig bezáróan naprakész.
+Ez a leírás a komponens **v1.4.0** kiadásáig bezáróan naprakész.
 Igényelt minimális framework verzió: **4.0**
 Teljes funkcionalitás és hatékonyság kihasználásához szükséges legalacsonyabb framework verzió: **4.5**
 ### A komponens arra szolgál, hogy egységes és egyszerű megvalósítása legyen a Logolásnak.
@@ -8,7 +8,7 @@ Pluginolható, a létező plugin megoldásaink a Vrh.Logger.PLUGINNAME komponens
 
 ## Használata logoláshoz
 A használathoz a **Vrh.Logger névtér** using-olandó.
-### Logger static class:
+### VrhLogger static class:
 Ez a static osztály adja a logoláshoz szükséges szűk eszközkészletet.
 #### 1. Log\<T>():
 Ezt hívjuk meg, ha bármit logolni akarunk a környezetben.
@@ -46,21 +46,21 @@ A defult logger JSON-ba serializálja a típust, de null is átadható neki.
  ```csharp    
 catch (Exception ex)
 {
-    Logger.Log<string>("error", null, ex, LogLevel.Error, this.GetType()));
+    VrhLogger.Log<string>("error", null, ex, LogLevel.Error, this.GetType()));
 }
  ```
  ```csharp
-Logger.Log<ApplicationTrust>(AppDomain.CurrentDomain.ApplicationTrust, null, null, LogLevel.Verbose, typeof(Program));
+VrhLogger.Log<ApplicationTrust>(AppDomain.CurrentDomain.ApplicationTrust, null, null, LogLevel.Verbose, typeof(Program));
  ```
  ```csharp
 Dictionary<string, string> logData = new Dictionary<string, string>()
 {
-    { "Vrh.Loger Version ", GetModulVersion(typeof(Logger)) },
+    { "Vrh.Loger Version ", GetModulVersion(typeof(VrhLogger)) },
     { "Used Logger", _logger != null ? _logger.GetType().FullName : String.Format("Not found!!! {0}", loggerTypeSelector) },
     { "Used Logger version", _logger != null ? GetModulVersion(_logger.GetType()) : "?" },
 };
 logData.Add("Used Plugin == Defult Logger", (_defaultLogger == null).ToString());
-Logger.Log<String>("Vrh.Logger Started", logData, null, _logger != null ? LogLevel.Information : LogLevel.Warning, typeof(Logger));
+Logger.Log<String>("Vrh.Logger Started", logData, null, _logger != null ? LogLevel.Information : LogLevel.Warning, typeof(VrhLogger));
 ```
 #### 1.1 String logolása
 Hogy ne kelljen a bonyolultabb formát beírni, egyszerű szöveges információ logolására használható az alábbi Log metódus is:
@@ -78,7 +78,7 @@ static public void Log(string logMessage, LogLevel level, Type source, [CallerMe
 ```
 **Példák a használatára**:
 ```csharp
-Logger.Log("Simple stringlog", LogLevel.Information, typeof(Program));
+VrhLogger.Log("Simple stringlog", LogLevel.Information, typeof(Program));
 ```
 ##### 1.2. Exception logolása
 Hogy ne kelljen a bonyolultabb formát beírni, kivétel logolására használható az alábbi Log metódus is:
@@ -98,7 +98,7 @@ static public void Log(Exception exception, Type source, LogLevel level = LogLev
 ```csharp
 catch (Exception ex)
 {
-    Logger.Log(ex, typeof(Program));
+    VrhLogger.Log(ex, typeof(Program));
 }
 ```
 #### 2. LoadLoggerPlugin():
@@ -117,7 +117,7 @@ static public void LoadLoggerPlugin(string config = null)
 
 **Használata:**
 ```csharp
-LoadLoggerPlugin(„LogConfig.xml/Vrh.Logger”);
+VrhLogger.LoadLoggerPlugin(„LogConfig.xml/Vrh.Logger”);
 ```
 #### 3. SetNoOfLogEntry():
 Segítségével egy olyan szolgáltatást implementálhatunk a felhasználás helyén, amivel egy adott sorszámra állítjuk a Logsorszámot. Az ilyesmi például hibakereséshez jöhet jól.
@@ -134,7 +134,7 @@ public static void SetNoOfLogEntry(ulong newNoOfLogEntry=0)
 
 **Használata:**
 ```csharp
-SetNoOfLogEntry(9999);
+VrhLogger.SetNoOfLogEntry(9999);
 ```
  ### LogHelper static class:
  Az olyan hasznos szolgáltatásokat biztosít egyszerű metódusokon keresztül, amelyek a logolással kapcsolatban hasznosak lehetnek. Jelenlegi szolgáltatásai:
@@ -242,6 +242,17 @@ public static string BytesToHumanReadableString(byte[] bytearray, byte indentLev
 /// <param name="indentLevel">Annyivel indentálja a hexa blockot</param>
 /// <returns>a formázott szöveg</returns>
 public static string BytesToHexBlock(byte[] data, bool header = true, bool footer = false, Encoding encoding = null, byte indentLevel = 0)
+```
+
+* **ExtractPropertyValuesToDataFields**: Visszadja a paraméterben kapott objektum propertijeinek értékeit név-érték párok litsájaként, amit közvetlenül odalehet adni a VrhLogger.Log hívásoknak, hogy kiírja az értékekeket. A property-ken a ToString-et hívja az értékhez, így az érték string reprezentánsa az adott típus ToString megvalósításának megfelelő lesz.
+```csharp
+        /// <summary>
+        /// Visszadja a paraméterben kapott objektum propertijeinek értékeit név-érték párok litsájaként (a property-n a ToString-et hívja az értékhez)
+        /// </summary>
+        /// <typeparam name="TClass">Ezzel az objektum típussal dolgozik</typeparam>
+        /// <param name="instance">Ezzel a példánnyal</param>
+        /// <returns>név-érték párok litáájaként a property-k neve és értéke</returns>
+        public static Dictionary<string, string> ExtractPropertyValuesToDataFields<TClass>(TClass instance)
 ```
 ### Konfiguráció:
 A Vrh.Logger konfigurációjának megadásához kétféle módszert támogat:
@@ -506,6 +517,15 @@ Az alábbi szabályok és elvek elvárások a Pluginnal szemben:
 <hr></hr>
 
 # Version History:
+## V1.4.0 (2017.12.06)
+### Compatibility API changes:
+1. Logger class funkciója áttéve a VrhLogger-class alá. Ott csak annak a public (API) funkcionalitása maradt, oly módon, hogy áthív a VrhLogger-be. (Hogy ne legyen incompatibility a change.)
+2. A Logger class Obsolote-tal jelölve --> Depcreated!
+### Patches:
+1. LogHelper.ExtractPropertyValuesToDataFields null védelme
+## V1.3.0 (2017.12.05)
+### Compatibility API changes:
+1. LogHelper kiegészítése az ExtractPropertyValuesToDataFields metódussal
 ## V1.2.0 (2017.08.10)
 ### Compatibility API changes:
 1. DefaultLogger kiegészítése TXT log file írási kéápességgel

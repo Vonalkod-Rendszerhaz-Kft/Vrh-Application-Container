@@ -168,7 +168,7 @@ namespace iSchedulerMonitor
                                     catch (Exception ex)
                                     {
                                         Exception rex = wc.LastException == null ? ex : wc.LastException;
-                                        Logger.Log(rex, this.GetType());
+                                        VrhLogger.Log(rex, this.GetType());
                                         ri = new ReturnInfoJSON()
                                         {
                                             ReturnValue = -5,
@@ -206,14 +206,14 @@ namespace iSchedulerMonitor
             }
             catch (Exception ex)
             {
-                Logger.Log(ex, this.GetType());
+                VrhLogger.Log(ex, this.GetType());
             }
         }
         #endregion Examination
 
         private void log(string message, LogLevel level = LogLevel.Debug)
         {
-            Logger.Log(message, level, this.GetType());
+            VrhLogger.Log(message, level, this.GetType());
         }
 
         #endregion Private methods
