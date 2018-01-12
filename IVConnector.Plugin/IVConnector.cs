@@ -31,15 +31,13 @@ namespace IVConnector.Plugin
         /// <summary>
         /// Creates the comm. class instance, reads the configuration. Rethrows any exceptions after logging the errors.
         /// </summary>
-        public IVConnector(string parameterFile, IVConnectorPlugin pluginReference)
+        public IVConnector(string configParameterFile, string messagesParameterFile, IVConnectorPlugin pluginReference)
         {
             _pluginReference = pluginReference;
-            _configuration = new IVConnectorParameterFileProcessor(parameterFile);
+            _configuration = new IVConnectorParameterFileProcessor(configParameterFile);
             _configuration.ConfigProcessorEvent += _configuration_ConfigProcessorEvent;
-            _msgPrefix = _configuration.MessagePrefix;
-            _msgSuffix = _configuration.MessageSuffix;
-            _idSeparator = _configuration.IDSeparator;
-            _paramSeparator = _configuration.ParameterSeparator;
+            _messagesConfiguration = new MessageDefinitionsParameterFileProcessor(messagesParameterFile);
+            _messagesConfiguration.ConfigProcessorEvent += _configuration_ConfigProcessorEvent;
         }
 
         /// <summary>
@@ -85,21 +83,20 @@ namespace IVConnector.Plugin
                     _process = new Thread(ts);
                     _process.Name = String.Format("IVConnector Process Thread ({0})", _pluginReference.InstanceName);
                     _process.Start();
-                    _stopped = false;
                     byte[] ba;
                     string hexString;
-                    ba = Encoding.Default.GetBytes(_msgSuffix);
+                    ba = Encoding.Default.GetBytes(_configuration.MessageSuffix);
                     hexString = BitConverter.ToString(ba);
-                    string msgSuffix = !String.IsNullOrEmpty(_msgSuffix) ? String.Format("{0} ({1})", _msgSuffix, hexString.Replace("-", "")) : "";
-                    ba = Encoding.Default.GetBytes(_msgPrefix);
+                    string msgSuffix = !String.IsNullOrEmpty(_configuration.MessageSuffix) ? String.Format("{0} ({1})", _configuration.MessageSuffix, hexString.Replace("-", "")) : "";
+                    ba = Encoding.Default.GetBytes(_configuration.MessagePrefix);
                     hexString = BitConverter.ToString(ba);
-                    string msgPrefix = !String.IsNullOrEmpty(_msgPrefix) ? String.Format("{0} ({1})", _msgPrefix, hexString.Replace("-", "")) : "";
-                    ba = Encoding.Default.GetBytes(_idSeparator);
+                    string msgPrefix = !String.IsNullOrEmpty(_configuration.MessagePrefix) ? String.Format("{0} ({1})", _configuration.MessagePrefix, hexString.Replace("-", "")) : "";
+                    ba = Encoding.Default.GetBytes(_configuration.IDSeparator);
                     hexString = BitConverter.ToString(ba);
-                    string idSeparator = !String.IsNullOrEmpty(_idSeparator) ? String.Format("{0} ({1})", _idSeparator, hexString.Replace("-", "")) : "";
-                    ba = Encoding.Default.GetBytes(_paramSeparator);
+                    string idSeparator = !String.IsNullOrEmpty(_configuration.IDSeparator) ? String.Format("{0} ({1})", _configuration.IDSeparator, hexString.Replace("-", "")) : "";
+                    ba = Encoding.Default.GetBytes(_configuration.FieldSeparator);
                     hexString = BitConverter.ToString(ba);
-                    string paramSeparator = !String.IsNullOrEmpty(_paramSeparator) ? String.Format("{0} ({1})", _paramSeparator, hexString.Replace("-", "")) : "";
+                    string paramSeparator = !String.IsNullOrEmpty(_configuration.FieldSeparator) ? String.Format("{0} ({1})", _configuration.FieldSeparator, hexString.Replace("-", "")) : "";
                     var data = new Dictionary<string, string>()
                     {
                         { "IVConnector plugin instance", _pluginReference.InstanceName },
@@ -128,7 +125,7 @@ namespace IVConnector.Plugin
                         }
                         data.Add("Input message label filtering", _configuration.LabelFilters);
                         data.Add("Intervention Id separator", _configuration.IDSeparator);
-                        data.Add("Intervention parameter separator", _configuration.ParameterSeparator);
+                        data.Add("Intervention parameter separator", _configuration.FieldSeparator);
                     }
                     _pluginReference.LogThis("IVConnector instance seccessfull started and watching!", data, null, Vrh.Logger.LogLevel.Information, this.GetType());
                 }
@@ -180,6 +177,8 @@ namespace IVConnector.Plugin
         /// </summary>
         private void ListenerProcess()
         {
+            VrhLogger.Log<string>($"ListenerProcess started: {Thread.CurrentThread.Name}", null, null, LogLevel.Debug, this.GetType());
+            _stopped = false;
             while (!disposed && !_stopped)
             {
                 if (_configuration.ConnectorType == IVConnectorType.TCP)
@@ -192,7 +191,10 @@ namespace IVConnector.Plugin
                             Socket s = _listener.AcceptSocket();
                             ThreadPool.QueueUserWorkItem(TCPProcessMessage, s);
                         }
-                        catch { }
+                        catch(Exception ex)
+                        {
+                            VrhLogger.Log(ex, this.GetType(), LogLevel.Error);
+                        }
                     }
                 }
                 else
@@ -201,6 +203,10 @@ namespace IVConnector.Plugin
                     ProcessMSMQ();
                 }
             }
+            var logData = new Dictionary<string, string>();
+            logData.Add("disposed", disposed.ToString());
+            logData.Add("stopped", _stopped.ToString());
+            VrhLogger.Log<string>($"ListenerProcess exited: {Thread.CurrentThread.Name}", logData, null, LogLevel.Debug, this.GetType());
         }
 
         /// <summary>
@@ -208,6 +214,12 @@ namespace IVConnector.Plugin
         /// </summary>
         private void ProcessMSMQ()
         {
+            var logData = new Dictionary<string, string>()
+                    {
+                        { "IVConnector plugin instance", _pluginReference.InstanceName },
+                        { "IVConnector plugin version", _pluginReference.PluginVersion },
+                        { "Used configuration file", _configuration.ConfigurationFileDefinition },
+                    };
             try
             {
                 if (!MessageQueue.Exists(_configuration.InQueue))
@@ -215,7 +227,7 @@ namespace IVConnector.Plugin
                     throw new FatalException(String.Format("Message queue not exists! {0}", _configuration.InQueue));
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Stop();
                 _pluginReference.SetErrorState(new FatalException(String.Format("Error access input Message queue: {0}", _configuration.InQueue), ex));
@@ -260,18 +272,80 @@ namespace IVConnector.Plugin
                             }
                             if (processThis)
                             {
-                                msg.Formatter = new ActiveXMessageFormatter();
+                                switch (_configuration.MsmqFormatter)
+                                {
+                                    case MSMQFormatter.ActiveXMessageFormatter:
+                                        msg.Formatter = new ActiveXMessageFormatter();
+                                        break;
+                                    case MSMQFormatter.XmlMessageFormatter:
+                                        msg.Formatter = new XmlMessageFormatter();
+                                        break;
+                                    default:
+                                        break;
+                                }
                                 msg.BodyType = 0;
-                                StreamReader reader = new StreamReader(msg.BodyStream, Encoding.Default);
+                                StreamReader reader;
+                                switch (_configuration.Encoding)
+                                {
+                                    case MyEncoding.Default:
+                                        reader = new StreamReader(msg.BodyStream, Encoding.Default);
+                                        break;
+                                    case MyEncoding.UTF8:
+                                        reader = new StreamReader(msg.BodyStream, Encoding.UTF8);
+                                        break;
+                                    case MyEncoding.UTF7:
+                                        reader = new StreamReader(msg.BodyStream, Encoding.UTF7);
+                                        break;
+                                    case MyEncoding.UTF32:
+                                        reader = new StreamReader(msg.BodyStream, Encoding.UTF32);
+                                        break;
+                                    case MyEncoding.Unicode:
+                                        reader = new StreamReader(msg.BodyStream, Encoding.Unicode);
+                                        break;
+                                    case MyEncoding.BigEndianUnicode:
+                                        reader = new StreamReader(msg.BodyStream, Encoding.BigEndianUnicode);
+                                        break;
+                                    case MyEncoding.ASCII:
+                                        reader = new StreamReader(msg.BodyStream, Encoding.ASCII);
+                                        break;
+                                    default:
+                                        reader = new StreamReader(msg.BodyStream, Encoding.Default);
+                                        break;
+                                }
                                 string msgBody = reader.ReadToEnd();
-                                string response = ProcessMSMQMessage(msgBody);
+                                bool harnessLoging = false;
+                                string response = String.Empty;
+                                try
+                                {
+                                    response = ProcessMessage(msgBody, null, out harnessLoging);
+                                }
+                                catch (Exception ex)
+                                {
+                                    _pluginReference.LogThis("IVConnector message processing error occured!", logData, ex, LogLevel.Error, this.GetType());
+                                    if (harnessLoging)
+                                    {
+                                        CallErrorLoging(msgBody, ex.Message, 2);
+                                    }
+                                    response = ex.Message;
+                                }
+
                                 if (!String.IsNullOrEmpty(_configuration.ResponseQueue))
                                 {
                                     using (var responseQueue = new MessageQueue(_configuration.ResponseQueue))
                                     {
                                         using (System.Messaging.Message resmsg = new System.Messaging.Message())
                                         {
-                                            resmsg.Formatter = new ActiveXMessageFormatter();
+                                            switch (_configuration.MsmqFormatter)
+                                            {
+                                                case MSMQFormatter.ActiveXMessageFormatter:
+                                                    resmsg.Formatter = new ActiveXMessageFormatter();
+                                                    break;
+                                                case MSMQFormatter.XmlMessageFormatter:
+                                                    resmsg.Formatter = new XmlMessageFormatter();
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
                                             string label = _configuration.ResponseLabel;
                                             if (_configuration.IdHandling == MSMQIdHandling.Label)
                                             {
@@ -283,13 +357,11 @@ namespace IVConnector.Plugin
                                             }
                                             resmsg.Label = label;
                                             resmsg.BodyStream = new MemoryStream(Encoding.UTF8.GetBytes(response));
-                                            //resmsg.UseDeadLetterQueue = true;
-                                            //resmsg.TimeToBeReceived = TimeSpan.FromMinutes(settings.MSMQReceiveTimout);                                            
                                             try
                                             {
                                                 responseQueue.Send(resmsg);
                                             }
-                                            catch(Exception ex)
+                                            catch (Exception ex)
                                             {
                                                 Dictionary<string, string> data = new Dictionary<string, string>()
                                                 {
@@ -307,28 +379,36 @@ namespace IVConnector.Plugin
                 }
             }
         }
-        
+
         /// <summary>
-        /// Feldolgozz egy MSMQ-ból kivett üzenetet
+        /// Loggol egy hibát a WCF sevicen
         /// </summary>
-        /// <param name="messageBody">Az üzenet tartalma</param>
-        /// <returns></returns>
-        private string ProcessMSMQMessage(string messageBody)
+        /// <param name="fullMessage">a feldolgozott üzenet</param>
+        /// <param name="errorTxt">hibaszöveg</param>
+        /// <param name="src">forrás: 0 - LJS, 1 - CP</param>
+        private void CallErrorLoging(string fullMessage, string errorTxt, int src)
         {
-            var data = new Dictionary<string, string>()
-                    {
-                        { "IVConnector plugin instance", _pluginReference.InstanceName },
-                        { "IVConnector plugin version", _pluginReference.PluginVersion },
-                        { "Used configuration file", _configuration.ConfigurationFileDefinition },
-                    };
             try
             {
-                return ProcessData(data, messageBody);
+                if (_configuration.CallWCFWithProcessingErrors)
+                {
+                    InterventionServiceClient interventionService = new InterventionServiceClient();
+                    Guid user = _configuration.UserGuid;
+                    Dictionary<string, object> parameters = new Dictionary<string, object>();
+                    parameters.Add("ProcessorSideError", errorTxt);
+                    parameters.Add("FullMessage", fullMessage);
+                    Intervention intervention = new Intervention()
+                    {
+                        Name = "HarnessErrorLog",
+                        ObjectID = src,
+                        Parameters = parameters,
+                    };
+                    interventionService.DoIntervention(intervention, user, null);
+                }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                _pluginReference.LogThis("IVConnector message processing error occured!", data, e, Vrh.Logger.LogLevel.Error, this.GetType());
-                return e.Message;
+                VrhLogger.Log(ex, this.GetType(), LogLevel.Error);
             }
         }
 
@@ -338,43 +418,58 @@ namespace IVConnector.Plugin
         /// <param name="state">The Accepted socket which must be processed</param>
         private void TCPProcessMessage(object state)
         {
-            var data = new Dictionary<string, string>()
+            bool harnessLogging = false;
+            string message = String.Empty;
+            var logData = new Dictionary<string, string>()
                     {
                         { "IVConnector plugin instance", _pluginReference.InstanceName },
                         { "IVConnector plugin version", _pluginReference.PluginVersion },
                         { "Used configuration file", _configuration.ConfigurationFileDefinition },
                     };
             Socket s = state as Socket;
-            byte[] buffer = new byte[_maxReceiveBufferSize];
+            byte[] tmpBuffer = new byte[_maxReceiveBufferSize];
             try
             {
                 // Setting up timeouts
                 s.ReceiveTimeout = _socketTimeout;
                 s.SendTimeout = _socketTimeout;
-                _pluginReference?.LogThis("Receiving msg...", data, null, Vrh.Logger.LogLevel.Debug, this.GetType());
-                int rcvd = 0;
+                _pluginReference?.LogThis("Receiving msg...", logData, null, Vrh.Logger.LogLevel.Debug, this.GetType());
+                int rcvd = 0;                
                 try
                 {
-                    rcvd = s.Receive(buffer);
+                    do
+                    {
+                        rcvd = s.Receive(tmpBuffer);
+                        //_buffer.Concat(tmpBuffer);
+                        message += Encoding.ASCII.GetString(tmpBuffer, 0, rcvd);
+                        if (!String.IsNullOrEmpty(_configuration.MessageSuffix))
+                        {
+                            if (message.Contains(_configuration.MessageSuffix))
+                            {
+                                break;
+                            }
+                        }
+                        var tc = new TickCounter();
+                        while(s.Available == 0 && !tc.IsTimeout(new TimeSpan(0, 0, 0, 0, _configuration.ReceiveTimeout)))
+                        {
+                            Thread.Sleep(_configuration.ReceiveTimeout / 10 >= 1 
+                                            ? _configuration.ReceiveTimeout / 10 
+                                            : _configuration.ReceiveTimeout);
+                        }                        
+                    } while (s.Available > 0);                        
+                    if (rcvd == 0)
+                    {
+                        return;
+                    }
                 }
-                catch
+                catch(Exception ex)
                 {
-                    _pluginReference?.LogThis("ERROR: No data received on socket.", data, null, Vrh.Logger.LogLevel.Warning, this.GetType());
+                    _pluginReference?.LogThis("ERROR: No data received on socket.", logData, ex, Vrh.Logger.LogLevel.Warning, this.GetType());
                     return;
-                }
-                string message = Encoding.ASCII.GetString(buffer, 0, rcvd);
-                _pluginReference.LogThis(String.Format("Receive message: {0}", message), data, null, Vrh.Logger.LogLevel.Information, this.GetType());
-                if (!message.StartsWith(_msgPrefix) && !message.EndsWith(_msgSuffix))
-                {
-                    throw new Exception("ERROR: Bad prefix or suffix in message!");
-                }
-                // Throwing out prefix and suffix
-                message = message.Substring(_msgPrefix.Length, message.Length - _msgSuffix.Length);
-                if (message.Length == 0)
-                {
-                    throw new Exception("ERROR: Empty message received!");
-                }
-                string result = ProcessData(data, message);
+                }                
+                harnessLogging = message.Contains("IVPPL") || message.Contains("IVPPC");
+                _pluginReference.LogThis($"Receive message: {Vrh.Logger.LogHelper.HexControlChars(message)}", logData, null, Vrh.Logger.LogLevel.Information, this.GetType());
+                string result = ProcessMessage(message, logData, out harnessLogging);
                 result = string.Empty;
                 if (String.IsNullOrEmpty(result))
                 {
@@ -387,7 +482,11 @@ namespace IVConnector.Plugin
             }
             catch (Exception e)
             {
-                _pluginReference.LogThis("IVConnector message processing error occured!", data, e, Vrh.Logger.LogLevel.Error, this.GetType());
+                _pluginReference.LogThis("IVConnector message processing error occured!", logData, e, Vrh.Logger.LogLevel.Error, this.GetType());
+                if (harnessLogging)
+                {
+                    CallErrorLoging(message, e.Message, 1);
+                }
                 s.Send(Encoding.ASCII.GetBytes("/x15".FromHexOrThis() + e.Message + _configuration.Ack));
             }
             finally
@@ -400,28 +499,290 @@ namespace IVConnector.Plugin
             }
         }
 
-        private string ProcessData(Dictionary<string, string> data, string message)
+        /// <summary>
+        /// Feldolgozza az üzenetet, mint stringet (akár TCP-n, akár MMQ-n érkezett)
+        /// </summary>
+        /// <param name="message">üzenet</param>
+        /// <param name="logData">adatok a loghoz</param>
+        /// <param name="harnessLoging">harness-en kell-e ezt a beavatkozást logolni</param>
+        /// <returns></returns>
+        private string ProcessMessage(string message, Dictionary<string, string> logData, out bool harnessLoging)
         {
-            string[] parts = message.Split(new string[] { _idSeparator }, StringSplitOptions.RemoveEmptyEntries);
-            if (parts.Length != 2)
+            string tmp = message;
+            string messagePrefix = _configuration.MessagePrefix;
+            if (!String.IsNullOrEmpty(messagePrefix))
             {
-                throw new Exception("ERROR: Cannot find or more than one ID.");
-                //_pluginReference.LogThis("ERROR: Cannot find or more than one ID.", data, null, Vrh.Logger.LogLevel.Warning, this.GetType());
-                //return;
+                // Ha van üzenet prefix
+                if (!tmp.StartsWith(messagePrefix))
+                {
+                    var ex = new Exception($"Invalid Message! Excepted message prefix ({Vrh.Logger.LogHelper.HexControlChars(messagePrefix)}) not found in received message: {Vrh.Logger.LogHelper.HexControlChars(message)}");
+                    throw ex;
+                }
+                tmp = tmp.Remove(0, messagePrefix.Length);
             }
-            string assemblyLineID = parts[0];
-            _pluginReference.LogThis(string.Format("Assembly Line ID : {0}", assemblyLineID), data, null, Vrh.Logger.LogLevel.Debug, this.GetType());
-            string[] pars = parts[1].Split(_paramSeparator.ToCharArray());
-            string interventionName = _configuration.GetIterventionFromID(pars[0]);
-            if (String.IsNullOrEmpty(interventionName))
+            string messageSuffix = _configuration.MessageSuffix;
+            if (!String.IsNullOrEmpty(messageSuffix))
             {
-                throw new Exception(string.Format("ERROR: Invalid message name: {0}.", pars[0]));
-                //_pluginReference.LogThis(string.Format("ERROR: Invalid message name: {0}.", pars[0]), data, null, Vrh.Logger.LogLevel.Warning, this.GetType());
-                //return;
+                // Ha van üzenet postfix
+                if (!tmp.EndsWith(messageSuffix))
+                {
+                    var ex = new Exception($"Invalid Message! Excepted message suffix ({Vrh.Logger.LogHelper.HexControlChars(messageSuffix)}) not found in received message: {Vrh.Logger.LogHelper.HexControlChars(message)}");
+                    throw ex;
+                }
+                tmp = tmp.Remove(tmp.Length - messageSuffix.Length);
+            }
+            string ivIdSeparator = _configuration.IDSeparator;
+            string assemblyLineId = null;
+            string ivId = null;
+            if (!String.IsNullOrEmpty(ivIdSeparator))
+            {
+                //string[] parts = tmp.Split(new string[] { ivIdSeparator }, StringSplitOptions.None);
+                //if (parts.Length > 2)
+                //{
+                //    var ex = new Exception($"The message id separator ({Vrh.Logger.LogHelper.HexControlChars(ivIdSeparator)}) can only once occur in message! Processed message {Vrh.Logger.LogHelper.HexControlChars(message)}");
+                //    throw ex;
+                //}
+                // Ha van ivid separátor --> akkor az addig tartó string a sor azonosító, a maradék a további adat
+                string[] parts = tmp.Split(new string[] { ivIdSeparator }, StringSplitOptions.RemoveEmptyEntries);
+                //if (parts.Length == 0) || !tmp.Contains(_configuration.IDSeparator))
+                //{
+                    //var ex = new Exception($"MessageID separator ({Vrh.Logger.LogHelper.HexControlChars(ivIdSeparator)}) required! Processed message {Vrh.Logger.LogHelper.HexControlChars(message)}");
+                    //throw ex;
+                //}
+                if (parts.Length == 1)
+                {
+                    ivId = parts[0];
+                    tmp = String.Empty;
+                }
+                if (parts.Length == 2)
+                {
+                    ivId = parts[0];
+                    tmp = parts[1];
+                }
+                if (parts.Length == 3)
+                {
+                    assemblyLineId = parts[0];
+                    ivId = parts[1];
+                    tmp = parts[2];
+                }
+            }
+            string[] fields = tmp.Split(new string[] { _configuration.FieldSeparator }, StringSplitOptions.RemoveEmptyEntries);
+            // fields[0] most az üzenet azonosító
+            // ivId = fields[0];                
+            harnessLoging = ivId.ToLower() == "ivppl" || ivId.ToLower() == "ivppc";
+            if (!_configuration.IsHandled(ivId))
+            {
+                throw new Exception($"This message with '{Vrh.Logger.LogHelper.HexControlChars(ivId)}' id not handled by this connector! Processed message {Vrh.Logger.LogHelper.HexControlChars(message)}");
+            }
+            // a maradék a paraméterek
+            List<Parameter> inputParameters = new List<Parameter>();
+            int no = 0;
+            for (int j = 0; j < fields.Length; j++)
+            {
+                try
+                {
+                    inputParameters.Add(
+                        new Parameter()
+                        {
+                            No = no,
+                            Name = Parameter.GetName(fields[j], _configuration.MessageFormat),
+                            Value = Parameter.GetValue(fields[j], _configuration.MessageFormat),
+                        }
+                    );
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+                no++;
+            }
+            if (_configuration.MessageFormat == MessageFormat.ByName)
+            {
+                var prline = inputParameters.FirstOrDefault(x => x.Name.ToUpper() == "PRLINE");
+                if (prline != null)
+                {
+                    assemblyLineId = prline.Value;
+                }
+            }
+            DefinedMessage def = _messagesConfiguration.GetMessage(ivId);
+            if (def == null)
+            {
+                throw new Exception($"Intervention definition not found this message id: {Vrh.Logger.LogHelper.HexControlChars(ivId)}! Processed message {Vrh.Logger.LogHelper.HexControlChars(message)}");
+            }
+            if (String.IsNullOrEmpty(assemblyLineId))
+            {
+                throw new Exception($"Assembly line id not present in received message: {Vrh.Logger.LogHelper.HexControlChars(message)}");
+            }
+
+            Parameter externalSystemId = null;
+            if (_configuration.MessageFormat == MessageFormat.ByName)
+            {
+                externalSystemId = inputParameters.FirstOrDefault(x => x.Name.ToUpper() == "IVSRC");
             }
             InterventionServiceClient interventionService = new InterventionServiceClient();
             Intervention intervention = new Intervention();
-            intervention.Name = interventionName;
+            int asId = GetObjectId(assemblyLineId, interventionService);
+            if (asId == -1)
+            {
+                if (externalSystemId != null)
+                {
+                    intervention.Name = "TranslateId";
+                    intervention.Parameters = new Dictionary<string, object>();
+                    intervention.Parameters.Add("EntityType", "ASLINE");
+                    intervention.Parameters.Add("ExternalSystem", externalSystemId.Value);
+                    intervention.Parameters.Add("fId", assemblyLineId);
+                    string resultId = interventionService.DoIntervention(intervention, _configuration.UserGuid, null);
+                    Int32.TryParse(resultId, out asId);
+                }
+                if (asId == -1)
+                {
+                    throw new Exception($"Unknown Assembly line: {assemblyLineId}! Processed message {Vrh.Logger.LogHelper.HexControlChars(message)}");
+                }
+            }
+            InterventionDefination ivDef = null;
+            foreach (var item in interventionService.GetAllIntervention(null))
+            {
+                if (((InterventionDefination)item).Name == def.Intervention)
+                {
+                    ivDef = (InterventionDefination)item;
+                    break;
+                }
+            }
+            if (ivDef == null)
+            {
+                throw new Exception($"Unknown intervention: {def.Intervention}! Processed message {Vrh.Logger.LogHelper.HexControlChars(message)}");
+            }
+            if (harnessLoging)
+            {
+                inputParameters.Add(
+                        new Parameter()
+                        {
+                            Name = "FullMessage",
+                            Value = message,
+                            No = inputParameters.Max(x => x.No),
+                        }
+                    );
+            }
+            intervention.Name = def.Intervention;
+            intervention.ObjectID = asId;
+            intervention.Parameters = GetParameters(ivDef, def, inputParameters);
+            Guid user = _configuration.UserGuid;
+            //data.Add("User guid", user.ToString());
+            string result = interventionService.DoIntervention(intervention, user, null);
+            VrhLogger.Log($"Processing success! Message: {Vrh.Logger.LogHelper.HexControlChars(message)}{Environment.NewLine}Intervention result: {result}",
+                     logData, null, LogLevel.Information, this.GetType());
+            return result;
+        }
+
+        /// <summary>
+        /// Összeállítja a paramétereket a WCF intervention-höz
+        /// </summary>
+        /// <param name="ivDef">Intervention definiciója (a szolgáltatásból)</param>
+        /// <param name="msgDef">üzenet definiciója az ivconnector xml-je szerint</param>
+        /// <param name="inputParameters">üzenetben kaott paraméterek listája</param>
+        /// <returns>iv paraméter lista</returns>
+        private Dictionary<string, object> GetParameters(InterventionDefination ivDef, DefinedMessage msgDef, List<Parameter> inputParameters)
+        {
+            var returnParameters = new Dictionary<string, Object>();
+            int i = 0;
+            foreach (var item in ivDef.ParameterList)
+            {
+                ParameterDefinition parameter = (ParameterDefinition)item;
+                Object parameterValue;
+                string inputStr = GetStringParameterValue(parameter, msgDef, inputParameters, i);
+                if (!String.IsNullOrEmpty(inputStr))
+                {
+                    switch (((DataType)parameter.ParameterType))
+                    {
+                        case DataType.Boolean:
+                            bool bValue = false;
+                            if (!bool.TryParse(inputStr, out bValue))
+                            {
+                                throw new Exception(string.Format("Wrong parameter format! Value: {0}, Expected type: {1}", inputStr, "Boolean"));
+                            }
+                            parameterValue = bValue;
+                            break;
+                        case DataType.Int32:
+                            int iValue = 0;
+                            if (!int.TryParse(inputStr, out iValue))
+                            {
+                                throw new Exception(string.Format("Wrong parameter format! Value: {0}, Expected type: {1}", inputStr, "Int32"));
+                            }
+                            parameterValue = iValue;
+                            break;
+                        case DataType.Double:
+                            double dValue = 0;
+                            if (!double.TryParse(inputStr, out dValue))
+                            {
+                                throw new Exception(string.Format("Wrong parameter format! Value: {0}, Expected type: {1}", inputStr, "Double"));
+                            }
+                            parameterValue = dValue;
+                            break;
+                        case DataType.DateTime:
+                            DateTime dtValue;
+                            if (!DateTime.TryParse(inputStr, out dtValue))
+                            {
+                                throw new Exception(string.Format("Wrong parameter format! Value: {0}, Expected type: {1}", inputStr, "DateTime"));
+                            }
+                            parameterValue = dtValue;
+                            break;
+                        default:
+                            parameterValue = inputStr;
+                            break;
+                    }
+                    returnParameters.Add(parameter.Name, parameterValue);
+                }
+                else
+                {
+                    throw new Exception($"Intervention parameter is missing: {parameter.Name}");
+                }
+                i++;
+            }
+
+            return returnParameters;
+        }
+
+        /// <summary>
+        /// kiszedi a megadott paraméter üzenettel kapott értékét stringként
+        /// </summary>
+        /// <param name="ivPar"></param>
+        /// <param name="msgDef">üzenet definiciója az ivconnector xml-je szerint</param>
+        /// <param name="inputParameters">üzenetben kaott paraméterek listája</param>        
+        /// <param name="no">hányadik paraméter?</param>
+        /// <returns>paraméter érték stringként</returns>
+        private string GetStringParameterValue(ParameterDefinition ivPar, DefinedMessage msgDef, List<Parameter> inputParameters, int no)
+        {
+            if (_configuration.MessageFormat == MessageFormat.Positional)
+            {
+                var input = inputParameters.FirstOrDefault(x => x.No == no);
+                if (input != null)
+                {
+                    return input.Value;
+                }
+            }
+            else
+            {
+                var field = msgDef.Fields.FirstOrDefault(x => x.InterventionParameter.ToLower() == ivPar.Name.ToLower());
+                if (field != null)
+                {
+                    var input = inputParameters.FirstOrDefault(x => x.Name.ToLower() == field.Name.ToLower());
+                    if (input != null)
+                    {
+                        return input.Value;
+                    }
+                }
+            }
+            return String.Empty;
+        }
+
+        /// <summary>
+        /// Visszaadja az object id-t, a szerelősor kulcsából
+        /// </summary>
+        /// <param name="assemblyLineId">szerelősor kulcsa</param>
+        /// <param name="interventionService">referencia a WCF intervention szolgáltatásra, ahonnan az információt megszerzi</param>
+        /// <returns>objektum id</returns>
+        private int GetObjectId(string assemblyLineId, InterventionServiceClient interventionService)
+        {
             int asId = -1;
             foreach (var item in interventionService.GetInterventionedObject(null))
             {
@@ -434,91 +795,14 @@ namespace IVConnector.Plugin
                 if (splitedName.Count() > 1)
                 {
                     string key = splitedName[1];
-                    if (key == String.Format("{0})", assemblyLineID) || name == assemblyLineID)
+                    if (key == String.Format("{0})", assemblyLineId) || name == assemblyLineId)
                     {
                         asId = item.ObjectID;
                         break;
                     }
                 }
             }
-            if (asId == -1)
-            {
-                throw new Exception(string.Format("ERROR: Unknown Assembly line: {0}!", assemblyLineID));
-                //_pluginReference.LogThis("ERROR: Unknown Assembly line: {0}!", data, null, Vrh.Logger.LogLevel.Warning, this.GetType());
-                //return;
-            }
-
-            InterventionDefination iv = null;
-            foreach (var item in interventionService.GetAllIntervention(null))
-            {
-                if (((InterventionDefination)item).Name == interventionName)
-                {
-                    iv = (InterventionDefination)item;
-                    break;
-                }
-            }
-            if (iv == null)
-            {
-                throw new Exception(string.Format("ERROR: Unknown intervention: {0}!", interventionName));
-            }
-            _pluginReference.LogThis(pars[0], data, null, Vrh.Logger.LogLevel.Information);
-            if (pars.Count() - 1 != iv.ParameterList.Count())
-            {
-                throw new Exception(string.Format("Wrong parameter count! Received: {0}, Expected: {1}", pars.Count() - 1, iv.ParameterList.Count()));
-            }
-            intervention.ObjectID = asId;
-            intervention.Parameters = new Dictionary<string, object>();
-            int i = 1;
-            foreach (var item in iv.ParameterList)
-            {
-                ParameterDefinition parameter = (ParameterDefinition)item;
-                Object parameterValue;
-                switch (((DataType)parameter.ParameterType))
-                {
-                    case DataType.Boolean:
-                        bool bValue = false;
-                        if (!bool.TryParse(pars[i], out bValue))
-                        {
-                            throw new Exception(string.Format("Wrong parameter format! Value: {0}, Expected type: {1}", pars[i], "Boolean"));
-                        }
-                        parameterValue = bValue;
-                        break;
-                    case DataType.Int32:
-                        int iValue = 0;
-                        if (!int.TryParse(pars[i], out iValue))
-                        {
-                            throw new Exception(string.Format("Wrong parameter format! Value: {0}, Expected type: {1}", pars[i], "Int32"));
-                        }
-                        parameterValue = iValue;
-                        break;
-                    case DataType.Double:
-                        double dValue = 0;
-                        if (!double.TryParse(pars[i], out dValue))
-                        {
-                            throw new Exception(string.Format("Wrong parameter format! Value: {0}, Expected type: {1}", pars[i], "Double"));
-                        }
-                        parameterValue = dValue;
-                        break;
-                    case DataType.DateTime:
-                        DateTime dtValue;
-                        if (!DateTime.TryParse(pars[i], out dtValue))
-                        {
-                            throw new Exception(string.Format("Wrong parameter format! Value: {0}, Expected type: {1}", pars[i], "DateTime"));
-                        }
-                        parameterValue = dtValue;
-                        break;
-                    default:
-                        parameterValue = pars[i];
-                        break;
-                }
-                intervention.Parameters.Add(parameter.Name, parameterValue);
-                i++;
-            }
-            Guid user = _configuration.UserGuid;
-            data.Add("User guid", user.ToString());
-            string result = interventionService.DoIntervention(intervention, user, null);
-            _pluginReference.LogThis(string.Format("IVConnector: Intervention result: {0}", result), data, null, Vrh.Logger.LogLevel.Debug);
-            return result;
+            return asId;
         }
 
         /// <summary>
@@ -539,21 +823,42 @@ namespace IVConnector.Plugin
             _pluginReference.LogThis(String.Format("Configuration issue: {0}", e.Message), data, e.Exception, level);
         }
 
+        /// <summary>
+        /// Referencia az iv connector pluginra (a szolgáltatásai közvetlen eléréséhez)
+        /// </summary>
         private IVConnectorPlugin _pluginReference = null;
 
+        /// <summary>
+        /// TCP socket timeout
+        /// </summary>
         private static int _socketTimeout = 5000;
+
+        /// <summary>
+        /// bejövő üenet méret
+        /// </summary>
         private static int _maxReceiveBufferSize = 200;
 
+        /// <summary>
+        /// Folymatot futtató szál
+        /// </summary>
         private Thread _process;
+
+        /// <summary>
+        /// Konfiguráció
+        /// </summary>
         private IVConnectorParameterFileProcessor _configuration;
 
-        private string _msgPrefix;
-        private string _msgSuffix;
-        private string _idSeparator;
-        private string _paramSeparator;
+        /// <summary>
+        /// Azon üzenetek definiciója, melyeket a connector feldolgoz 
+        /// </summary>
+        private MessageDefinitionsParameterFileProcessor _messagesConfiguration;
 
+        /// <summary>
+        /// TCP server socket
+        /// </summary>
         private TcpListener _listener;
-        //private InterventionService _referencToInterventionService;
+
+        private byte[] _buffer = new byte[_maxReceiveBufferSize];
 
         /// <summary>
         /// Jelzi, hogy a connector nincs elindított állapotban

@@ -1,43 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<IVConnectorConfig>
-  <Configuration Type="MSMQ">
-    <InQueue>.\private$\TEST</InQueue>  
-    <ResponseQueue>.\private$\Out</ResponseQueue>
-    <LabelFilter>!Response</LabelFilter>
-    <ResponseLabel>Response {0}</ResponseLabel>
-    <!-- CorrelationId, Label, None -->
-    <IdHandling>CorrelationId</IdHandling>
-    <IVIDSeparator>#$</IVIDSeparator>
-    <ParameterSeparator>@</ParameterSeparator>
-  </Configuration>
-  <!--
-  <Configuration Type="TCP">
-    <IP>127.0.0.1</IP>
-    <Port>3200</Port>
-    <MessagePrefix></MessagePrefix>
-    <MessageSuffix>\x0D0A</MessageSuffix>
-    <IVIDSeparator>#$</IVIDSeparator>
-    <ParameterSeparator>@</ParameterSeparator>
-    <Ack>\x06</Ack>
-  </Configuration>
-  -->
-  <!-- egy beavatkozás üzenet formája:
-					[MessagePrefix][AssemblyLineName][IVIDSeparator]
-					[MessageId]
-					[ParameterSeparator][Parameter1]
-					[ParameterSeparator][Parameter2]
-					[ParameterSeparator][Parameter3]
-					[MessageSuffix] -->
-  <!-- IP = ezen az IP-n várja a csatlakozást a szerver -->
-  <!-- Port = ezen a porton várja a csatlakozást a szerver -->
-  <!-- MessagePrefix = a feldolgozandó üzeneteknek ezzel a prefix-szel kell kezdődni -->
-  <!-- MessageSuffix = a feldolgozandó üzeneteknek ezzel a suffix-szel kell végződni -->
-  <!-- IVIDSeparator = a beavatkozás azonosítót a paraméterektől elválasztó karakter sorozat -->
-  <!-- ParameterSeparator = a beavatkozás paramétereket egymástól elválasztó karakter sorozat -->
-  <!-- Ack = Az üzenet sikeres feldolgozása után visszaküüldendő karaktersorozat -->
-  <!-- ha ezek a karaktersorozatok \x-szel kezdődnek, akkor utána hexadecimálisan van leírva a tartalom, tehát \x0D0A a CR-LF karakterek küldését jelenti -->
-  <HandledMessages UserGuid="B4A6BFAD-ECFA-46E3-9CFF-813DCEF76845">
-    <!--
+<!--
       ivACTIVATE
       ivDEACTIVATE
       ivSET_NUMOFWORKERS
@@ -77,7 +39,103 @@
       ivANDONINI
       ivSPMPlanGenerate
     -->
-    <Message MessageId="IVPC" Intervention="ivPCPackClose"/>
-    <Message MessageId="IVPP" Intervention="ivPCPack"/>
-  </HandledMessages>
+<IVConnectorConfig>
+	<!-- Type: A connector típusa: 
+	MSMQ - Message queue üzenetek feldolgozásval működik, 
+	TCP - tcp server socketet nyít és az azon kapott üzeneteket dolgozza fel. -->
+	<Configuration_M1 Type="MSMQ">
+		<!-- Bejövő várósor -->
+		<InQueue>.\private$\Test</InQueue>
+		<!-- A használt formatter: Lehetséges értékek: XmlMessageFormatter | ActiveXMessageFormatter -->
+		<MessageFormater>ActiveXMessageFormatter</MessageFormater>
+		<!-- Csak az itt megadott szövegeket tartalmazó, vagy nem tartalmazó label-ü üzeneteket szedi ki a Queue-ból. 
+		A ! (negációval) lehet jelezni, hogy mit nem akarunk. -->
+		<LabelFilter>!Response</LabelFilter>
+		<!-- Válasz Queue, ha meg van adva, akkor ebbe mennek vissza üzenetek a feldolgozások eredményéről -->
+		<ResponseQueue></ResponseQueue>
+		<!-- Ez lesz a válasz üzenetek label-je. A {0} helyre beteszi az üzenet azonosítót, de csak ha IdHandling == Label -->
+		<ResponseLabel>Response {0}</ResponseLabel>
+		<!-- Milyen azonosítóval köti a válaszokat a feldolgozott üzenethez. Lehetséges értékek: CorrelationId, Label, None -->
+		<IdHandling>CorrelationId</IdHandling>
+		<!-- Ha meg van adva, akkor az IVPPL és az IVPPC üzenetek esetén (vagy, ha nem ismeri fel az üzenet típusát) 
+				az üzenet feldolgozás az üzenet hibás/nem értelmezhető formátuma miatt hibára fut, 
+				akkor behív az ALM WCF intervention service-be, 
+				hogy a HarnessTransactionLog táblába bekerülhessen az üzenetfeldolgozási hiba. --> 
+		<CallWCFWithProcessingErrors>true</CallWCFWithProcessingErrors>
+    <!-- Lehetséges értékek: UTF8, UTF7, UTF32, Unicode, Default, BigEndianUnicode, ASCII-->    
+    <Encoding>Unicode</Encoding>
+		<!-- 
+		Az üzenet struktúrája a következő:
+		[Prefix] [TARGETID] [IVIDSeparator] IVID [List of fields] [Suffix]
+		A "List of fields" egy eleme: 
+			Format=positional esetén: FieldSeparator [List of values]
+			Format=byname esetén: FieldSeparator [FieldNameFrame] FIELDNAME [FieldNameFrame] = [List of values]
+		A "List of values" egy eleme = [value][ValuesSeparator]
+		-->
+		<MessageStructure Prefix="" IVIDSeparator="#$" FieldSeparator=";" FieldNameFrame="$" ValuesSeparator="," Suffix="" Format="byname"/>
+		<!-- UserGuid: Az itt megadott felhasználó azonosító nevében végzi a el az ALM rendszerben a beavatkozást. -->
+		<UserGuid>B4A6BFAD-ECFA-46E3-9CFF-813DCEF76845</UserGuid>
+		<Messages>
+			<Message IVID="IVPC"/>
+			<Message IVID="IVPP"/>
+			<Message IVID="IVPPL"/>
+			<Message IVID="IVPPC"/>
+		</Messages>
+	</Configuration_M1>
+	<Configuration_T1 Type="TCP">
+		<!-- IP = ezen az IP-n várja a csatlakozást a szerver -->
+		<!-- Port = ezen a porton várja a csatlakozást a szerver -->
+		<!-- Ack = ez a nyugta üzenet -->
+		<IP>127.0.0.1</IP>
+		<Port>3301</Port>
+		<Ack>\x06</Ack>
+    <ReceiveTimeout>300</ReceiveTimeout>
+		<CallWCFWithProcessingErrors>true</CallWCFWithProcessingErrors>
+		<!-- UserGuid: Az itt megadott felhasználó azonosító nevében végzi a el az ALM rendszerben a beavatkozást. -->
+		<UserGuid>B4A6BFAD-ECFA-46E3-9CFF-813DCEF76845</UserGuid>
+		<!-- 
+		Az üzenet struktúrája a következő:
+		[Prefix] [TARGETID] [IVIDSeparator] IVID [List of fields] [Suffix]
+		A "List of fields" egy eleme: 
+			Format=positional esetén: FieldSeparator [List of values]
+			Format=byname esetén: FieldSeparator [FieldNameFrame] FIELDNAME [FieldNameFrame] = [List of values]
+		A "List of values" egy eleme = [value][ValuesSeparator]
+		Format=positional esetén: ha a Message definícióban egy mező neve üres, akkor az egy nem használt mező pozíciót képvisel
+		Ha IVIDFieldName vagy TARGETIDFieldName meg van adva, akkor abban az üzenetben az IVID és a TARGETID adatokat a mezők közül kell kiemelni
+		-->
+		<MessageStructure Prefix="" Suffix="\x0D0A" IVIDSeparator="#$" FieldSeparator=";" FieldNameFrame="$" ValuesSeparator="," Format="byname"/>
+		<Messages>
+			<Message IVID="IVPC"/>
+			<Message IVID="IVPP"/>
+			<Message IVID="IVPPc" TargetIdFieldName=""/>
+      <Message IVID="IVPPL" TargetIdFieldName=""/>
+		</Messages>
+	</Configuration_T1>  
+	<MessageDefinitions>
+		<Message IVID="IVPC" Intervention="ivPCPackClose">
+      <MsgField Name="Count"></MsgField>  
+    </Message>
+    <Message IVID="IVPP" Intervention="ivPCPack">
+      <MsgField Name="Count"></MsgField>
+    </Message>    
+		<Message IVID="IVPPc" Intervention="ivPCPackCP">
+			<MsgField Name="IVSRC" InterventionParameter=""></MsgField>
+			<MsgField Name="GPN"></MsgField>
+			<MsgField Name="CPN"></MsgField>
+			<MsgField Name="LOT"></MsgField>
+			<MsgField Name="SUSN"></MsgField>
+			<MsgField Name="ITSN"></MsgField>
+			<MsgField Name="QTY"></MsgField>
+			<MsgField Name="DATETIME"></MsgField>
+      <MsgField Name="FullMessage"></MsgField>
+		</Message>    	
+		<Message IVID="IVPPL" Intervention="ivPCPackLJS">
+		  <MsgField Name="IVSRC"></MsgField>
+		  <MsgField Name="WO"></MsgField>
+		  <MsgField Name="FYON"></MsgField>
+		  <MsgField Name="PRLINE"></MsgField>
+		  <MsgField Name="DATETIME"></MsgField>
+      <MsgField Name="FullMessage"></MsgField>
+		</Message>    
+	</MessageDefinitions>
 </IVConnectorConfig>

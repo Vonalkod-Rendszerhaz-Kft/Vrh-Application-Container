@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>IVConnector.Plugin</RootNamespace>
     <AssemblyName>IVConnector.Plugin</AssemblyName>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -51,8 +51,8 @@
       <HintPath>..\packages\VRH.Common.1.13.0\lib\net35\VRH.Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Vrh.LinqXMLProcessor.Base, Version=1.2.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.LinqXMLProcessor.Base.1.2.2\lib\net40\Vrh.LinqXMLProcessor.Base.dll</HintPath>
+    <Reference Include="Vrh.LinqXMLProcessor.Base, Version=1.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.LinqXMLProcessor.Base.1.2.3\lib\net40\Vrh.LinqXMLProcessor.Base.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Vrh.Logger, Version=1.4.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -65,7 +65,10 @@
     <Compile Include="IVConnector.cs" />
     <Compile Include="IVConnectorPlugin.cs" />
     <Compile Include="IVConnectorTypeEnum.cs" />
+    <Compile Include="MessageDefinitions.Config.cs" />
+    <Compile Include="MessageFormatEnum.cs" />
     <Compile Include="MSMQIdHandlingEnum.cs" />
+    <Compile Include="Parameter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service References\InterventionService\Reference.cs">
       <AutoGen>True</AutoGen>
@@ -124,6 +127,9 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadataStorage Include="Service References\InterventionService\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Binary References\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

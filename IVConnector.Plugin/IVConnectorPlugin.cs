@@ -45,8 +45,43 @@ namespace IVConnector.Plugin
             {
                 _ivConnector.Dispose();
             }
-            string pluginConfig = String.IsNullOrEmpty(_myData.InstanceConfig) ? _myData.Type.PluginConfig : _myData.InstanceConfig;
-            _ivConnector = new IVConnector(String.IsNullOrEmpty(pluginConfig) ? "IVConnector.Config.xml" : pluginConfig, this);
+            string pluginTmp = _myData.Type.PluginConfig;
+            string[] pluginConfigParts = pluginTmp.Split(",".ToCharArray(), StringSplitOptions.None);
+            string pluginConfig = String.Empty;
+            string pluginMessageDefinitions = String.Empty;
+            if (pluginConfigParts.Length > 0)
+            {
+                pluginConfig = pluginConfigParts[0];
+            }
+            if (pluginConfigParts.Length > 1)
+            {
+                pluginMessageDefinitions = pluginConfigParts[1];
+            }
+            string instanceTmp = _myData.InstanceConfig;
+            string[] instanceConfigParts = instanceTmp.Split(",".ToCharArray(), StringSplitOptions.None);
+            string instanceConfig = String.Empty;
+            string instanceMessageDefinitions = String.Empty;
+            if (instanceConfigParts.Length > 0)
+            {
+                instanceConfig = instanceConfigParts[0];
+            }
+            if (instanceConfigParts.Length > 1)
+            {
+                instanceMessageDefinitions = instanceConfigParts[1];
+            }
+            instanceConfig = !String.IsNullOrEmpty(instanceConfig) 
+                                ? instanceConfig 
+                                : pluginConfig;
+            instanceMessageDefinitions = !String.IsNullOrEmpty(instanceMessageDefinitions) 
+                                            ? instanceMessageDefinitions 
+                                            : pluginMessageDefinitions;
+            instanceConfig = !String.IsNullOrEmpty(instanceConfig) 
+                                ? instanceConfig 
+                                : "IVConnector.Config.xml/Configuration";
+            instanceMessageDefinitions = !String.IsNullOrEmpty(instanceMessageDefinitions) 
+                                ? instanceMessageDefinitions 
+                                : "IVConnector.Config.xml/MessageDefinitions";                        
+            _ivConnector = new IVConnector(instanceConfig, instanceMessageDefinitions, this);
             try
             {
                 _ivConnector.Start();

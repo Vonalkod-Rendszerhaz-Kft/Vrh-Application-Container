@@ -1,16 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<Plugins>
-
+<Plugins.Config>
+  <Plugins StackSize="50">
+    <!--
 	<Plugin Description="Scheduler Monitor" 
           Assembly="iSchedulerMonitor.dll" 
 			    Type="iSchedulerMonitor.MonitorPlugin" 
           Version="1.0.0-alpha" Singletone="false" AutoStart ="true" 
           PluginDirectory="iSchedulerMonitor">
-			
+-->
     <!-- ANTI: Ha nem azonos gépen fut a WebServer és a plugin, akkor az 
                InstanceConfig a plugint futtató gépen az xml helye; InstanceData a távoli gépen az xml helye. 
                Ha azonos gépen fut, akkor az InstanceData nem kötelező. 
     -->
+    <!--  
     <Instance	Id="Monitor1"
 				Name="SchedulerMonitor_for_LearALM"
 				Description="Időzített feladatok figyelése a LearALM-ben."
@@ -20,14 +22,32 @@
         ....
       </Parameters>
     </Instance>
+-->
     <!--VRH-->
     <!--
     <Instance	Id="Monitor1"
 					Name="SchedulerMonitor_for_LearALM"
 					Description="Időzített feladatok figyelése a LearALM-ben."
 					InstanceConfig="c:\ALM\wwwroot\App_Data\iScheduler\iScheduler.xml"/>
-    -->
 
   </Plugin>  
-	
-</Plugins>
+ -->
+    <Plugin Description="IV Connevctor plugin"
+              Assembly="IVConnector.Plugin.dll"
+              Type ="IVConnector.Plugin.IVConnectorPlugin"
+              Version="2.0.0"
+              Singletone="false"
+              AutoStart="true"
+              PluginDirectory="IVConnector"
+              PluginConfig=",\IVConnector\IVConnector.Config.xml/IVConnectorConfig/MessageDefinitions">
+      <Instance	Id="MSMQIVConnector"
+            Name="IVConnector for MSMQ"
+            Description="MSQMQ-n érkező bevartkozások kezelőfelülete LearALM-ben."
+            InstanceConfig="\IVConnector\IVConnector.Config.xml/IVConnectorConfig/Configuration_M1,\IVConnector\IVConnector.Config.xml/IVConnectorConfig/MessageDefinitions"/>
+      <Instance	Id="TCPIVConnector"
+            Name="IVConnector for TCP"
+            Description="TCP-n érkező bevartkozások kezelőfelülete LearALM-ben."
+            InstanceConfig="\IVConnector\IVConnector.Config.xml/IVConnectorConfig/Configuration_T1,\IVConnector\IVConnector.Config.xml/IVConnectorConfig/MessageDefinitions"/>
+    </Plugin>
+  </Plugins>
+</Plugins.Config>

@@ -149,6 +149,9 @@ Ha hibaérzékenység nem, de például logolás szükséges, akkor ezt a Config
 <hr></hr>
 
 # Version History:
+## V1.2.3 (2017.12.20)
+### Patches:
+1. GetRootElement javítása, hogy helyesen dolgozza fel a file.xml/tag1/tag2/tag3 jellegű definíciókat.
 ## V1.2.2 (2017.03.21)
 ### Patches:
 1. GetElementPath, GetAttributePath nullvédelme
