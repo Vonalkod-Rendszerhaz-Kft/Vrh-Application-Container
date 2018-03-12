@@ -21,6 +21,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iSchedulerMonitor", "iSched
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vrh.ApplicationContainer.WindowsServiceHost", "Vrh.ApplicationContainer.WindowsServiceHost\Vrh.ApplicationContainer.WindowsServiceHost.csproj", "{38529388-3CE3-49D6-A0DB-76647B84EA62}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IVServiceWatchdog", "IVServiceWatchdog\IVServiceWatchdog.csproj", "{501DB928-AD32-46FC-8510-214EBD1FE200}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service.Starter", "Service.Starter\Service.Starter.csproj", "{275CB54C-6639-4CB5-A34B-A9D7FD5A9714}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,6 +63,14 @@ Global
 		{38529388-3CE3-49D6-A0DB-76647B84EA62}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{38529388-3CE3-49D6-A0DB-76647B84EA62}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{38529388-3CE3-49D6-A0DB-76647B84EA62}.Release|Any CPU.Build.0 = Release|Any CPU
+		{501DB928-AD32-46FC-8510-214EBD1FE200}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{501DB928-AD32-46FC-8510-214EBD1FE200}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{501DB928-AD32-46FC-8510-214EBD1FE200}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{501DB928-AD32-46FC-8510-214EBD1FE200}.Release|Any CPU.Build.0 = Release|Any CPU
+		{275CB54C-6639-4CB5-A34B-A9D7FD5A9714}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{275CB54C-6639-4CB5-A34B-A9D7FD5A9714}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{275CB54C-6639-4CB5-A34B-A9D7FD5A9714}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{275CB54C-6639-4CB5-A34B-A9D7FD5A9714}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -69,5 +81,7 @@ Global
 		{B0B86A2A-7F39-40C4-82C5-FEA9ADC1D62B} = {DFAA4713-DE67-4DF8-A7E3-DC992C935CD3}
 		{13AA79BE-E374-41DE-96A7-F4B725377BA2} = {DFAA4713-DE67-4DF8-A7E3-DC992C935CD3}
 		{E2EE1A88-D8A2-4031-9A8A-CFF111E87FB3} = {DFAA4713-DE67-4DF8-A7E3-DC992C935CD3}
+		{501DB928-AD32-46FC-8510-214EBD1FE200} = {DFAA4713-DE67-4DF8-A7E3-DC992C935CD3}
+		{275CB54C-6639-4CB5-A34B-A9D7FD5A9714} = {DFAA4713-DE67-4DF8-A7E3-DC992C935CD3}
 	EndGlobalSection
 EndGlobal

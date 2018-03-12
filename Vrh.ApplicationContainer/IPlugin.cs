@@ -267,7 +267,7 @@ namespace Vrh.ApplicationContainer
                             { "Name", _myData.Name },
                             { "Type", _myData.Type.TypeName },
                         };
-            LogThis(String.Format("Plagin status change from {0} to {1}", _myStatus, PluginStateEnum.Error), data, null, Logger.LogLevel.Information);
+            LogThis(String.Format("Plugin status change from {0} to {1}", _myStatus, PluginStateEnum.Error), data, null, Logger.LogLevel.Information);
             lock (_locker)
             {
                 _myStatus = PluginStateEnum.Error;
@@ -310,7 +310,7 @@ namespace Vrh.ApplicationContainer
                             { "InternalId", _myData?.InternalId.ToString() },
                             { "Plugin id", _myData?.Id },
                         };
-                        LogThis(String.Format("Plagin status change from {0} to {1}", _myStatus, value), data, null, Logger.LogLevel.Information);
+                        LogThis(String.Format("Plugin status change from {0} to {1}", _myStatus, value), data, null, Logger.LogLevel.Information);
                         _myStatus = value;
                     }
                 }

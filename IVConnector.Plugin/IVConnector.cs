@@ -596,7 +596,7 @@ namespace IVConnector.Plugin
                 }
                 no++;
             }
-            if (_configuration.MessageFormat == MessageFormat.ByName)
+            if (_configuration.MessageFormat == MessageFormat.ByName && String.IsNullOrEmpty(assemblyLineId))
             {
                 var prline = inputParameters.FirstOrDefault(x => x.Name.ToUpper() == "PRLINE");
                 if (prline != null)
@@ -734,7 +734,14 @@ namespace IVConnector.Plugin
                 }
                 else
                 {
-                    throw new Exception($"Intervention parameter is missing: {parameter.Name}");
+                    if ((DataType) parameter.ParameterType == DataType.String)
+                    {
+                        returnParameters.Add(parameter.Name, String.Empty);
+                    }
+                    else
+                    {
+                        throw new Exception($"Intervention parameter is missing: {parameter.Name}");
+                    }                    
                 }
                 i++;
             }

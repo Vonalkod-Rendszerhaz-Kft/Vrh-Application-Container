@@ -73,15 +73,27 @@ namespace Vrh.ApplicationContainer
         [DataMember]
         public string FactoryMethodName { set; get; }
 
+        /// <summary>
+        /// Azt mutatja, hogy mennyi példány van betöltve jelenleg eből a pluginból az ApplicationContainer-be
+        /// </summary>
         [DataMember]
         public int LoadedInstanceCount { set; get; }
 
+        /// <summary>
+        /// Azt mutatja, hogy mennyi példány van definiálva eből a pluginból az összeállítás konfigurációja szerint
+        /// </summary>
         [DataMember]
         public int DefinedInstanceCount { set; get; }
 
+        /// <summary>
+        /// Azt mutatja, hogy be van-e betöltve eből  apluginból jelenleg példány 
+        /// </summary>
         [DataMember]
         public bool Loaded { get; set; }
 
+        /// <summary>
+        /// Megmutatja, hogy a plugin jelenleg definiálva van-e az összeállítás konfigurációjában
+        /// </summary>
         [DataMember]
         public bool NotDefined { get; set; }
     }    

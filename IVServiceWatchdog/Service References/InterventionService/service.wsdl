@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="http://tempuri.org/" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="InterventionService" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsp:Policy wsu:Id="DTMInterventionService_policy">
+    <wsp:ExactlyOne>
+      <wsp:All>
+        <msb:BinaryEncoding xmlns:msb="http://schemas.microsoft.com/ws/06/2004/mspolicy/netbinary1">
+        </msb:BinaryEncoding>
+        <msf:Streamed xmlns:msf="http://schemas.microsoft.com/ws/2006/05/framing/policy">
+        </msf:Streamed>
+        <wsaw:UsingAddressing>
+        </wsaw:UsingAddressing>
+      </wsp:All>
+    </wsp:ExactlyOne>
+  </wsp:Policy>
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://tempuri.org/Imports">
+      <xsd:import namespace="http://tempuri.org/" />
+      <xsd:import namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import namespace="http://schemas.datacontract.org/2004/07/DTM.WCF.InterventionService" />
+      <xsd:import namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="IInterventionService_GetAllIntervention_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetAllIntervention" />
+  </wsdl:message>
+  <wsdl:message name="IInterventionService_GetAllIntervention_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetAllInterventionResponse" />
+  </wsdl:message>
+  <wsdl:message name="IInterventionService_GetInterventionedObject_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetInterventionedObject" />
+  </wsdl:message>
+  <wsdl:message name="IInterventionService_GetInterventionedObject_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetInterventionedObjectResponse" />
+  </wsdl:message>
+  <wsdl:message name="IInterventionService_GetCurrentInterventionOnThisObject_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetCurrentInterventionOnThisObject" />
+  </wsdl:message>
+  <wsdl:message name="IInterventionService_GetCurrentInterventionOnThisObject_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetCurrentInterventionOnThisObjectResponse" />
+  </wsdl:message>
+  <wsdl:message name="IInterventionService_DoIntervention_InputMessage">
+    <wsdl:part name="parameters" element="tns:DoIntervention" />
+  </wsdl:message>
+  <wsdl:message name="IInterventionService_DoIntervention_OutputMessage">
+    <wsdl:part name="parameters" element="tns:DoInterventionResponse" />
+  </wsdl:message>
+  <wsdl:portType name="IInterventionService">
+    <wsdl:operation name="GetAllIntervention">
+      <wsdl:input wsaw:Action="http://tempuri.org/IInterventionService/GetAllIntervention" message="tns:IInterventionService_GetAllIntervention_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IInterventionService/GetAllInterventionResponse" message="tns:IInterventionService_GetAllIntervention_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetInterventionedObject">
+      <wsdl:input wsaw:Action="http://tempuri.org/IInterventionService/GetInterventionedObject" message="tns:IInterventionService_GetInterventionedObject_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IInterventionService/GetInterventionedObjectResponse" message="tns:IInterventionService_GetInterventionedObject_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCurrentInterventionOnThisObject">
+      <wsdl:input wsaw:Action="http://tempuri.org/IInterventionService/GetCurrentInterventionOnThisObject" message="tns:IInterventionService_GetCurrentInterventionOnThisObject_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IInterventionService/GetCurrentInterventionOnThisObjectResponse" message="tns:IInterventionService_GetCurrentInterventionOnThisObject_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="DoIntervention">
+      <wsdl:input wsaw:Action="http://tempuri.org/IInterventionService/DoIntervention" message="tns:IInterventionService_DoIntervention_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IInterventionService/DoInterventionResponse" message="tns:IInterventionService_DoIntervention_OutputMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="DTMInterventionService" type="tns:IInterventionService">
+    <wsp:PolicyReference URI="#DTMInterventionService_policy">
+    </wsp:PolicyReference>
+    <soap12:binding transport="http://schemas.microsoft.com/soap/named-pipe" />
+    <wsdl:operation name="GetAllIntervention">
+      <soap12:operation soapAction="http://tempuri.org/IInterventionService/GetAllIntervention" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetInterventionedObject">
+      <soap12:operation soapAction="http://tempuri.org/IInterventionService/GetInterventionedObject" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCurrentInterventionOnThisObject">
+      <soap12:operation soapAction="http://tempuri.org/IInterventionService/GetCurrentInterventionOnThisObject" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DoIntervention">
+      <soap12:operation soapAction="http://tempuri.org/IInterventionService/DoIntervention" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="InterventionService">
+    <wsdl:port name="DTMInterventionService" binding="tns:DTMInterventionService">
+      <soap12:address location="net.pipe://localhost/DTMInterventionService" />
+      <wsa10:EndpointReference>
+        <wsa10:Address>net.pipe://localhost/DTMInterventionService</wsa10:Address>
+        <Identity xmlns="http://schemas.xmlsoap.org/ws/2006/02/addressingidentity">
+          <Dns>localhost</Dns>
+        </Identity>
+      </wsa10:EndpointReference>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

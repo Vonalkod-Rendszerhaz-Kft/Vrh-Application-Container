@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ServiceStarterConfig>
+  <!-- ControlledServices  
+  Ez alatt soroljuk fel azokat a Windows service-eket, melyeket kontrol alá kívánunk helyezni 
+        CheckInterval: Ilyen gyakran ellenőrzi a servicek futását. (A service-nél megadott intervallum felülírja.) Ha nem nagyobb nullánál, akkor alapértelmezés szerint nincs ellenőrzés
+        DependenciesSemafor: Tegyen-e a Redis semafort azokra a servicekre melyek ettől függenek (Így szintén elindulnak, ha nem, futnak)
+        MaxStartingTime: Ha elindít egy service-t, maximum ennyi ideig várakozik, hogy az Running státusba kerüljön. (A service-nél megadott érték felülírja. )
+        CreateRedisSemafor: Ha meg van adva egy 0-tól különbüöző TimeSpan, akkor a timespanben definiált lejárattal egy szemafort helyez el a redisen, amikor újraindít egy service-t
+  -->
+  <ControlledServices CheckInterval="00:00:05" DependenciesSemafor="true" MaxStartingTime="00:01:00" CreateRedisSemafor="00:02:00">
+    <!-- Ellenőrzött service 
+          Name: a service szolgáltatásneve 
+          CheckInterval: Milyen gyakran ellenőrízze? (Elhagyható, ez esetben a ControlledServices element CheckInterval értéke jut érvényre), ha a megadott intervallum nem nagyobb nullánál, akkor ninc sellenőrzés 
+          CheckDependenciesToo: Ellenőrizze-e a servicek definiált függőségeit is? (Elhagyható, ez esetben a ControlledServices element CheckDependenciesToo értéke jut érvényre)
+          MaxStartingTime: Ha elindít egy service-t, maximum ennyi ideig várakozik, hogy az Running státusba kerüljön. (Elhagyható, ez esetben a ControlledServices element MaxStartingTime értéke jut érvényre)
+          CreateRedisSemafor: Ha meg van adva egy 0-tól különbüöző TimeSpan, akkor a timespanben definiált lejárattal egy szemafort helyez el a redisen, amelyik az IVService Watchdog-ban meggátolja, hogy terminálja a processzt. (Ha elhagyjuk, akkor  adefult beállítás jut érvényre.)
+    -->
+    <!--<Service Name="Service1"/>-->
+    <!--<Service Name="SQL Server (SQL2008R2EXPRESS)" CheckInterval="00:00:05" CheckDependenciesToo="false" MaxStartingTime="00:02:00"/>-->
+    <!--<Service Name="sppsvc" CheckDependenciesToo="true"/>-->
+    <Service Name="SQLBrowser" DependenciesSemafor="true" CreateRedisSemafor="00:02:00"/>    
+    <!--<Service Name="Service4" CheckInterval="00:00:15"/>-->
+  </ControlledServices>
+  <RedisConnection>localhost,defaultDatabase=7</RedisConnection>
+</ServiceStarterConfig>

@@ -128,9 +128,7 @@
   <ItemGroup>
     <WCFMetadataStorage Include="Service References\InterventionService\" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Binary References\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy /Y /R "$(SolutionDir)IVConnector.Plugin\bin\$(ConfigurationName)\IVConnector.Plugin.dll" "$(SolutionDir)Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\IVConnector"

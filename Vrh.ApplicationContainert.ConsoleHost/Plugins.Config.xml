@@ -31,7 +31,7 @@
 					InstanceConfig="c:\ALM\wwwroot\App_Data\iScheduler\iScheduler.xml"/>
 
   </Plugin>  
- -->
+--> 
     <Plugin Description="IV Connevctor plugin"
               Assembly="IVConnector.Plugin.dll"
               Type ="IVConnector.Plugin.IVConnectorPlugin"
@@ -49,5 +49,34 @@
             Description="TCP-n érkező bevartkozások kezelőfelülete LearALM-ben."
             InstanceConfig="\IVConnector\IVConnector.Config.xml/IVConnectorConfig/Configuration_T1,\IVConnector\IVConnector.Config.xml/IVConnectorConfig/MessageDefinitions"/>
     </Plugin>
+
+    <!--
+  <Plugin Description="IV Service Watchdog plugin"
+              Assembly="IVServiceWatchdog.dll"
+              Type ="IVServiceWatchdog.IVServiceWatchdogPlugin"
+              Version="1.0.0"
+              Singletone="false"
+              AutoStart="true"
+              PluginDirectory="IVServiceWatchdog"
+              PluginConfig="">
+      <Instance	Id="Intervention Service Watchdog"
+            Name="Intervention Service Watchdog"
+            Description="Check ALM intervention service, and restart them, if need"
+            InstanceConfig="\IVServiceWatchdog\IVServiceWatchdog.Config.xml"/>
+    </Plugin>
+    <Plugin Description="Windows Service Starter plugin"
+              Assembly="Service.Starter.dll"
+              Type ="Service.Starter.ServiceStarterPlugin"
+              Version="1.0.0"
+              Singletone="false"
+              AutoStart="true"
+              PluginDirectory="ServiceStarter"
+              PluginConfig="">
+      <Instance	Id="ALM Windows Service Starter"
+            Name="ALM Windows Service Starter"
+            Description="Check all Windows service in ALM and start them, if not run"
+            InstanceConfig="\ServiceStarter\ServiceStarter.Config.xml"/>
+    </Plugin>
+    -->
   </Plugins>
 </Plugins.Config>

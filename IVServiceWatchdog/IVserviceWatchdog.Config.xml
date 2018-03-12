@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<IVServiceWatchdogConfig>
+  <!-- Ilyen gyakran ellenőrzi a WCF service elérhetőségét. -->
+  <CheckInterval>00:00:02</CheckInterval>
+  <!-- Ennyi hiba összegyúlése után lép életbe a hibaketzelés. -->
+  <MaxErrorCount>1</MaxErrorCount>
+  <!-- Ha a WCF szolgáltatás az itt megadottnmál roszabb válaszidővel válaszol, az hibának számít -->
+  <MinimalResponseTime>00:00:00</MinimalResponseTime>
+  <!-- Ennyi idő után, ha nem gyűlt össze az elérendő hibaszám (MaxErrorCount), akkor a hibaszámláló nulláról indul újra. -->
+  <Lapses>00:00:00</Lapses>
+  <!-- Annak a windows serviznek a neve, amelyik a WCF szolgálrtatást hostolja -->
+  <WindowsServiceName>SQLBrowser</WindowsServiceName>
+  <!-- Hiba esetén kell-e dump fájlt készíteni a megadott windows service process-éről -->
+  <CreateDump>true</CreateDump>
+  <!-- Hiba esetén ki kell-e "lőni" a megadott windows service process-ét -->
+  <KillProcess>true</KillProcess>
+  <!-- Itt van a Procdump.exe -->
+  <ProcdumpPath>D:\Temp</ProcdumpPath>
+  <!-- Ebbe  akönyvtárba készüljön a dump fájl -->
+  <DumpTargetPath>D:\Temp\</DumpTargetPath>
+  <!-- Redis connection -->
+  <RedisConnection>localhost,defaultDatabase=7</RedisConnection>
+  <!--Maximum enyni lehet a threadek száma a figyelt alkalmazásban -->
+  <MaximumAllowedThreadNumber>1000</MaximumAllowedThreadNumber>
+</IVServiceWatchdogConfig>
+  
