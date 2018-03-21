@@ -430,13 +430,13 @@ namespace IVConnector.Plugin
             byte[] tmpBuffer = new byte[_maxReceiveBufferSize];
             try
             {
-                // Setting up timeouts
-                s.ReceiveTimeout = _socketTimeout;
-                s.SendTimeout = _socketTimeout;
-                _pluginReference?.LogThis("Receiving msg...", logData, null, Vrh.Logger.LogLevel.Debug, this.GetType());
-                int rcvd = 0;                
                 try
                 {
+                    // Setting up timeouts
+                    s.ReceiveTimeout = _socketTimeout;
+                    s.SendTimeout = _socketTimeout;
+                    _pluginReference?.LogThis("Receiving msg...", logData, null, Vrh.Logger.LogLevel.Debug, this.GetType());
+                    int rcvd = 0;
                     do
                     {
                         rcvd = s.Receive(tmpBuffer);
@@ -459,25 +459,43 @@ namespace IVConnector.Plugin
                     } while (s.Available > 0);                        
                     if (rcvd == 0)
                     {
+                        s.Send(Encoding.ASCII.GetBytes("/x15".FromHexOrThis() + "Timeout occured. (Client connected, but sended Nothing within timeout!!!)" + _configuration.Ack));
                         return;
                     }
                 }
                 catch(Exception ex)
                 {
+                    s.Send(Encoding.ASCII.GetBytes("/x15".FromHexOrThis() + "Timeout or tcp socket error occured." + _configuration.Ack));
                     _pluginReference?.LogThis("ERROR: No data received on socket.", logData, ex, Vrh.Logger.LogLevel.Warning, this.GetType());
                     return;
                 }                
-                harnessLogging = message.Contains("IVPPL") || message.Contains("IVPPC");
-                _pluginReference.LogThis($"Receive message: {Vrh.Logger.LogHelper.HexControlChars(message)}", logData, null, Vrh.Logger.LogLevel.Information, this.GetType());
-                string result = ProcessMessage(message, logData, out harnessLogging);
-                result = string.Empty;
-                if (String.IsNullOrEmpty(result))
+                try
+                {
+                    harnessLogging = message.Contains("IVPPL") || message.Contains("IVPPC");
+                    _pluginReference.LogThis($"Receive message: {Vrh.Logger.LogHelper.HexControlChars(message)}", logData, null, Vrh.Logger.LogLevel.Information, this.GetType());
+                    ProcessMessage(message, logData, out harnessLogging);
+                }
+                catch(EndpointNotFoundException e)
+                {
+                    s.Send(Encoding.ASCII.GetBytes("/x15".FromHexOrThis() + "ALM side WCF service currently not available!" + _configuration.Ack));
+                    _pluginReference.LogThis("IVConnector message processing error occured!", logData, e, Vrh.Logger.LogLevel.Error, this.GetType());
+                    return;
+                }
+                catch (Exception e)
+                {
+                    _pluginReference.LogThis("IVConnector message processing error occured!", logData, e, Vrh.Logger.LogLevel.Error, this.GetType());
+                    if (harnessLogging)
+                    {
+                        CallErrorLoging(message, e.Message, 1);
+                    }
+                }
+                if (String.IsNullOrEmpty(_configuration.MessageSuffix) || message.Contains(_configuration.MessageSuffix))
                 {
                     s.Send(Encoding.ASCII.GetBytes(_configuration.Ack));
                 }
                 else
                 {
-                    s.Send(Encoding.ASCII.GetBytes("/x15".FromHexOrThis() + result + _configuration.Ack));
+                    s.Send(Encoding.ASCII.GetBytes("/x15".FromHexOrThis() + "Timeout or tcp socket error occured. Message suffix is missing in recieved message!" + _configuration.Ack));
                 }
             }
             catch (Exception e)
@@ -486,8 +504,7 @@ namespace IVConnector.Plugin
                 if (harnessLogging)
                 {
                     CallErrorLoging(message, e.Message, 1);
-                }
-                s.Send(Encoding.ASCII.GetBytes("/x15".FromHexOrThis() + e.Message + _configuration.Ack));
+                }                
             }
             finally
             {
