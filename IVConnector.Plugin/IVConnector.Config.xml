@@ -88,8 +88,8 @@
 		<!-- Ack = ez a nyugta üzenet -->
 		<IP>127.0.0.1</IP>
 		<Port>3301</Port>
-		<Ack>\x06</Ack>
-    <ReceiveTimeout>300</ReceiveTimeout>
+		<Ack>\x06NA EZ ITT AZ ACK</Ack>
+    <ReceiveTimeout>3000</ReceiveTimeout>
 		<CallWCFWithProcessingErrors>true</CallWCFWithProcessingErrors>
 		<!-- UserGuid: Az itt megadott felhasználó azonosító nevében végzi a el az ALM rendszerben a beavatkozást. -->
 		<UserGuid>B4A6BFAD-ECFA-46E3-9CFF-813DCEF76845</UserGuid>
