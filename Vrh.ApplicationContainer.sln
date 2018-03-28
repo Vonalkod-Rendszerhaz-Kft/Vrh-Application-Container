@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vrh.ApplicationContainert.ConsoleHost", "Vrh.ApplicationContainert.ConsoleHost\Vrh.ApplicationContainert.ConsoleHost.csproj", "{1F47D82A-1730-41E2-B164-DE5BBAAA4CD3}"
 EndProject
@@ -24,6 +24,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IVServiceWatchdog", "IVServiceWatchdog\IVServiceWatchdog.csproj", "{501DB928-AD32-46FC-8510-214EBD1FE200}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service.Starter", "Service.Starter\Service.Starter.csproj", "{275CB54C-6639-4CB5-A34B-A9D7FD5A9714}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vrh.PrintingService", "Vrh.PrintingService\Vrh.PrintingService.csproj", "{FF1F20EF-E26A-4AF2-AC88-3901F42E8AC8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vrh.PrintingService.PrinterTypeContract", "Vrh.PrintingService.PrinterTypeContract\Vrh.PrintingService.PrinterTypeContract.csproj", "{3CFEF4DA-1E6F-4EF4-BEB1-928D5A53C8D4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vrh.PrintingService.Godex.ZX1200i", "Vrh.PrintingService.Godex.ZX1200i\Vrh.PrintingService.Godex.ZX1200i.csproj", "{A89AAB3E-16BE-4254-A119-A2C8D1042CE9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,6 +77,18 @@ Global
 		{275CB54C-6639-4CB5-A34B-A9D7FD5A9714}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{275CB54C-6639-4CB5-A34B-A9D7FD5A9714}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{275CB54C-6639-4CB5-A34B-A9D7FD5A9714}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF1F20EF-E26A-4AF2-AC88-3901F42E8AC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF1F20EF-E26A-4AF2-AC88-3901F42E8AC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF1F20EF-E26A-4AF2-AC88-3901F42E8AC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF1F20EF-E26A-4AF2-AC88-3901F42E8AC8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3CFEF4DA-1E6F-4EF4-BEB1-928D5A53C8D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CFEF4DA-1E6F-4EF4-BEB1-928D5A53C8D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3CFEF4DA-1E6F-4EF4-BEB1-928D5A53C8D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3CFEF4DA-1E6F-4EF4-BEB1-928D5A53C8D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A89AAB3E-16BE-4254-A119-A2C8D1042CE9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A89AAB3E-16BE-4254-A119-A2C8D1042CE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A89AAB3E-16BE-4254-A119-A2C8D1042CE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A89AAB3E-16BE-4254-A119-A2C8D1042CE9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -83,5 +101,11 @@ Global
 		{E2EE1A88-D8A2-4031-9A8A-CFF111E87FB3} = {DFAA4713-DE67-4DF8-A7E3-DC992C935CD3}
 		{501DB928-AD32-46FC-8510-214EBD1FE200} = {DFAA4713-DE67-4DF8-A7E3-DC992C935CD3}
 		{275CB54C-6639-4CB5-A34B-A9D7FD5A9714} = {DFAA4713-DE67-4DF8-A7E3-DC992C935CD3}
+		{FF1F20EF-E26A-4AF2-AC88-3901F42E8AC8} = {DFAA4713-DE67-4DF8-A7E3-DC992C935CD3}
+		{3CFEF4DA-1E6F-4EF4-BEB1-928D5A53C8D4} = {DFAA4713-DE67-4DF8-A7E3-DC992C935CD3}
+		{A89AAB3E-16BE-4254-A119-A2C8D1042CE9} = {DFAA4713-DE67-4DF8-A7E3-DC992C935CD3}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8B808B22-F202-4D12-A56E-DEC843AC3722}
 	EndGlobalSection
 EndGlobal

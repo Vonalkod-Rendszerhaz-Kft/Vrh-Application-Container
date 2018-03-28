@@ -1,17 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B0B86A2A-7F39-40C4-82C5-FEA9ADC1D62B}</ProjectGuid>
+    <ProjectGuid>{A89AAB3E-16BE-4254-A119-A2C8D1042CE9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Plugin.Test</RootNamespace>
-    <AssemblyName>Plugin.Test</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <RootNamespace>Vrh.PrintingService.Godex.ZX1200i</RootNamespace>
+    <AssemblyName>Vrh.PrintingService.Godex.ZX1200i</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -32,6 +31,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -41,25 +41,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TestPlugin.cs" />
+    <Compile Include="ZX1200i.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Vrh.ApplicationContainer\Vrh.ApplicationContainer.csproj">
-      <Project>{0f167592-dcc8-4cf5-9737-6f0b86d0f76f}</Project>
-      <Name>Vrh.ApplicationContainer</Name>
+    <ProjectReference Include="..\Vrh.PrintingService.PrinterTypeContract\Vrh.PrintingService.PrinterTypeContract.csproj">
+      <Project>{3cfef4da-1e6f-4ef4-beb1-928d5a53c8d4}</Project>
+      <Name>Vrh.PrintingService.PrinterTypeContract</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if not exist "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\Test" mkdir "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\Test"
-xcopy /Y /R  "$(SolutionDir)Plugin.Test\bin\$(ConfigurationName)\Plugin.Test.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\Test"</PostBuildEvent>
+    <PostBuildEvent>if not exist "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhPrintingService" mkdir "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhPrintingService"
+xcopy /Y /R  "$(SolutionDir)Vrh.PrintingService.Godex.ZX1200i\bin\$(ConfigurationName)\Vrh.PrintingService.Godex.ZX1200i.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhPrintingService"</PostBuildEvent>
   </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

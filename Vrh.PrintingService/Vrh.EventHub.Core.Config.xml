@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8" ?> 
+<Vrh.EventHub.Core>
+  <ThrowEventHubCoreExceptions>true</ThrowEventHubCoreExceptions>
+</Vrh.EventHub.Core>

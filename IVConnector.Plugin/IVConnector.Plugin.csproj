@@ -131,7 +131,8 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /Y /R "$(SolutionDir)IVConnector.Plugin\bin\$(ConfigurationName)\IVConnector.Plugin.dll" "$(SolutionDir)Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\IVConnector"
+    <PostBuildEvent>if not exist "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\IVConnector" mkdir "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\IVConnector"
+xcopy /Y /R "$(SolutionDir)IVConnector.Plugin\bin\$(ConfigurationName)\IVConnector.Plugin.dll" "$(SolutionDir)Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\IVConnector"
 xcopy /Y /R "$(SolutionDir)IVConnector.Plugin\IVConnector.Config.xml" "$(SolutionDir)Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\IVConnector"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -32,7 +32,7 @@
 
   </Plugin>  
 --> 
-    <Plugin Description="IV Connevctor plugin"
+    <!--<Plugin Description="IV Connevctor plugin"
               Assembly="IVConnector.Plugin.dll"
               Type ="IVConnector.Plugin.IVConnectorPlugin"
               Version="2.0.0"
@@ -48,7 +48,7 @@
             Name="IVConnector for TCP"
             Description="TCP-n érkező bevartkozások kezelőfelülete LearALM-ben."
             InstanceConfig="\IVConnector\IVConnector.Config.xml/IVConnectorConfig/Configuration_T1,\IVConnector\IVConnector.Config.xml/IVConnectorConfig/MessageDefinitions"/>
-    </Plugin>
+    </Plugin>-->
 
     <!--
   <Plugin Description="IV Service Watchdog plugin"
@@ -78,5 +78,19 @@
             InstanceConfig="\ServiceStarter\ServiceStarter.Config.xml"/>
     </Plugin>
     -->
+
+    <Plugin Description="Vrh Printing Service plugin"
+          Assembly="Vrh.PrintingService.dll"
+          Type ="Vrh.PrintingService.PrintingServicePlugin"
+          Version="1.0.0.0"
+          Singletone="true"
+          AutoStart="true"
+          PluginDirectory="VrhPrintingService"
+          PluginConfig="\VrhPrintingService\XmlParser.xml">
+      <Instance	Id="VRH Printing Service"
+            Name="VRH Printing Service"
+            Description="Description..."
+            InstanceConfig=""/>
+    </Plugin>
   </Plugins>
 </Plugins.Config>

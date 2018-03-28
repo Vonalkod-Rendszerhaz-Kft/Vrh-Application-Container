@@ -90,7 +90,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\iSchedulerMonitor.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\iSchedulerMonitor"
+    <PostBuildEvent>if not exist "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\iSchedulerMonitor" mkdir "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\iSchedulerMonitor"
+xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\iSchedulerMonitor.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\iSchedulerMonitor"
 xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\Vrh.Common.Serialization.Structures.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)"
 xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\VRH.ConnectionStringStore.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)"
 xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\iSchedulerMonitor.Config.xml" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\iSchedulerMonitor"</PostBuildEvent>
