@@ -5,7 +5,7 @@
   </Configurations>
 
   <PrintingConfig>
-    <PrintingService Interval="1000" TimeToWait="500" MaxTry="3" PathOfLabels="D:\!Projects\!Git\Application.Container\Vrh.ApplicationContainert.ConsoleHost\bin\Debug\VrhPrintingService\Labels"/>
+    <PrintingService MessageTimeout="5000" Interval="1000" TimeToWait="500" MaxTry="3" PathOfLabels="D:\!Projects\!Git\Application.Container\Vrh.ApplicationContainert.ConsoleHost\bin\Debug\VrhPrintingService\Labels"/>
     <PrinterDefinitions>
       <PrinterDefinition Name="REELCHECK_AUTO" Type="Godex_ZX1200i" ConnectionType="TCPIP" ConnectionString="192.168.76.26:9100"/>
       <PrinterDefinition Name="REELCHECK_AUTO2" Type="Godex_ZX1200i" ConnectionType="ASECOM" ConnectionString="..."/>

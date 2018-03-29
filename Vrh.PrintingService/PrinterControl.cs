@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using System.IO;
+using Vrh.PrintingService.MessageTypes;
 using Vrh.PrintingService.PrinterTypeContract;
 
 namespace Vrh.PrintingService
@@ -28,34 +29,14 @@ namespace Vrh.PrintingService
 
         PrinterTypeImporter pti = null;
 
-        public Dictionary<string, string> PrinterStates = new Dictionary<string, string>()
-        {
-           { "00", "Ready"},
-           { "01 ", "Media Empty or Media Jam"},
-           { "02", "Media Empty or Media Jam"},
-           { "03", "Ribbon Empty"},
-           { "04", "Printhead Up ( Open )"},
-           { "05", "Rewinder Full"},
-           { "06", "File System Full"},
-           { "07", "Filename Not Found"},
-           { "08", "Duplicate Name"},
-           { "09", "Syntax error"},
-           { "10", "Cutter JAM"},
-           { "11", "Extended Menory Not Found"},
-           { "20", "Pause"},
-           { "21", "In Setting Mode"},
-           { "22", "In Keyboard Mode"},
-           { "50", "Printer is Printing"},
-           { "60", "Data in Process"},
-        };
-
-        public PrinterControl(Printer printer, TimeSpan interval, TimeSpan timeToWait, int maxTry, string pathOfLabels)
+        public PrinterControl(Printer printer, TimeSpan messageTimeout, TimeSpan interval, TimeSpan timeToWait, int maxTry, string pathOfLabels)
         {
             //MEF Printer típusok betöltése
             pti = new PrinterTypeImporter();
             pti.DoImport();
 
             messageCache = new ConcurrentQueue<PrintMessage>();
+            this.MessageTimeout = messageTimeout;
             this.interval = interval;
             this.printer = printer;
             this.maxTry = maxTry;
@@ -64,6 +45,8 @@ namespace Vrh.PrintingService
             SetTimer();
             stopwatch.Start();
         }
+
+        public TimeSpan MessageTimeout { get; set; }
 
         /// <summary>
         /// Set the timers preferences from the log4proDBcontext
@@ -104,90 +87,55 @@ namespace Vrh.PrintingService
             PrintMessage printMessage;
             while (messageCache.TryDequeue(out printMessage))
             {
-                Console.WriteLine($"1:{printMessage.MSGConnectionName}");
-
-                bool successSend = true;
-                bool successPrint = false;
-
-                if (!pti.Connect(printer.Type, printer.ConnectionType, printer.ConnectionString, out PrinterConnection printerConnection))
+                try
                 {
-                    SetPrintMessagePreferences(printMessage, false);
-                    return;
+                    Console.WriteLine($"1:{printMessage.MSGConnectionName}");
+
+                    bool successSend = true;
+                    bool successPrint = false;
+
+                    if (!pti.Connect(printer.Type, printer.ConnectionType, printer.ConnectionString, out PrinterConnection printerConnection))
+                    {
+                        SetPrintMessagePreferences(printMessage, false);
+                        return;
+                    }
+
+                    string messageData = String.Empty;
+
+                    if (!string.IsNullOrEmpty(printMessage.Message.LabelDefinitionName))
+                    {
+                        //Label nyomtatás
+                        messageData = ComposeLabel(printMessage);
+                    }
+                    else
+                    {
+                        //Nyomtató parancs küldés
+                        messageData = printMessage.Message.Stream;
+                    }
+
+                    successSend = pti.SendPrintCommand(printer.Type, messageData, printerConnection, maxTry, timeToWait);
+                    Thread.Sleep(3000);
+                    if (successSend)
+                    {
+                        successPrint = pti.VerifyPrinterState(printer.Type, printerConnection, maxTry, timeToWait);
+                    }
+
+                    SetPrintMessagePreferences(printMessage, successPrint);
+
+                    Console.WriteLine($"2:{printMessage.MSGConnectionName}");
+
+                    pti.CloseConnection(printer.Type, printerConnection);                    
                 }
-
-                string messageData = String.Empty;
-
-                if (!string.IsNullOrEmpty(printMessage.Message.LabelDefinitionName))
+                catch (Exception ex)
                 {
-                    //Label nyomtatás
-                    messageData = ComposeLabel(printMessage);
+                    printMessage.Exception = ex;
                 }
-                else
+                finally
                 {
-                    //Nyomtató parancs küldés
-                    messageData = printMessage.Message.Stream;
+                    printMessage.Semaphore.Set();
                 }
-
-                successSend = pti.SendPrintCommand(printer.Type, messageData, printerConnection, maxTry, timeToWait);
-                Thread.Sleep(3000);
-                if (successSend)
-                {
-                    successPrint = pti.VerifyPrinterState(printer.Type, printerConnection, maxTry, timeToWait);
-                }
-
-                SetPrintMessagePreferences(printMessage, successPrint);
-
-                Console.WriteLine($"2:{printMessage.MSGConnectionName}");
-
-                pti.CloseConnection(printer.Type, printerConnection);
             }
         }
-
-        //private void SendPrintMessages()
-        //{
-        //    PrintMessage printMessage;
-        //    while (messageCache.TryDequeue(out printMessage))
-        //    {
-        //        Console.WriteLine($"1:{printMessage.MSGConnectionName}");
-
-        //        bool successSend = true;
-        //        bool successPrint = false;
-
-        //        if (!ConnectToPrinter(printer.ConnectionType, printer.ConnectionString, out TcpClient client, out NetworkStream writer))
-        //        {
-        //            SetPrintMessagePreferences(printMessage, false);
-        //            return;
-        //        }
-
-        //        PrinterInitialize(writer);
-
-        //        string messageData = String.Empty;
-
-        //        if (!string.IsNullOrEmpty(printMessage.Message.LabelDefinitionName))
-        //        {
-        //            //Label nyomtatás
-        //            messageData = ComposeLabel(printMessage);
-        //        }
-        //        else
-        //        {
-        //            //Nyomtató parancs küldés
-        //            messageData = printMessage.Message.Stream;
-        //        }
-
-        //        successSend = SendPrintCommand(messageData, writer);
-        //        Thread.Sleep(3000);
-        //        if (successSend)
-        //        {
-        //            successPrint = VerifyPrinting(writer);
-        //        }
-
-        //        SetPrintMessagePreferences(printMessage, successPrint);
-
-        //        Console.WriteLine($"2:{printMessage.MSGConnectionName}");
-
-        //        CloseConnection(client, writer);
-        //    }
-        //}
 
         internal void StartTimer()
         {
@@ -208,130 +156,6 @@ namespace Vrh.PrintingService
             {
                 printMessage.SendingState = false;
             }
-        }
-
-        /// <summary>
-        /// Nyomtatási parancs kiküldése utáni státuszellenőrzés.
-        /// </summary>
-        /// <param name="writer">Stream a parancsok kiküldéséhez.</param>
-        /// <returns>Nyomtatás sikeressége</returns>
-        private bool VerifyPrinting(NetworkStream writer)
-        {
-            bool isSuccess = false;
-            int retries = 0;
-
-            while (retries < maxTry || !isSuccess)
-            {
-                try
-                {
-                    if (IsError(writer))
-                    {
-                        retries++;
-                        Thread.Sleep(timeToWait);
-                        continue;
-                    }
-
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    retries++;
-                    continue;
-                }
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Nyomtatási parancs kiküldése a nyomtatónak.
-        /// </summary>
-        /// <param name="labelData">Címkeformátum a nyomtatandó adatokkal</param>
-        /// <param name="writer">Stream a parancsok küldéséhez.</param>
-        /// <returns>Parancs kiküldésének sikeressége</returns>
-        private bool SendPrintCommand(string labelData, NetworkStream writer)
-        {
-            bool isSuccess = false;
-            int retries = 0;
-
-            while (retries < maxTry && !isSuccess)
-            {
-                try
-                {
-                    if (IsError(writer))
-                    {
-                        retries++;
-                        Thread.Sleep(timeToWait);
-                        continue;
-                    }
-
-                    SendToPrinter(labelData, writer);
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    retries++;
-                    continue;
-                }
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Parancsok kiküldése a nyomtatóra streamen keresztül. (String konverzió)
-        /// </summary>
-        /// <param name="message">Küldendő üzenet.</param>
-        /// <param name="writer">Stream a parancs küldéséhez.</param>
-        private void SendToPrinter(string message, NetworkStream writer)
-        {
-            byte[] data = Encoding.ASCII.GetBytes(message);
-            writer.Write(data, 0, data.Length);
-            writer.Flush();
-        }
-
-        /// <summary>
-        /// Tcp socket és stream lezárása.
-        /// </summary>
-        /// <param name="client">Tcp socket</param>
-        /// <param name="writer">Tcp socketen levő stream.</param>
-        private void CloseConnection(TcpClient client, NetworkStream writer)
-        {
-            // Close Connection
-            writer.Close();
-            client.Close();
-        }
-
-        /// <summary>
-        /// Kapcsolódás a nyomtatóhoz.
-        /// </summary>
-        /// <param name="printerAddress">Nyomtató IP címe</param>
-        /// <param name="client">Tcp socket - kimenő paraméter</param>
-        /// <param name="writer">Stream a Tcp socketen - kimenő paraméter</param>
-        private bool ConnectToPrinter(string connectionType, string connectionString, out TcpClient client, out NetworkStream writer)
-        {
-            // Open connection
-            client = new TcpClient();
-
-            try
-            {
-                string printerAddress = connectionString.Substring(0, connectionString.IndexOf(':'));
-                int printerPort = int.Parse(connectionString.Substring(connectionString.IndexOf(':') + 1));
-
-                if (IPAddress.TryParse(printerAddress, out IPAddress printerIP))
-                {
-                    client.Connect(printerIP, printerPort);
-                }
-            }
-                catch (Exception ex)
-            {
-                writer = null;
-                return false;
-            }
-            // Write ZPL String to connection
-            writer = client.GetStream();
-            return true;
-
         }
 
         /// <summary>
@@ -357,42 +181,6 @@ namespace Vrh.PrintingService
             }
 
             return labelData;
-        }
-
-        /// <summary>
-        /// Nyomtató alap beállítása.
-        /// </summary>
-        /// <param name="writer">Stream a parancsok kiküldéséhez.</param>
-        /// <returns>Van-e hiba a nyomtatóban.</returns>
-        private bool PrinterInitialize(NetworkStream writer)
-        {
-            //byte[] data = new byte[256];
-            //string responseData = string.Empty;
-
-            this.SendToPrinter("^XSET,IMMEDIATE,1\r", writer);
-            //int bytes = writer.Read(data, 0, data.Length);
-            //responseData = Encoding.ASCII.GetString(data, 0, bytes);
-            //bool isError = (responseData == string.Empty) || responseData.Contains(" 1 ");
-
-            return true;
-        }
-
-        /// <summary>
-        /// Nyomtató státuszának lekérdezése, hiba detektálás céljából.
-        /// </summary>
-        /// <param name="writer">Stream a parancsok kiküldéséhez.</param>
-        /// <returns>Van-e hiba a nyomtatóban.</returns>
-        private bool IsError(NetworkStream writer)
-        {
-            byte[] data = new byte[256];
-            string responseData = string.Empty;
-
-            this.SendToPrinter("~S,CHECK\r", writer);
-            int bytes = writer.Read(data, 0, data.Length);
-            responseData = Encoding.ASCII.GetString(data, 0, bytes);
-            bool isError = (responseData == string.Empty) || !responseData.Contains("00");
-
-            return isError;
         }
 
         #region IDisposable Support

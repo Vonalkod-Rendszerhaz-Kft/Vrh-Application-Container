@@ -17,6 +17,27 @@ namespace Vrh.PrintingService.Godex.ZX1200i
     {
         public string Description => "Godex ZX1200i";
 
+        public Dictionary<string, string> PrinterStates = new Dictionary<string, string>()
+        {
+           { "00", "Ready"},
+           { "01 ", "Media Empty or Media Jam"},
+           { "02", "Media Empty or Media Jam"},
+           { "03", "Ribbon Empty"},
+           { "04", "Printhead Up ( Open )"},
+           { "05", "Rewinder Full"},
+           { "06", "File System Full"},
+           { "07", "Filename Not Found"},
+           { "08", "Duplicate Name"},
+           { "09", "Syntax error"},
+           { "10", "Cutter JAM"},
+           { "11", "Extended Menory Not Found"},
+           { "20", "Pause"},
+           { "21", "In Setting Mode"},
+           { "22", "In Keyboard Mode"},
+           { "50", "Printer is Printing"},
+           { "60", "Data in Process"},
+        };
+
         public bool Connect(string connectionType, string connectionString, out PrinterConnection printerConnection)
         {
             printerConnection = new PrinterConnection(connectionType != "ASECOM" ? ConnectionTypes.TCPIP : ConnectionTypes.ASECOM,
@@ -36,8 +57,9 @@ namespace Vrh.PrintingService.Godex.ZX1200i
             }
             catch (Exception ex)
             {
-                printerConnection = null;
-                return false;
+                //    printerConnection = null;
+                //    return false;
+                throw new Exception($"Connect to {connectionString} printer failed!");
             }
             // Write ZPL String to connection
             printerConnection.Writer = printerConnection.Client.GetStream();
@@ -86,6 +108,10 @@ namespace Vrh.PrintingService.Godex.ZX1200i
                 catch (Exception ex)
                 {
                     retries++;
+                    if (retries == maxTry)
+                    {
+                        throw ex;
+                    }
                     continue;
                 }
             }
@@ -114,6 +140,10 @@ namespace Vrh.PrintingService.Godex.ZX1200i
                 catch (Exception ex)
                 {
                     retries++;
+                    if (retries == maxTry)
+                    {
+                        throw ex;
+                    }
                     continue;
                 }
             }
@@ -132,13 +162,21 @@ namespace Vrh.PrintingService.Godex.ZX1200i
             string responseData = string.Empty;
 
             this.SendToPrinter("~S,CHECK\r", writer);
-            //int bytes = writer.Read(data, 0, data.Length);
-            //responseData = Encoding.ASCII.GetString(data, 0, bytes);
-            //bool isError = (responseData == string.Empty) || !responseData.Contains("00");
+            int bytes = writer.Read(data, 0, data.Length);
+            responseData = Encoding.ASCII.GetString(data, 0, bytes);
+            bool isError = (responseData == string.Empty) || !responseData.Contains("00");
 
-            //return isError;
+            if (isError && !string.IsNullOrEmpty(responseData))
+            {
+                throw new Exception(PrinterStates.FirstOrDefault(x => x.Key == responseData.Substring(0, 2)).Value);
+            }
 
-            return false;
+            return isError;
+
+            #region Debug
+            //throw new Exception("Debug exception");
+            //return false;
+            #endregion
         }
 
         /// <summary>

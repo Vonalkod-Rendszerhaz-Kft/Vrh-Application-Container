@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Vrh.PrintingService.MessageTypes;
 using Vrh.ApplicationContainer;
 using Vrh.EventHub.Core;
 using Vrh.EventHub.Protocols.RedisPubSub;
@@ -67,11 +69,13 @@ namespace Vrh.PrintingService
                 string subpass = assemblyFolder + configParameterFile;
                 PrintingConfigXmlProcessor pcxp = new PrintingConfigXmlProcessor(subpass, "PrintingConfig", "hu-HU");
 
+                int messageTimeoutmS = pcxp.GetValue("MessageTimeout", pcxp.GetElement("PrintingService"), 1000, true, true);
                 int intervalmS = pcxp.GetValue("Interval", pcxp.GetElement("PrintingService"), 1000, true, true);
                 int timeToWaitmS = pcxp.GetValue("TimeToWait", pcxp.GetElement("PrintingService"), 500, true, true);
                 int maxTry = pcxp.GetValue("MaxTry", pcxp.GetElement("PrintingService"), 3, true, true);
                 string pathOfLabels = pcxp.GetValue("PathOfLabels", pcxp.GetElement("PrintingService"), @"C:\Labels", true, true);
 
+                TimeSpan messageTimeout = new TimeSpan(0, 0, 0, 0, messageTimeoutmS);
                 TimeSpan interval = new TimeSpan(0, 0, 0, 0, intervalmS);
                 TimeSpan timeToWait = new TimeSpan(0, 0, 0, 0, timeToWaitmS);
 
@@ -97,7 +101,7 @@ namespace Vrh.PrintingService
                         }
                     }
 
-                    printerControls.Add(new PrinterControl(printer, interval, timeToWait, maxTry, pathOfLabels));
+                    printerControls.Add(new PrinterControl(printer, messageTimeout, interval, timeToWait, maxTry, pathOfLabels));
                 }
 
                 //List<Printer> printers = context.Printers.Take(maxPrinter).ToList();
@@ -116,25 +120,10 @@ namespace Vrh.PrintingService
 
                 EventHubCore.RegisterHandler<RedisPubSubChannel, PrintMessage, MessageResult>("DATA", Print);
 
-                //Callhoz kérés összerakása
+                #region Debug print call
+                ////Debug idejére
+                ////Callhoz kérés összerakása
 
-                //////Debug idejére
-                PrintMessage pm = new PrintMessage("REELCHECK_AUTO",
-                                                   "DATA",
-                                                   new Message("REELCHECK_AUTO.prn",
-                                                               null,
-                                                               new Dictionary<string, string>() {
-                                                                                                    { "MACHINE", "12345678"},
-                                                                                                    { "PROGRAM", "87654321"},
-                                                                                                },
-                                                               Modes.SYNC
-                                                              ));
-
-                MessageResult mr = EventHubCore.Call<RedisPubSubChannel, PrintMessage, MessageResult>("DATA", pm, null);             
-
-                
-
-                //////Debug idejére
                 //PrintMessage pm = new PrintMessage("REELCHECK_AUTO",
                 //                                   "DATA",
                 //                                   new Message("REELCHECK_AUTO.prn",
@@ -145,8 +134,15 @@ namespace Vrh.PrintingService
                 //                                                                                },
                 //                                               Modes.SYNC
                 //                                              ));
-
-                //Print(pm);
+                //try
+                //{
+                //    MessageResult mr = EventHubCore.Call<RedisPubSubChannel, PrintMessage, MessageResult>("DATA", pm, null);
+                //}
+                //catch (Exception ex)
+                //{
+                //    Console.WriteLine($"Exception:{ex.Message}");
+                //}
+                #endregion
             }
             catch (Exception ex)
             {
@@ -167,6 +163,13 @@ namespace Vrh.PrintingService
             try
             {
                 // Implement stop logic here
+                EventHubCore.DropChannel<RedisPubSubChannel>("DATA");
+
+                foreach (PrinterControl printerControl in printerControls)
+                {
+                    printerControl.Dispose();
+                }
+                printerControls = null;
 
                 base.Stop();
             }
@@ -218,26 +221,39 @@ namespace Vrh.PrintingService
 
         public Response<MessageResult>Print(Request<PrintMessage, MessageResult> message)
         {
-            PrinterControl printerControl = printerControls.FirstOrDefault(x => x.printer.Name == message.RequestContent.MSGConnectionName);
             Response<MessageResult> Rmr = message.GetMyResponse;
 
-            if (printerControl == null)
+            try
             {
-                Rmr.ResponseContent.ResultString = "Printer is null!";
-                return Rmr;
+                PrinterControl printerControl = printerControls.FirstOrDefault(x => x.printer.Name == message.RequestContent.MSGConnectionName);
+
+                if (printerControl == null)
+                {
+                    throw new Exception("Printer control not found!");
+                }
+                message.RequestContent.Semaphore = new AutoResetEvent(false);
+                printerControl.messageCache.Enqueue(message.RequestContent);
+
+                message.RequestContent.Semaphore.WaitOne(printerControl.MessageTimeout);
+
+                if (message.RequestContent.Exception != null)
+                {
+                    throw message.RequestContent.Exception;
+                }
+
+                if (!message.RequestContent.SendingState)
+                {
+                    throw new Exception ("Printing timeout!");
+                }
+
+                Rmr.ResponseContent = new MessageResult();                
+            }
+            catch (Exception ex)
+            {
+                Rmr.Exception = ex;
             }
 
-            printerControl.messageCache.Enqueue(message.RequestContent);
-
-            Rmr.ResponseContent.ResultString = "Success";
             return Rmr;
-
-            //Rmr.
-        }
-
-        public class MessageResult
-        {
-            public string ResultString { get; set; }
         }
     }
 }

@@ -110,20 +110,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="LabelFormat.cs" />
-    <Compile Include="Message.cs" />
-    <Compile Include="ModeEnum.cs" />
     <Compile Include="Printer.cs" />
     <Compile Include="PrinterControl.cs" />
     <Compile Include="PrinterTypeImporter.cs" />
     <Compile Include="PrintingConfigXmlProcessor.cs" />
     <Compile Include="PrintingServicePlugin.cs" />
-    <Compile Include="PrintMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Vrh.ApplicationContainer\Vrh.ApplicationContainer.csproj">
       <Project>{0f167592-dcc8-4cf5-9737-6f0b86d0f76f}</Project>
       <Name>Vrh.ApplicationContainer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Vrh.PrintingService.MessageTypes\Vrh.PrintingService.MessageTypes.csproj">
+      <Project>{3034d57f-d3e5-4447-9dee-035868234dcb}</Project>
+      <Name>Vrh.PrintingService.MessageTypes</Name>
     </ProjectReference>
     <ProjectReference Include="..\Vrh.PrintingService.PrinterTypeContract\Vrh.PrintingService.PrinterTypeContract.csproj">
       <Project>{3cfef4da-1e6f-4ef4-beb1-928d5a53c8d4}</Project>

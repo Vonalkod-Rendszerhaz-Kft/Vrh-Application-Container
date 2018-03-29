@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Vrh.PrintingService
+namespace Vrh.PrintingService.MessageTypes
 {
     public class Message
     {
