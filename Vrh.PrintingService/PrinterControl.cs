@@ -36,7 +36,7 @@ namespace Vrh.PrintingService
             pti.DoImport();
 
             messageCache = new ConcurrentQueue<PrintMessage>();
-            this.MessageTimeout = messageTimeout;
+            MessageTimeout = messageTimeout;
             this.interval = interval;
             this.printer = printer;
             this.maxTry = maxTry;
@@ -46,7 +46,7 @@ namespace Vrh.PrintingService
             stopwatch.Start();
         }
 
-        public TimeSpan MessageTimeout { get; set; }
+        public TimeSpan MessageTimeout { get; }
 
         /// <summary>
         /// Set the timers preferences from the log4proDBcontext
@@ -66,7 +66,7 @@ namespace Vrh.PrintingService
         {
 
             counter++;
-            Console.WriteLine(counter / stopwatch.Elapsed.TotalSeconds);
+            //Console.WriteLine(counter / stopwatch.Elapsed.TotalSeconds);
 
             timer.Stop();
             try
@@ -89,7 +89,7 @@ namespace Vrh.PrintingService
             {
                 try
                 {
-                    Console.WriteLine($"1:{printMessage.MSGConnectionName}");
+                    Console.WriteLine($"1:{printMessage.PrinterName}");
 
                     bool successSend = true;
                     bool successPrint = false;
@@ -122,7 +122,7 @@ namespace Vrh.PrintingService
 
                     SetPrintMessagePreferences(printMessage, successPrint);
 
-                    Console.WriteLine($"2:{printMessage.MSGConnectionName}");
+                    Console.WriteLine($"2:{printMessage.PrinterName}");
 
                     pti.CloseConnection(printer.Type, printerConnection);                    
                 }

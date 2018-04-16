@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{3034D57F-D3E5-4447-9DEE-035868234DCB}</ProjectGuid>
+    <ProjectGuid>{382369C0-B225-4BF2-BC1C-5D947A032624}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Vrh.PrintingService.MessageTypes</RootNamespace>
-    <AssemblyName>Vrh.PrintingService.MessageTypes</AssemblyName>
+    <RootNamespace>Vrh.CameraService.MessageTypes</RootNamespace>
+    <AssemblyName>Vrh.CameraService.MessageTypes</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -43,10 +43,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommonMessageResult.cs" />
+    <Compile Include="ManualLabelDataMessageResult.cs" />
+    <Compile Include="SetIOMessage.cs" />
+    <Compile Include="IOChangeMessageResult.cs" />
     <Compile Include="Message.cs" />
-    <Compile Include="ModesEnum.cs" />
-    <Compile Include="MessageResult.cs" />
-    <Compile Include="PrintMessage.cs" />
+    <Compile Include="LabelDataMessageResult.cs" />
+    <Compile Include="GetIOMessage.cs" />
+    <Compile Include="BulbsEnum.cs" />
+    <Compile Include="ReadMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -54,7 +59,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if not exist "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhPrintingService" mkdir "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhPrintingService"
-xcopy /Y /R  "$(SolutionDir)\Vrh.PrintingService.MessageTypes\bin\$(ConfigurationName)\Vrh.PrintingService.MessageTypes.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhPrintingService"</PostBuildEvent>
+    <PostBuildEvent>if not exist "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhCameraService" mkdir "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhCameraService"
+xcopy /Y /R  "$(SolutionDir)\Vrh.CameraService.MessageTypes\bin\$(ConfigurationName)\Vrh.CameraService.MessageTypes.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhCameraService"</PostBuildEvent>
   </PropertyGroup>
 </Project>

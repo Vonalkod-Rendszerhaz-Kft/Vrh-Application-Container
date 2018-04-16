@@ -143,6 +143,8 @@ namespace Vrh.PrintingService
                 //    Console.WriteLine($"Exception:{ex.Message}");
                 //}
                 #endregion
+
+                
             }
             catch (Exception ex)
             {
@@ -221,11 +223,11 @@ namespace Vrh.PrintingService
 
         public Response<MessageResult>Print(Request<PrintMessage, MessageResult> message)
         {
-            Response<MessageResult> Rmr = message.GetMyResponse;
+            Response<MessageResult> Rmr = message.MyResponse;
 
             try
             {
-                PrinterControl printerControl = printerControls.FirstOrDefault(x => x.printer.Name == message.RequestContent.MSGConnectionName);
+                PrinterControl printerControl = printerControls.FirstOrDefault(x => x.printer.Name == message.RequestContent.PrinterName);
 
                 if (printerControl == null)
                 {

@@ -92,5 +92,19 @@
             Description="Description..."
             InstanceConfig=""/>
     </Plugin>
+
+    <Plugin Description="Vrh Camera Service plugin"
+      Assembly="Vrh.CameraService.dll"
+      Type ="Vrh.CameraService.CameraServicePlugin"
+      Version="1.0.0.0"
+      Singletone="false"
+      AutoStart="true"
+      PluginDirectory="VrhCameraService"
+      PluginConfig="\VrhCameraService\XmlParser.xml">
+      <Instance	Id="VRH Camera Service"
+            Name="VRH Camera Service"
+            Description="Description..."
+            InstanceConfig=""/>
+    </Plugin>
   </Plugins>
 </Plugins.Config>
