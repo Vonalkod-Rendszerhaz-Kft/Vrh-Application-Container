@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.12
+VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vrh.ApplicationContainert.ConsoleHost", "Vrh.ApplicationContainert.ConsoleHost\Vrh.ApplicationContainert.ConsoleHost.csproj", "{1F47D82A-1730-41E2-B164-DE5BBAAA4CD3}"
 EndProject
@@ -34,6 +34,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vrh.PrintingService.MessageTypes", "Vrh.PrintingService.MessageTypes\Vrh.PrintingService.MessageTypes.csproj", "{3034D57F-D3E5-4447-9DEE-035868234DCB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "VrhPrintingService", "VrhPrintingService", "{42904ED0-A6EA-42BB-8AAF-726D7DF5BB27}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vrh.ApplicationContainer.PluginTemplate", "Vrh.ApplicationContainer.PluginTemplate\Vrh.ApplicationContainer.PluginTemplate.csproj", "{B6D31D7E-F06D-47DB-B175-C9C379D1476A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApplicationContainer.Plugin.Project.Template", "VSIX.ApplicationContainer.Project.Template\ApplicationContainer.Plugin.Project.Template.csproj", "{3BB656D2-008C-4F9E-95D1-47CA91DFEDDC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.ProjectTemplate", "Plugin.ProjectTemplate\Plugin.ProjectTemplate.csproj", "{3AD51DA8-D45B-4C20-8495-1FBCFB9EEE50}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -97,6 +103,18 @@ Global
 		{3034D57F-D3E5-4447-9DEE-035868234DCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3034D57F-D3E5-4447-9DEE-035868234DCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3034D57F-D3E5-4447-9DEE-035868234DCB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6D31D7E-F06D-47DB-B175-C9C379D1476A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6D31D7E-F06D-47DB-B175-C9C379D1476A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6D31D7E-F06D-47DB-B175-C9C379D1476A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6D31D7E-F06D-47DB-B175-C9C379D1476A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3BB656D2-008C-4F9E-95D1-47CA91DFEDDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3BB656D2-008C-4F9E-95D1-47CA91DFEDDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3BB656D2-008C-4F9E-95D1-47CA91DFEDDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3BB656D2-008C-4F9E-95D1-47CA91DFEDDC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3AD51DA8-D45B-4C20-8495-1FBCFB9EEE50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3AD51DA8-D45B-4C20-8495-1FBCFB9EEE50}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3AD51DA8-D45B-4C20-8495-1FBCFB9EEE50}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3AD51DA8-D45B-4C20-8495-1FBCFB9EEE50}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

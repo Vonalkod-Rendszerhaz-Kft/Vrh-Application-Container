@@ -30,6 +30,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\Vrh.ApplicationContainer.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Diagnostics.Runtime, Version=0.8.31.1, Culture=neutral, processorArchitecture=MSIL">
@@ -72,6 +73,7 @@
     <Compile Include="ApplicationContainer.Config.cs" />
     <Compile Include="ApplicationContainerService.cs" />
     <Compile Include="Exceptions.cs" />
+    <Compile Include="forNuGet packaging\%24assemblyname%24Plugin.cs" />
     <Compile Include="IApplicationContainer.cs" />
     <Compile Include="IInstanceFactory.cs" />
     <Compile Include="InstanceDefinition.cs" />
@@ -86,6 +88,10 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="Documentation\ReadMe.md" />
+    <None Include="forNuGet packaging\Install.ps1" />
+    <None Include="forNuGet packaging\Vrh.ApplicationContainer.nuspec">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
     <None Include="Vrh.NugetModuls.Documentations\VRH.Common\ReadMe.md" />
     <None Include="Vrh.NugetModuls.Documentations\Vrh.LinqXMLProcessor.Base\ReadMe.md" />
@@ -109,10 +115,10 @@
     <PostBuildEvent>xcopy /Y /R "$(SolutionDir)Vrh.ApplicationContainer\ApplicationContainer.Config.xml" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)"
 
 
-REM Create a NuGet package for this project and place the .nupkg file in the project's output directory.
+REM Create a NuGet package for this project and place the .nupkg file in the project's output directory.
 REM If you see this in Visual Studio's Error List window, check the Output window's Build tab for the actual error.
 ECHO Creating NuGet package in Post-Build event...
-PowerShell -NoProfile -ExecutionPolicy Bypass -Command "&amp; '$(ProjectDir)_CreateNewNuGetPackage\DoNotModify\CreateNuGetPackage.ps1' -ProjectFilePath '$(ProjectPath)' -OutputDirectory '$(TargetDir)' -BuildConfiguration '$(ConfigurationName)' -BuildPlatform '$(PlatformName)'"</PostBuildEvent>
+PowerShell -NoProfile -ExecutionPolicy Bypass -Command "&amp; '$(ProjectDir)_CreateNewNuGetPackage\DoNotModify\CreateNuGetPackage.ps1' -ProjectFilePath '$(ProjectPath)' -OutputDirectory '$(TargetDir)' -BuildConfiguration '$(ConfigurationName)' -BuildPlatform '$(PlatformName)' -Verbose"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

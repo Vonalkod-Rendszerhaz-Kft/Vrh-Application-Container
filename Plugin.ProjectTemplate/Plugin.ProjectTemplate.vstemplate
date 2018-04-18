@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" xmlns:sdk="http://schemas.microsoft.com/developer/vstemplate-sdkextension/2010">
+  <TemplateData>
+    <Name>VRH Application Container Plugin</Name>
+    <Description>A project for creating a VRH Application Container plugin</Description>
+    <Icon>Plugin.ProjectTemplate.ico</Icon>
+    <ProjectType>CSharp</ProjectType>
+    <RequiredFrameworkVersion>4.5</RequiredFrameworkVersion>
+    <SortOrder>1000</SortOrder>
+    <TemplateID>1483e9e0-9653-4d66-aab5-f834156e9113</TemplateID>
+    <CreateNewFolder>true</CreateNewFolder>
+    <DefaultName>MyPlugin</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+    
+  </TemplateData>
+  <TemplateContent>
+    <Project File="ProjectTemplate.csproj" ReplaceParameters="true">
+      <ProjectItem ReplaceParameters="true" TargetFileName="Properties\AssemblyInfo.cs">AssemblyInfo.cs</ProjectItem>
+      <!-- plugin cs file skeleton -->
+      <ProjectItem ReplaceParameters="true" TargetFileName="$safeprojectname$Plugin.cs" OpenInEditor="true">PluginSkeleton.cs</ProjectItem>
+      <!-- Nugets -->
+      <ProjectItem TargetFileName="packages.config">packages.config</ProjectItem>
+      <!-- Configs -->
+      <ProjectItem ReplaceParameters="true" TargetFileName="Plugins.Config.xml">Plugins.Config.xml</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="ApplicationContainer.Config.xml">ApplicationContainer.Config.xml</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="LogConfig.xml">LogConfig.xml</ProjectItem>
+    </Project>
+  </TemplateContent>
+</VSTemplate>

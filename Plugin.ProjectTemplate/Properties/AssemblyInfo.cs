@@ -5,13 +5,13 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("InstanceFactory.FromXMLConfig")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("ApplicationContainer.Plugin.ProjectTemplate")]
+[assembly: AssemblyDescription("VRH Application Container plugin project template")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("InstanceFactory.FromXMLConfig")]
-[assembly: AssemblyCopyright("Copyright ©  2017")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCompany("Vonalkód Rendszerház Kft.")]
+[assembly: AssemblyProduct("VRH.Application.Container")]
+[assembly: AssemblyCopyright("Copyright © Vonalkód Rendszerház Kft. 2018")]
+[assembly: AssemblyTrademark("VRH, Log4Pro, Application Container")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("e993c7d1-bea9-4eb1-8012-46065e29ae10")]
+[assembly: Guid("3ad51da8-d45b-4c20-8495-1fbcfb9eee50")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -32,6 +32,6 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.1.0.0")]
-[assembly: AssemblyFileVersion("0.1.0.0")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]
 [assembly: AssemblyInformationalVersion("1.0.0")]

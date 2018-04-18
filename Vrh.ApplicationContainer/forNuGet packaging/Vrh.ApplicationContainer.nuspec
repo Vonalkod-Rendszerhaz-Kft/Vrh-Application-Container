@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>$title$</id>
+    <version>$version$</version>
+    <title></title>
+    <authors>Görcsös Zoltán</authors>
+    <owners>Vonalkód Rendszerház Kft.</owners>
+    <tags>VRH, Log4Pro, Application Container, High Avability</tags>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <copyright>$copyright$</copyright>
+    <releaseNotes>
+      v1.0.0 (2018.04.09)
+        Initial 1.0.0 release
+
+    </releaseNotes>
+    <projectUrl>http://redmine.vonalkod.hu/projects/vrh-applicationcontainer</projectUrl>
+    <iconUrl>http://nuget.vonalkod.hu/content/projectavatars/applicationcontainer.png</iconUrl>
+  </metadata>
+  <files>
+    <file src="..\..\Vrh.ApplicationContainert.ConsoleHost\forNuGet packaging\Vrh.ApplicationContainert.ConsoleHost.config" target="content" />
+    <file src="..\..\Vrh.ApplicationContainert.ConsoleHost\bin\Release\Vrh.ApplicationContainert.ConsoleHost.exe" target="lib\net45" />
+    <file src="..\..\InstanceFactory.FromXMLConfig\bin\Release\InstanceFactory.FromXML.dll" target="lib\net45" />
+    <file src="..\..\InstanceFactory.FromXMLConfig\forNuget packaging\Plugins.Config.xml.transform" target="content" />
+    <file src="..\LogConfig.xml" target="" exclude="..\LogConfig.xml"/>
+    <file src="..\Documentation\ReadMe.md" target="content\Vrh.NugetModuls.Documentations\Vrh.ApplicationContainer" />
+    <file src="Install.ps1" target="tools"/>
+  </files>
+</package>
