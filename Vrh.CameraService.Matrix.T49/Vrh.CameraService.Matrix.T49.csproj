@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{3034D57F-D3E5-4447-9DEE-035868234DCB}</ProjectGuid>
+    <ProjectGuid>{A2D8C52C-1C2E-40DA-B3DB-7CF8E636D596}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Vrh.PrintingService.MessageTypes</RootNamespace>
-    <AssemblyName>Vrh.PrintingService.MessageTypes</AssemblyName>
+    <RootNamespace>Vrh.CameraService.Matrix</RootNamespace>
+    <AssemblyName>Vrh.CameraService.Matrix.T49</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -30,10 +30,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -43,18 +41,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Message.cs" />
-    <Compile Include="ModesEnum.cs" />
-    <Compile Include="MessageResult.cs" />
-    <Compile Include="PrintMessage.cs" />
+    <Compile Include="T49.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ProjectReference Include="..\Vrh.CameraService.CameraTypeContract\Vrh.CameraService.CameraTypeContract.csproj">
+      <Project>{94d87acb-ecad-47ab-ba6f-977a451dc500}</Project>
+      <Name>Vrh.CameraService.CameraTypeContract</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if not exist "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhPrintingService" mkdir "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhPrintingService"
-xcopy /Y /R  "$(SolutionDir)\Vrh.PrintingService.MessageTypes\bin\$(ConfigurationName)\Vrh.PrintingService.MessageTypes.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhPrintingService"</PostBuildEvent>
+    <PostBuildEvent>if not exist "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhCameraService" mkdir "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhCameraService"
+xcopy /Y /R  "$(SolutionDir)Vrh.CameraService.Matrix.T49\bin\$(ConfigurationName)\Vrh.CameraService.Matrix.T49.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhCameraService"</PostBuildEvent>
   </PropertyGroup>
 </Project>

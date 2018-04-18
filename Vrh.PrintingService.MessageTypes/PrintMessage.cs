@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace Vrh.PrintingService.MessageTypes
 {
@@ -16,19 +17,20 @@ namespace Vrh.PrintingService.MessageTypes
         {
         }
 
-        public PrintMessage(string msgConnectionName, string channel, Message message)
+        public PrintMessage(string printerName, Message message)
         {
-            MSGConnectionName = msgConnectionName;
-            Channel = channel;
+            PrinterName = printerName;
             Message = message;
             SendingState = false;
         }
 
-        public string MSGConnectionName { get; set; }
-        public string Channel { get; set; }
+        public string PrinterName { get; set; }
         public Message Message { get; set; }
+        [JsonIgnore]
         public bool SendingState { get; set; }
+        [JsonIgnore]
         public Exception Exception { get; set; }
+        [JsonIgnore]
         public AutoResetEvent Semaphore { get; set; }
     }
 }

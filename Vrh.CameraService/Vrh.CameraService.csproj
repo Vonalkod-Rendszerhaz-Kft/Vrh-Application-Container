@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{FF1F20EF-E26A-4AF2-AC88-3901F42E8AC8}</ProjectGuid>
+    <ProjectGuid>{3226659E-7D72-4B05-97D4-3B79D11AFEF0}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Vrh.PrintingService</RootNamespace>
-    <AssemblyName>Vrh.PrintingService</AssemblyName>
+    <RootNamespace>Vrh.CameraService</RootNamespace>
+    <AssemblyName>Vrh.CameraService</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -43,7 +43,7 @@
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.11.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="StackExchange.Redis, Version=1.2.6.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\StackExchange.Redis.1.2.6\lib\net46\StackExchange.Redis.dll</HintPath>
@@ -109,12 +109,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LabelFormat.cs" />
-    <Compile Include="Printer.cs" />
-    <Compile Include="PrinterControl.cs" />
-    <Compile Include="PrinterTypeImporter.cs" />
-    <Compile Include="PrintingConfigXmlProcessor.cs" />
-    <Compile Include="PrintingServicePlugin.cs" />
+    <Compile Include="Camera.cs" />
+    <Compile Include="CameraControl.cs" />
+    <Compile Include="CameraTypeImporter.cs" />
+    <Compile Include="CameraConfigXmlProcessor.cs" />
+    <Compile Include="CameraServicePlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -122,20 +121,17 @@
       <Project>{0f167592-dcc8-4cf5-9737-6f0b86d0f76f}</Project>
       <Name>Vrh.ApplicationContainer</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Vrh.PrintingService.MessageTypes\Vrh.PrintingService.MessageTypes.csproj">
-      <Project>{3034d57f-d3e5-4447-9dee-035868234dcb}</Project>
-      <Name>Vrh.PrintingService.MessageTypes</Name>
+    <ProjectReference Include="..\Vrh.CameraService.CameraTypeContract\Vrh.CameraService.CameraTypeContract.csproj">
+      <Project>{94d87acb-ecad-47ab-ba6f-977a451dc500}</Project>
+      <Name>Vrh.CameraService.CameraTypeContract</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Vrh.PrintingService.PrinterTypeContract\Vrh.PrintingService.PrinterTypeContract.csproj">
-      <Project>{3cfef4da-1e6f-4ef4-beb1-928d5a53c8d4}</Project>
-      <Name>Vrh.PrintingService.PrinterTypeContract</Name>
+    <ProjectReference Include="..\Vrh.CameraService.MessageTypes\Vrh.CameraService.MessageTypes.csproj">
+      <Project>{382369c0-b225-4bf2-bc1c-5d947a032624}</Project>
+      <Name>Vrh.CameraService.MessageTypes</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="Labels\REELCHECK_AUTO.prn">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="packages.config" />
     <None Include="Vrh.NugetModuls.Documentations\VRH.Common\ReadMe.md" />
     <None Include="Vrh.NugetModuls.Documentations\Vrh.EventHub.Core\ReadMe.md" />
@@ -166,20 +162,23 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if not exist "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhPrintingService" mkdir "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhPrintingService"
-xcopy /Y /R  "$(SolutionDir)Vrh.PrintingService\bin\$(ConfigurationName)\Vrh.Web.Common.Lib.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhPrintingService"
-xcopy /Y /R  "$(SolutionDir)Vrh.PrintingService\bin\$(ConfigurationName)\VRH.Mockable.TimeProvider.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhPrintingService"
-xcopy /Y /R  "$(SolutionDir)Vrh.PrintingService\bin\$(ConfigurationName)\System.Web.Mvc.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhPrintingService"
-xcopy /Y /R  "$(SolutionDir)Vrh.PrintingService\bin\$(ConfigurationName)\System.Web.Razor.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhPrintingService"
-xcopy /Y /R  "$(SolutionDir)Vrh.PrintingService\bin\$(ConfigurationName)\System.Web.WebPages.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhPrintingService"
-xcopy /Y /R  "$(SolutionDir)Vrh.PrintingService\bin\$(ConfigurationName)\System.Web.WebPages.Razor.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhPrintingService"
+    <PostBuildEvent>if not exist "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhCameraService" mkdir "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhCameraService"
+xcopy /Y /R  "$(SolutionDir)Vrh.CameraService\bin\$(ConfigurationName)\Vrh.Web.Common.Lib.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhCameraService"
+xcopy /Y /R  "$(SolutionDir)Vrh.CameraService\bin\$(ConfigurationName)\VRH.Mockable.TimeProvider.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhCameraService"
+xcopy /Y /R  "$(SolutionDir)Vrh.CameraService\bin\$(ConfigurationName)\System.Web.Mvc.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhCameraService"
+xcopy /Y /R  "$(SolutionDir)Vrh.CameraService\bin\$(ConfigurationName)\System.Web.Razor.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhCameraService"
+xcopy /Y /R  "$(SolutionDir)Vrh.CameraService\bin\$(ConfigurationName)\System.Web.WebPages.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhCameraService"
+xcopy /Y /R  "$(SolutionDir)Vrh.CameraService\bin\$(ConfigurationName)\System.Web.WebPages.Razor.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhCameraService"
+xcopy /Y /R  "$(SolutionDir)Vrh.CameraService\bin\$(ConfigurationName)\Newtonsoft.Json.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhCameraService"
+xcopy /Y /R  "$(SolutionDir)Vrh.CameraService\bin\$(ConfigurationName)\StackExchange.Redis.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhCameraService"
+xcopy /Y /R  "$(SolutionDir)Vrh.CameraService\bin\$(ConfigurationName)\Vrh.EventHub.Core.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhCameraService"
+xcopy /Y /R  "$(SolutionDir)Vrh.CameraService\bin\$(ConfigurationName)\Vrh.EventHub.Protocols.RedisPubSub.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhCameraService"
+xcopy /Y /R  "$(SolutionDir)Vrh.CameraService\bin\$(ConfigurationName)\Vrh.LinqXMLProcessor.Base.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhCameraService"
+xcopy /Y /R  "$(SolutionDir)Vrh.CameraService\bin\$(ConfigurationName)\Vrh.Logger.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhCameraService"
+xcopy /Y /R  "$(SolutionDir)Vrh.CameraService\bin\$(ConfigurationName)\Vrh.Redis.ConnectionStore.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhCameraService"
 
-xcopy /Y /R  "$(SolutionDir)Vrh.PrintingService\bin\$(ConfigurationName)\Vrh.PrintingService.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhPrintingService"
-xcopy /Y /R  "$(SolutionDir)Vrh.PrintingService\bin\$(ConfigurationName)\Vrh.PrintingService.pdb" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhPrintingService"
-xcopy /Y /R  "$(SolutionDir)Vrh.PrintingService\bin\$(ConfigurationName)\XmlParser.xml" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhPrintingService"
-
-
-if not exist "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhPrintingService\Labels" mkdir "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhPrintingService\Labels"
-xcopy /Y /R  "$(SolutionDir)Vrh.PrintingService\bin\$(ConfigurationName)\Labels\REELCHECK_AUTO.prn" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhPrintingService\Labels"</PostBuildEvent>
+xcopy /Y /R  "$(SolutionDir)Vrh.CameraService\bin\$(ConfigurationName)\Vrh.CameraService.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhCameraService"
+xcopy /Y /R  "$(SolutionDir)Vrh.CameraService\bin\$(ConfigurationName)\Vrh.CameraService.pdb" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhCameraService"
+xcopy /Y /R  "$(SolutionDir)Vrh.CameraService\bin\$(ConfigurationName)\XmlParser.xml" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\VrhCameraService"</PostBuildEvent>
   </PropertyGroup>
 </Project>
