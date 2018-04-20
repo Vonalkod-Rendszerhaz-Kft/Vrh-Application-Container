@@ -63,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="for Nuget packaging\Vrh.ApplicationContainer.WindowsServiceHost.exe.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\InstanceFactory.FromXMLConfig\InstanceFactory.FromXML.csproj">

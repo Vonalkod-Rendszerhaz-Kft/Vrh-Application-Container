@@ -86,7 +86,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /Y /R "$(SolutionDir)InstanceFactory.FromXMLConfig\bin\$(ConfigurationName)\InstanceFactory.FromXML.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)"
+    <PostBuildEvent>xcopy /Y /R "$(SolutionDir)InstanceFactory.FromXMLConfig\bin\$(ConfigurationName)\InstanceFactory.FromXML.dll" "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)"
 </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Plugins StackSize="50">
-  <Plugin Assembly="Plugin.ProjectTemplate.dll" Type="Plugin.ProjectTemplatePlugin" Version="1.0.0" Singletone="false" AutoStart="true" PluginDirectory="">
+  
+<Plugin Assembly="Plugin.ProjectTemplate.dll" Type="Plugin.ProjectTemplate.Plugin.ProjectTemplatePlugin" Version="1.0.0" Singletone="false" AutoStart="true" PluginDirectory="">
     <Instance Id="instance1" Name="" />
-  </Plugin>
-</Plugins>
+  </Plugin></Plugins>

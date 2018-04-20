@@ -19,8 +19,10 @@
     <iconUrl>http://nuget.vonalkod.hu/content/projectavatars/applicationcontainer.png</iconUrl>
   </metadata>
   <files>
-    <file src="..\..\Vrh.ApplicationContainert.ConsoleHost\forNuGet packaging\Vrh.ApplicationContainert.ConsoleHost.config" target="content" />
-    <file src="..\..\Vrh.ApplicationContainert.ConsoleHost\bin\Release\Vrh.ApplicationContainert.ConsoleHost.exe" target="lib\net45" />
+    <file src="..\..\Vrh.ApplicationContainer.ConsoleHost\forNuGet packaging\Vrh.ApplicationContainer.ConsoleHost.exe.config" target="content" />
+    <file src="..\..\Vrh.ApplicationContainer.ConsoleHost\bin\Release\Vrh.ApplicationContainer.ConsoleHost.exe" target="lib\net45" />
+    <file src="..\..\Vrh.ApplicationContainer.WindowsServiceHost\for NuGet packaging\Vrh.ApplicationContainer.WindowsServiceHost.exe.config" target="content" />
+    <file src="..\..\Vrh.ApplicationContainer.WindowsServiceHost\bin\Release\Vrh.ApplicationContainer.WindowsServiceHost.exe" target="lib\net45" />
     <file src="..\..\InstanceFactory.FromXMLConfig\bin\Release\InstanceFactory.FromXML.dll" target="lib\net45" />
     <file src="..\..\InstanceFactory.FromXMLConfig\forNuget packaging\Plugins.Config.xml.transform" target="content" />
     <file src="..\LogConfig.xml" target="" exclude="..\LogConfig.xml"/>

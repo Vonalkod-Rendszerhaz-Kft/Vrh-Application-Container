@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Plugins StackSize="50">
+  <Plugin Assembly="$safeprojectname$.ApplicationContainer.Plugin.dll" Type="$safeprojectname$.$safeprojectname$Plugin" Version="1.0.0" Singletone="false" AutoStart="true" PluginDirectory="">
+    <Instance Id="instance1" Name="$safeprojectname$Plugin instance 1" />
+  </Plugin>
+</Plugins>

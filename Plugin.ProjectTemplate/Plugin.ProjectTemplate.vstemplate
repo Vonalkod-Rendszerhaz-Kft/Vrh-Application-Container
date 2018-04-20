@@ -1,29 +1,34 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" xmlns:sdk="http://schemas.microsoft.com/developer/vstemplate-sdkextension/2010">
   <TemplateData>
-    <Name>VRH Application Container Plugin</Name>
-    <Description>A project for creating a VRH Application Container plugin</Description>
+    <Name>VRH ApplicationContainer Plugin</Name>
+    <Description>A project for creating an ApplicationContainer Plugin</Description>
     <Icon>Plugin.ProjectTemplate.ico</Icon>
     <ProjectType>CSharp</ProjectType>
-    <RequiredFrameworkVersion>4.5</RequiredFrameworkVersion>
+    <RequiredFrameworkVersion>2.0</RequiredFrameworkVersion>
     <SortOrder>1000</SortOrder>
-    <TemplateID>1483e9e0-9653-4d66-aab5-f834156e9113</TemplateID>
+    <TemplateID>c68e492f-8f81-4754-843f-b1bd28dd9a64</TemplateID>
     <CreateNewFolder>true</CreateNewFolder>
-    <DefaultName>MyPlugin</DefaultName>
+    <DefaultName>YourPluginName</DefaultName>
     <ProvideDefaultName>true</ProvideDefaultName>
-    
   </TemplateData>
   <TemplateContent>
-    <Project File="ProjectTemplate.csproj" ReplaceParameters="true">
-      <ProjectItem ReplaceParameters="true" TargetFileName="Properties\AssemblyInfo.cs">AssemblyInfo.cs</ProjectItem>
-      <!-- plugin cs file skeleton -->
-      <ProjectItem ReplaceParameters="true" TargetFileName="$safeprojectname$Plugin.cs" OpenInEditor="true">PluginSkeleton.cs</ProjectItem>
+    <Project File="targetProjectFile.csproj" ReplaceParameters="true">
+      <ProjectItem ReplaceParameters="true" TargetFileName="Properties\AssemblyInfo.cs">targetAssemblyInfo.cs</ProjectItem>
       <!-- Nugets -->
-      <ProjectItem TargetFileName="packages.config">packages.config</ProjectItem>
-      <!-- Configs -->
-      <ProjectItem ReplaceParameters="true" TargetFileName="Plugins.Config.xml">Plugins.Config.xml</ProjectItem>
-      <ProjectItem ReplaceParameters="true" TargetFileName="ApplicationContainer.Config.xml">ApplicationContainer.Config.xml</ProjectItem>
-      <ProjectItem ReplaceParameters="true" TargetFileName="LogConfig.xml">LogConfig.xml</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="packages.config">targetpackages.config</ProjectItem>    
+      <!-- plugin class cs file skeleton -->
+      <ProjectItem ReplaceParameters="true" TargetFileName="$safeprojectname$Plugin.cs" OpenInEditor="true">targetPluginSkeleton.cs.txt</ProjectItem>    
+      <!-- Config files -->
+      <ProjectItem ReplaceParameters="true" TargetFileName="Plugins.Config.xml">targetPlugins.Config.xml</ProjectItem>
+      <ProjectItem TargetFileName="ApplicationContainer.Config.xml">targetApplicationContainer.Config.xml</ProjectItem>
+      <ProjectItem TargetFileName="LogConfig.xml">targetLogConfig.xml</ProjectItem>    
+      <ProjectItem TargetFileName="Vrh.ApplicationContainer.ConsoleHost.exe.config">targetVrh.ApplicationContainer.ConsoleHost.exe.config</ProjectItem>
+      <ProjectItem TargetFileName="Vrh.ApplicationContainer.WindowsServiceHost.exe.config">targetVrh.ApplicationContainer.WindowsServiceHost.exe.config</ProjectItem>
     </Project>
   </TemplateContent>
+  <WizardExtension>
+    <Assembly>Plugin.ProjectTemplate.Install, Version=1.0.0.0, Culture=Neutral, PublicKeyToken=353d4499111b7e11</Assembly>
+    <FullClassName>Plugin.ProjectTemplate.Install.WizardImplementation</FullClassName>
+  </WizardExtension>
 </VSTemplate>

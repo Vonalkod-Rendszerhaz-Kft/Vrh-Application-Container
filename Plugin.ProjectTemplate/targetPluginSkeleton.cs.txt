@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Vrh.ApplicationContainer;
 
 namespace $safeprojectname$
 {
@@ -22,7 +23,7 @@ namespace $safeprojectname$
         /// <param name="instanceDefinition">A példány definiciója</param>
         /// <param name="instanceData">A példánynak átadott adat(ok)</param>
         /// <returns></returns>
-        public static $safeprojectname$Plugin ServiceStarterPluginFactory(InstanceDefinition instanceDefinition, Object instanceData)
+        public static $safeprojectname$Plugin $safeprojectname$PluginFactory(InstanceDefinition instanceDefinition, Object instanceData)
         {
             var instance = new $safeprojectname$Plugin();
             instance._myData = instanceDefinition;
@@ -115,3 +116,4 @@ namespace $safeprojectname$
         #endregion
     }
 }
+

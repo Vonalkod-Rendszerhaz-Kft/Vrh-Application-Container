@@ -9,7 +9,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectTypeGuids>{82b43b9b-a64c-4715-b499-d71e9ca2bd60};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <ProjectGuid>{3AD51DA8-D45B-4C20-8495-1FBCFB9EEE50}</ProjectGuid>
+    <ProjectGuid>{62D7348C-5CC1-4F6F-8BD6-8DD4F4A8B0E9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Plugin.ProjectTemplate</RootNamespace>
@@ -43,9 +43,8 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <OutputPath>$(MSBuildProjectDirectory)\bin\Release\</OutputPath>
-    <StartAction>Program</StartAction>
-    <StartProgram>$(OutputPath)2Vrh.ApplicationContainert.ConsoleHost.exe</StartProgram>
+    <CreateVsixContainer>False</CreateVsixContainer>
+    <DeployExtension>False</DeployExtension>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="InstanceFactory.FromXML, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -67,8 +66,11 @@
     <Reference Include="Vrh.ApplicationContainer, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Vrh.ApplicationContainer.1.0.0\lib\net45\Vrh.ApplicationContainer.dll</HintPath>
     </Reference>
-    <Reference Include="Vrh.ApplicationContainert.ConsoleHost, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.ApplicationContainer.1.0.0\lib\net45\Vrh.ApplicationContainert.ConsoleHost.exe</HintPath>
+    <Reference Include="Vrh.ApplicationContainer.ConsoleHost, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.ApplicationContainer.1.0.0\lib\net45\Vrh.ApplicationContainer.ConsoleHost.exe</HintPath>
+    </Reference>
+    <Reference Include="Vrh.ApplicationContainer.WindowsServiceHost, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.ApplicationContainer.1.0.0\lib\net45\Vrh.ApplicationContainer.WindowsServiceHost.exe</HintPath>
     </Reference>
     <Reference Include="VRH.Common, Version=1.13.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\VRH.Common.1.13.0\lib\net35\VRH.Common.dll</HintPath>
@@ -81,15 +83,20 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="PluginSkeleton.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="AssemblyInfo.cs" />
+    <None Include="targetAssemblyInfo.cs" />
     <None Include="packages.config" />
-    <None Include="ProjectTemplate.csproj" />
+    <None Include="targetpackages.config" />
+    <None Include="targetProjectFile.csproj" />
     <None Include="Plugin.ProjectTemplate.ico" />
-    <None Include="Vrh.ApplicationContainert.ConsoleHost.config">
+    <None Include="targetVrh.ApplicationContainer.ConsoleHost.exe.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="targetVrh.ApplicationContainer.WindowsServiceHost.exe.config" />
+    <None Include="Vrh.ApplicationContainer.ConsoleHost.exe.config" />
+    <None Include="Vrh.ApplicationContainer.WindowsServiceHost.exe.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Vrh.NugetModuls.Documentations\Vrh.ApplicationContainer\ReadMe.md" />
@@ -98,7 +105,9 @@
     <None Include="Vrh.NugetModuls.Documentations\Vrh.Logger\ReadMe.md" />
   </ItemGroup>
   <ItemGroup>
-    <VSTemplate Include="Plugin.ProjectTemplate.vstemplate" />
+    <VSTemplate Include="Plugin.ProjectTemplate.vstemplate">
+      <SubType>Designer</SubType>
+    </VSTemplate>
   </ItemGroup>
   <ItemGroup>
     <None Include="LogConfig.xml">
@@ -106,12 +115,24 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="ApplicationContainer.Config.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="Plugins.Config.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="targetApplicationContainer.Config.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="targetLogConfig.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="targetPlugins.Config.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ApplicationContainer.Config.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <Content Include="targetPluginSkeleton.cs.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />

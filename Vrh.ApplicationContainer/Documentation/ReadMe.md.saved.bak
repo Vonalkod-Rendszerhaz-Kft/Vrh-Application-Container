@@ -1,11 +1,14 @@
 ﻿# Vrh.ApplicationContainer
 ![](http://nuget.vonalkod.hu/content/projectavatars/applicationcontainer.png)
 
-Ez a leírás a komponens **v1.0.0-alpha** kiadásáig bezáróan naprakész.
+Ez a leírás a komponens a leírtakat tekintve **v1.0.0** kiadásáig bezáróan naprakész.
+**A dokumentáció nem teljes!**
 Igényelt minimális framework verzió: **4.5**
 Teljes funkcionalitás és hatékonyság kihasználásához szükséges legalacsonyabb framework verzió: **4.5**
 
 **Ez a komponens alkalmazás funkciók hostolására szolgál.** 
+
+A Nuget csomagját jellemzően nem telepítjük önállóan, hanem a VSIX instalerrel hozzáadjuk a VRH ApplicationContainer project template extensiont a Visual Studio példányunkhoz. Ez telepíti a VRH ApplicationContainer project templatet. Amikor ApplicationContainer plugint fejlesztünk, akkor egy **VRH ApplicationContainer Plugin** projecttípust adunk a solusion-höz.
 
 Az alkalmazások terjedelmére, jellegére nincs megkötés, de a megoldás jellegéből fakadóan ez egy microservice arhitektura, melyben az alkalmazás funkciókat önálló kis egységekként, az azok közötti kapcsolatokat pedig szolgáltatásként fogalmazzuk meg. 
 A hostolt funkciók egységes elvek mentén építhetőek fel, pluginokként. A plugin példányok mindegyike önálló konfigurációval rendelkezhet.
@@ -217,18 +220,19 @@ Minden ApplicationContainer plugin kötelezően a PluginAncestor leszármazott, 
 ## Templatek
 
 ## Létező instanceFactory pluginok
-###FromXML instancefactory plugin
+### FromXML instancefactory plugin
 
 ## InstanceFactory pluginek fejlesztése
 
-
+## Application container WCF szolgáltatás
 
 
 <hr></hr>
 
 # Version History:
 
-## 1.0.0 (2017.02.21)
+## 1.0.0 (2018.04.09)
 Initial release version
 
-## 1.0.0-alpha
+## 1.0.0-alpha (2017.02.21)
+Working prototype

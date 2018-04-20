@@ -7,8 +7,8 @@
     <ProjectGuid>{1F47D82A-1730-41E2-B164-DE5BBAAA4CD3}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Vrh.ApplicationContainert.ConsoleHost</RootNamespace>
-    <AssemblyName>Vrh.ApplicationContainert.ConsoleHost</AssemblyName>
+    <RootNamespace>Vrh.ApplicationContainer.ConsoleHost</RootNamespace>
+    <AssemblyName>Vrh.ApplicationContainer.ConsoleHost</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -72,7 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="forNuGet packaging\Vrh.ApplicationContainert.ConsoleHost.config" />
+    <None Include="forNuGet packaging\Vrh.ApplicationContainer.ConsoleHost.exe.config" />
     <None Include="packages.config" />
     <None Include="Vrh.NugetModuls.Documentations\VRH.Common\ReadMe.md" />
     <None Include="Vrh.NugetModuls.Documentations\Vrh.LinqXMLProcessor.Base\ReadMe.md" />
