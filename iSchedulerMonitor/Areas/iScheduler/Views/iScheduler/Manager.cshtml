@@ -1,0 +1,524 @@
+﻿@*  Manager.cshtml
+    Nagy valószínűség szerint ez a cshtml, magának a lista nézetnek a megvalósítása.
+    Vagyis nem kell azt vizsgálni, melyik nézetben vagyunk, ez a listanézet!
+    Minden nézet egy új cshtml lesz, nem érdemes őket egybe erőltetni, a
+    controller-ben el kell dönteni, melyik cshtml lesz az aktuális.
+*@
+@using DataTables.Areas.DataTables.Models;
+@using DataTables.Areas.DataTables.Models.ColumnActions;
+@using DataTables.Areas.DataTables.Models.ColumnFilters;
+@using Vrh.Web.Common.Lib;
+
+
+@model Vrh.iScheduler.iSchedulerModel
+@{
+    // bootstrap toggle: http://www.bootstraptoggle.com/
+
+    bool isErrorOccured = Model.Scheduler.ErrorList.Count != 0;
+
+    string titleOK = Model.Translation(typeof(WordCodes.iScheduler.Manager.Title));
+    string titleError = isErrorOccured ? Model.Translation(typeof(WordCodes.iScheduler.Error.ErrorOccuredWhileXMLParsing)) : "";
+
+    iScheduler.OneButton newbtn = Model.Scheduler.Buttons.FirstOrDefault(x => x.Name == iScheduler.SysButtonNames.NewSchedule);
+    string createTitle = newbtn == null ? "New schedule" : newbtn.Display;
+    string updateTitle = Model.Translation(typeof(WordCodes.MasterData.Action.Update));
+    string deleteTitle = Model.Translation(typeof(WordCodes.MasterData.Action.Delete));
+    string makeEditableToolTip = Model.Translation(typeof(WordCodes.iScheduler.Manager.MakeEditableToolTip));
+    int[] tableToolsExportColumnIndexes = new int[] { 0, 1, 2, 3, 4 };
+
+    /**** !!!FIX!!! INNENTŐL nem kell módosítani, belenyúlni (elvileg :$) ****/
+    string dataTableSelector = ViewBag.dataTableSelector;
+    //string actionsColumnText = langHelper.getTranslation("MasterData.Actions");
+    string actionsColumnText = String.Empty;
+    string boolAllText = Model.Translation(typeof(WordCodes.MasterData.All)); //logikai szűrő lenyíló listákhoz az értékek feliratai, null vagy üres = default
+    string boolFalseText = Model.Translation(typeof(WordCodes.MasterData.DropDownFalse));
+    string boolTrueText = Model.Translation(typeof(WordCodes.MasterData.DropDownTrue));
+
+    string areaName = (string)ViewContext.RouteData.DataTokens["area"];
+    //string controllerName = (string)ViewContext.RouteData.DataTokens["controller"];
+    string controllerName = HttpContext.Current.Request.RequestContext.RouteData.Values["controller"].ToString();
+    AjaxParametersModel ajaxParameters = new AjaxParametersModel(areaName, controllerName, createTitleText: createTitle,
+                                                updateTitleText: updateTitle, deleteTitleText: deleteTitle,
+                                                deleteMessage: Model.Translation(typeof(WordCodes.MasterData.Delete.Message)),
+                                                detailsTitleText: Model.Translation(typeof(WordCodes.MasterData.Details.Title)),
+                                                oKButtonText: Model.Translation(typeof(WordCodes.MasterData.Dialog.OK)),
+                                                cancelButtonText: Model.Translation(typeof(WordCodes.MasterData.Dialog.Cancel))
+                                                );
+    UpdateDeleteModel actions = new UpdateDeleteModel();
+    actions.DeleteTitleText = deleteTitle;
+    actions.UpdateTitleText = updateTitle;
+    //string dataTablesLanguageFile = Url.Action("GetDataTablesLanguage", "Home", new { area = "" }) + @"\?languageCode=" + languageCode;
+    string dataTablesLanguageFile = Url.Content("~/DataTables/Content/DataTables/Languages/" + Model.CurrentLCID + ".txt");
+
+    string dateTimePickerLanguage = Model.CurrentLCID.Substring(0, 2);
+    string tableToolsSWFPath = Url.Content("~/DataTables/Content/DataTables/extras/TableTools/media/swf/copy_csv_xls_pdf.swf");
+
+    ViewBag.Title = Html.Raw(titleOK);
+    /**** !!!FIX!!! Eddig ****/
+}
+
+@Styles.Render("~/Content/DataTables/css/jquery.dataTables.css"
+             , "~/Content/DataTables/css/dataTables.tableTools.css"
+             , "~/Content/smalot-datetimepicker/bootstrap-datetimepicker.min.css"
+             , "~/Content/smalot-datetimepicker/bootstrap-datetimepicker.min.css"
+              )
+@Styles.Render("~/DataTables/Content/DataTables.css")
+@Styles.Render("~/Content/VRHDataTables.css")
+@Styles.Render("~/ischeduler/content")
+<style>
+    .toggle.manager { border-radius: 10px;}
+    .toggle.manager .toggle-handle { border-radius: 10px;}
+    .toggle.manager .toggle-on {
+        @Html.Raw(Model.ConsistencyStyle)
+    }
+    .toggle.manager .toggle-off {
+        color: black;
+        background-color: lightgray;
+    }
+</style>
+
+@Scripts.Render("~/Scripts/DataTables/jquery.dataTables.js"
+              , "~/Scripts/DataTables/dataTables.tableTools.js"
+              , "~/Scripts/smalot-datetimepicker/bootstrap-datetimepicker.min.js"
+               )
+@Scripts.Render("~/Scripts/jquery.jeditable.js"
+              , "~/Scripts/jquery.jeditable.time.js"
+              , "~/Scripts/jquery.dataTables.editable.js"
+               )
+
+@Scripts.Render("~/DataTables/Scripts/DataTables.js")
+@Scripts.Render("~/bundles/ischeduler/scripts")
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <table style="max-width:80%;background-color:inherit;">
+            <tr>
+                <td style="vertical-align:middle;" rowspan="2">
+                    <h2>@Html.Raw(isErrorOccured ? titleError : titleOK)</h2>
+                </td>
+                <td style="padding-left:10px;">
+                    @Html.Raw(Model.Translation(typeof(WordCodes.iScheduler.Manager.Label.ObjectTpye)) + ":")
+                </td>
+                <td style="padding-left:3px;font-weight:bold;">
+                    @Html.Raw(Model.Scheduler.ObjectType)
+                </td>
+            </tr>
+            <tr>
+                <td style="padding-left:10px;">
+                    @Html.Raw(Model.Translation(typeof(WordCodes.iScheduler.Manager.Label.ObjectGroupId)) + ":")
+                </td>
+                <td style="padding-left:3px;font-weight:bold;">
+                    @Html.Raw(Model.Scheduler.ObjectGroupId ?? "")
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="panel-body" id="ischedulerpanel">
+        @if (isErrorOccured)
+        {
+            foreach (var item in Model.Scheduler.ErrorList)
+            {
+                <div style="font-size:larger;">@Html.Raw(item)</div>
+            }
+        }
+        else
+        {
+            <table style="width:100%;">
+                <tr>
+                    <td id="@(iScheduler.SysButtonNames.ConsistencyCheck)title" style="color:yellow;background-color:inherit;vertical-align:bottom;"></td>
+                    <td style="text-align:right;">
+                        @if (Model.Scheduler.Buttons.Count > 0)
+                        {
+                            <table style="float:right;">
+                                @for (int row = 1; row <= Model.Scheduler.ButtonRows; row++)
+                                {
+                                    <tr>
+                                        @for (int col = 0; col <= Model.Scheduler.ButtonCols; col++)
+                                        {
+                                            iScheduler.OneButton btn = Model.Scheduler.Buttons.FirstOrDefault(x => x.Row == row && x.Col == col);
+                                            <td style="padding-left:5px;padding-bottom:5px;">
+                                                @if (btn != null)
+                                                {
+                                                    if (btn.Name == iScheduler.SysButtonNames.ConsistencyCheck)
+                                                    {
+                                                        <input type="checkbox"
+                                                               id="@(btn.Name)"
+                                                               data-toggle="toggle"
+                                                               data-on="@Html.Raw(btn.Display)"
+                                                               data-off="@Html.Raw(btn.DisplayOff)"
+                                                               data-style="manager"
+                                                               data-onstyle="manager"
+                                                               data-offstyle="manager"
+                                                               onchange="javascript: consistencyCheck(this);">
+                                                    }
+                                                    else
+                                                    {   //ez a cshtml a lista nézet, ezért a listanézet gombot kihagyjuk (letiltjuk)
+                                                        if (btn.Name != iScheduler.SysButtonNames.GoToListView)
+                                                        {
+                                                            string btnurl = Url.Content(btn.Url.GetUrl(true));
+                                                            btnurl = btnurl.Replace(Vrh.iScheduler.iScheduler.Variables.ObjectType, Model.ObjectType);
+                                                            btnurl = btnurl.Replace(Vrh.iScheduler.iScheduler.Variables.GroupId, Model.ObjectGroupId);
+
+                                                            <button type="button"
+                                                                    id="@Html.Raw(btn.Name)"
+                                                                    name="@Html.Raw(btn.Name)"
+                                                                    class="btn allowhide"
+                                                                    style="@Html.Raw(btn.Style)"
+                                                                    onclick="javascript:buttonOnClick('@Html.Raw(btnurl)', @(btn.IsDialog?"true":"false"), '@(btn.DialogSize)')"
+                                                                    @(btn.Name == iScheduler.SysButtonNames.GoToListView ? "disabled" : "")>
+                                                                @(Html.Raw(btn.Display))
+                                                            </button>
+                                                        }
+                                                    }
+                                                }
+                                            </td>
+                                        }
+                                    </tr>
+                                }
+                            </table>
+                        }
+                    </td>
+                </tr>
+            </table>
+
+            <table id="@Html.Raw(dataTableSelector.Substring(1))" class="table table-bordered table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th hidden><input type="text" value="" class="dataTablesFilterTextBox form-control" /></th>   @*Id*@
+                        <th>﻿<input type="text" value="" class="dataTablesFilterTextBox form-control" /></th>   @*Object*@
+                        <th>﻿<input type="text" value="" class="dataTablesFilterTextBox form-control" /></th>   @*Operation*@
+                        <th>﻿<input type="text" value="" class="dataTablesFilterTextBox form-control" /></th>   @*OperationTime*@
+                        <th>﻿<input type="text" value="" class="dataTablesFilterTextBox form-control" /></th>   @*SeriesType*@
+                        <th>﻿<input type="text" value="" class="dataTablesFilterTextBox form-control" /></th>   @*State*@
+                        @if (Model.Scheduler.ObjectGroupId == iScheduler.Groups.All)
+                        {
+                            <th>﻿<input type="text" value="" class="dataTablesFilterTextBox form-control" /></th>
+                        }
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <th hidden>@Html.LabelFor(x => Model.Id)</th>
+                        <th>@Html.LabelFor(x => Model.OperationTime)</th>
+                        <th>@Html.LabelFor(x => Model.ObjectIdText)</th>
+                        <th>@Html.LabelFor(x => Model.OperationIdText)</th>
+                        <th>@Html.Raw(Model.Translation(typeof(WordCodes.iScheduler.Manager.Label.SeriesType)))</th>
+                        <th>@Html.Raw(Model.Translation(typeof(WordCodes.iScheduler.Manager.Label.State)))</th>
+                        @if (Model.Scheduler.ObjectGroupId == iScheduler.Groups.All)
+                        {
+                            <th>@Html.LabelFor(x => Model.ObjectGroupId)</th>
+                        }
+                        <th style="vertical-align:middle;"></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+                <tfoot></tfoot>
+            </table>
+        }
+    </div>
+</div>
+
+<script type="text/javascript">
+    /*##### GLOBAL VARIABLES #####*/
+    var oTable = null;  //jquery objektum lesz
+    var aoColumns = [
+        { sName: "Id", sWidth: "25px", bVisible: false },
+        { sName: "OperationTime", sWidth: "150px" },
+        { sName: "ObjectName" },
+        { sName: "OperationName" },
+        { sName: "SeriesTypeAndName" },
+        {
+            sName: "State",
+            sWidth: "75px",
+            mRender: function (data, type, full) {
+                //console.log('state mRender: data full[7]', data, full[7]);
+                var html = full[7] == "" ? data : ('<a href="#" onclick="showStateMessage(' + full[0] + ');">' + data + '</a>');
+                return html;
+            }
+        },
+        @if (Model.Scheduler.ObjectGroupId == iScheduler.Groups.All)
+        {
+            <text>{ sName: "ObjectGroupId", sWidth: "75px" },</text>
+        }
+        {
+            sName: "Actions",
+            sWidth: "50px",
+            bSearchable: false,
+            bSortable: false,
+            mRender: function (data, type, full) {
+                var html = '<a style="margin-right:5px;cursor:pointer;"><span onclick="updateSchedule(\'' + full[0] + '\')" title="@Html.Raw(updateTitle)" class="glyphicon glyphicon-pencil"></span></a>'
+                         + '<a style="margin-right:5px;cursor:pointer;"><span onclick="deleteSchedule(\'' + full[0] + '\',\'' + full[1] + '\',\'' + full[2] + '\',\'' + full[3] + '\')" title="@Html.Raw(deleteTitle)" class="glyphicon glyphicon-trash"></span></a>';
+                return html;
+            }
+        },
+    ];
+
+    var $consistencyTitle = $('#@(iScheduler.SysButtonNames.ConsistencyCheck)title');
+    var $consistencyInput = $('#@(iScheduler.SysButtonNames.ConsistencyCheck)');
+    var callingViewMode = '@(String.IsNullOrWhiteSpace(Model.CallingViewMode) ? "" : Model.CallingViewMode)';
+
+    var sAjaxSource = '@Html.Raw(Url.Action("GetData", controllerName, new { area = areaName
+                                                                  , objectType = Model.Scheduler.ObjectType
+                                                                  , groupId = Model.Scheduler.ObjectGroupId
+                                                                  , connectionString = Model.ConnectionString
+                                                                  }))';
+    @Html.Partial("~/Areas/DataTables/Views/DataTables/_AjaxParameters.cshtml", ajaxParameters)
+
+    var editorUrl = '@Url.Action("Editor", controllerName, new { area = areaName
+                                                               , xmlfile = Model.Scheduler.XMLFileName
+                                                               , groupId = Model.Scheduler.ObjectGroupId })';
+    AjaxParameters.Create.AjaxUrl = editorUrl;
+    /*##### GLOBAL VARIABLES END #####*/
+
+
+    /*##### FUNCTIONS #####*/
+    function waitMessageDialog(message) {
+        if (!message) message = '@Html.Raw(Model.Translation(typeof(WordCodes.iScheduler.Manager.WaitMessage)))';
+        return bootbox.dialog({ message: '<div class="text-center"><i class="glyphicon glyphicon-cog spin-right"></i> ' + message + '</div>' });
+    }
+
+    function showStateMessage(id) {
+        'use strict';
+        var thisfn = 'iScheduler.Manager.showStateMessage: ';
+        var url = '@Url.Action("ShowStateMessage", controllerName, new { area = areaName, connectionString = Model.ConnectionString })';
+        console.log(thisfn + 'id url', id, url);
+
+        $.ajax({
+            url: url,
+            type: 'get',
+            contenttype: 'application/json',
+            datatype: 'json',
+            data: { id: id },
+            success: function (response) {
+                bootbox.dialog({
+                    title: '@Html.Raw(Model.Translation(typeof(WordCodes.iScheduler.Editor.ResultOfTheOperation)))',
+                    message: response
+                });
+            },
+            error: function (jqXHR, exception) {
+                console.log(thisfn + 'Ajax hívás sikertelen! ', jqXHR.responseText);
+            }
+        });
+    }@*showStateMessage function VÉGE*@
+
+
+    function consistencyCheck(checkbox) {
+        console.log('iScheduler.Manager.consistencyCheck: checked', checkbox.checked);
+        var url = '@Html.Raw(Url.Content(Model.ConsistencyUrl))';
+
+        if (checkbox.checked) {
+            $consistencyTitle.text('@Html.Raw(Model.ConsistencyHeader)');
+            //var diagwait = waitMessageDialog('@Html.Raw(Model.Translation(typeof(WordCodes.iScheduler.Manager.ConsistencyWaitMessage)))');
+            $('.allowhide').css('visibility', 'hidden');
+            $.ajax({
+                cache: false,
+                url: url,
+                type: 'get',
+                contenttype: 'application/json',
+                datatype: 'json',
+                data: null,
+                success: function (response) {
+                    console.log('iScheduler.Manager.consistencyCheck: response', response);
+                    if (response.ErrorMessage == "") {
+                        var variable = '@(iScheduler.Variables.ObjectList)';
+                        var checkurl = '@Html.Raw(Url.Content(Model.CheckObjectsUrl))';
+                        while (checkurl.includes(variable)) checkurl = checkurl.replace(variable, response.ObjectIdList);
+                        console.log('iScheduler.Manager.consistencyCheck: checkurl', checkurl);
+                        $.ajax({
+                            cache: false,
+                            url: checkurl,
+                            type: 'get',
+                            contenttype: 'application/json',
+                            datatype: 'json',
+                            data: null,
+                            success: function (checklistJSON) {
+                                console.log('iScheduler.Manager.consistencyCheck: CheckObjects success. checklistJSON', checklistJSON);
+                                var list = "";
+                                var prefix = "";
+                                for (var i = 0; i < checklistJSON.length; i++) {
+                                    if (checklistJSON[i].Checked == false) {
+                                        list += prefix + checklistJSON[i].Value;
+                                        prefix = ",";
+                                    }
+                                }
+                                //diagwait.modal('hide');
+                                console.log('iScheduler.Manager.consistencyCheck: dataTableBuild list', list);
+                                dataTableBuild(sAjaxSource + '&checkList=' + list + '&isConsistencyCheck=true');
+                            },
+                            error: function (jqXHR, exception) {
+                                console.log('iScheduler.Manager.consistencyCheck: CheckObjects hívás sikertelen! ', jqXHR.responseText);
+                                //diagwait.modal('hide');
+                                $consistencyInput.bootstrapToggle('off')
+                            }
+                        });
+
+                    } else {
+                        //diagwait.modal('hide');
+                        bootbox.alert(response.ErrorMessage);
+                        $consistencyInput.bootstrapToggle('off');
+                    }
+                },
+                error: function (jqXHR, exception) {
+                    console.log('iScheduler.Manager.consistencyCheck: ConsistencyCheck.GET hívás sikertelen! ', jqXHR.responseText);
+                    //diagwait.modal('hide');
+                    $consistencyInput.bootstrapToggle('off')
+                }
+            });
+
+        } else { //kikapcsolt állapotot mutat
+            $consistencyTitle.text('');
+            //$('.allowhide').show();
+            $('.allowhide').css('visibility', 'visible');
+            dataTableBuild(sAjaxSource);
+        }
+    }@*consistencyCheck function VÉGE*@
+
+
+    var isAllowButtonClick = true;
+    var timeoutButtonClick;
+    function buttonOnClick(url, isDialog, widthDialog) {
+        console.log('iScheduler.Manager.ButtonOnClick url, isDialog, widthDialog', url, isDialog, widthDialog);
+        if (isAllowButtonClick) {
+            isAllowButtonClick = false;
+
+
+            if (isDialog) {
+                var prefix = (url.indexOf('?') != -1) ? '&' : '?';
+                url = url + prefix + 'callingViewMode=' + callingViewMode;
+                bootboxAction(url, false, null, null, widthDialog);
+            } else {
+                waitMessageDialog();
+                window.location.assign(url);
+            }
+            timeoutButtonClick = setTimeout(function () {
+                isAllowButtonClick = true;
+            }, 1000);
+        }
+    }@*buttonOnClick function VÉGE*@
+
+    var isAllowUpdateSchedule = true;
+    var timeoutUpdateSchedule;
+    function updateSchedule(id) {
+        console.log('iScheduler.Manager.updateSchedule: id', id);
+        if (isAllowUpdateSchedule) {
+            isAllowUpdateSchedule = false;
+            var prefix = (editorUrl.indexOf('?') != -1) ? '&' : '?';
+            var url = editorUrl + prefix + 'id=' + id + '&callingViewMode=' + callingViewMode;
+            bootboxAction(url);
+            timeoutUpdateSchedule = setTimeout(function () {
+                isAllowUpdateSchedule = true;
+            }, 1000);
+        }
+    }@*updateSchedule function VÉGE*@
+
+    function deleteSchedule(id, time, name, operation) {
+        /// A függvény a törlés rákérdezése után a paraméterben megadott id-val, meghívja
+        /// az [AjaxParameters.Delete.AjaxUrl]-t. Amely következő függvényt hívja a controllerben:
+        ///     public JsonResult Delete(int id){ ... }
+        /// Ha az üres stringgel tér vissza, akkor minden rendben lezajlott, ha nem, akkor az hibaüzenet.
+        console.log('iScheduler.Manager.deleteSchedule: id', id);
+        var mess = '<table>'
+                 + '<tr><td>@Html.Raw(Model.Translation(typeof(WordCodes.iScheduler.Manager.Label.OperationTime))):</td><td style="padding-left:4px;">' + time + '</td></tr>'
+                 + '<tr><td>@Html.Raw(Model.Translation(typeof(WordCodes.iScheduler.Manager.Label.ObjectId))):</td><td style="padding-left:4px;">' + name + '</td></tr>'
+                 + '<tr><td>@Html.Raw(Model.Translation(typeof(WordCodes.iScheduler.Manager.Label.OperationId))):</td><td style="padding-left:4px;">' + operation + '</td></tr>'
+                 + '</table>'
+                 + '<br />'
+                 + '<div style="font-weight:bold;">@Html.Raw(Model.Translation(typeof(WordCodes.iScheduler.Manager.ConfirmDelete)))';
+        //console.log('iScheduler.Manager.deleteSchedule: mess', mess);
+        var dialog = bootbox.dialog({
+            message: mess,
+            onEscape: function (event) {
+                dialog.modal('hide');
+            },
+            buttons: {
+                ok: {
+                    label: '@(Html.Raw(Model.Translation(typeof(WordCodes.MasterData.Dialog.Yes))))',
+                    className: 'btn btn-danger',
+                    callback: function () {
+                        console.log('iScheduler.Manager.deleteSchedule: biztos benne Id=' + id);
+                        dialog.modal('hide');
+                        var diagwait = waitMessageDialog();
+                        $.ajax({
+                            cache: false,
+                            url: '@Html.Raw(@Url.Action("Delete", controllerName, new { area = areaName }))',
+                            type: 'get',
+                            contenttype: 'application/json',
+                            datatype: 'json',
+                            data: ({
+                                id: id,
+                                connectionString: '@Html.Raw(Model.ConnectionString.Replace(@"\",@"\\"))',
+                                isDeleteSeries: false
+                            }),
+                            success: function (errorMessage) {
+                                diagwait.modal('hide');
+                                if (errorMessage == "") {
+                                    oTable.fnDraw();
+                                } else {
+                                    bootbox.alert(errorMessage);
+                                }
+                            },
+                            error: function (jqXHR, exception) {
+                                console.log('iScheduler.Manager.deleteSchedule: Ajax hívás sikertelen! ', jqXHR.responseText);
+                                diagwait.modal('hide');
+                            }
+                        });
+                    }
+                },
+                cancel: {
+                    label: '@(Html.Raw(Model.Translation(typeof(WordCodes.MasterData.Dialog.No))))',
+                    className: 'btn btn-primary',
+                    callback: function () {
+                    }
+                }
+            }
+        });
+    }@*deleteSchedule function VÉGE*@
+
+    function dataTableBuild(getDataUrl) {
+        if (oTable) oTable.fnDestroy();
+
+        oTable = dataTableInitialization({
+            dataTableSelector: '@Html.Raw(dataTableSelector)',
+            sAjaxSource: getDataUrl,
+            aoColumns: aoColumns,
+            languageUrl: '@dataTablesLanguageFile',
+            dateTimePickerLanguage: '@dateTimePickerLanguage',
+            oTableTools: {
+                sSwfPath: '@tableToolsSWFPath',
+                pdfExport: true,
+                exportColumns: [@string.Join(", ", tableToolsExportColumnIndexes)]
+            }
+        });
+
+        //console.log('iScheduler.Manager.document.ready event: oTable', oTable);
+        //oTable.makeEditable({
+        //    sUpdateURL: '@Url.Action("UpdateData", controllerName, new { area = areaName })',
+        //    oEditableSettings: { event: "click" },
+        //    aoColumns: [
+        //        {   @*ObjectName*@
+        //            placeholder: "",
+        //            tooltip: '@Html.Raw(makeEditableToolTip)',
+        //        },
+        //        {   @*OperationName*@
+        //            placeholder: "",
+        //            tooltip: '@Html.Raw(makeEditableToolTip)',
+        //        },
+        //        {   @*OperationTime*@
+        //            placeholder: "",
+        //            tooltip: '@Html.Raw(makeEditableToolTip)',
+        //        },
+        //        null, @*State*@
+        //        null, @*Actions*@
+        //        ],
+        //});
+    }@*dataTableBuild function VÉGE*@
+
+    /*##### FUNCTIONS END #####*/
+
+    /*##### EVENTS #####*/
+    $(document).ready(function () {
+        console.log('iScheduler.Manager.document.ready event: PING createTitle="@(createTitle)"');
+        dataTableBuild(sAjaxSource);
+    });@*$(document).ready() event VÉGE*@
+    /*##### EVENTS END #####*/
+
+</script>

@@ -132,10 +132,10 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if not exist $(SolutionDir)Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\IVServiceWatchdog mkdir $(SolutionDir)Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\IVServiceWatchdog
-xcopy /Y /R "$(SolutionDir)IVServiceWatchdog\bin\$(ConfigurationName)\IVServiceWatchdog.dll" "$(SolutionDir)Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\IVServiceWatchdog"
-xcopy /Y /R "$(SolutionDir)IVServiceWatchdog\bin\$(ConfigurationName)\IVServiceWatchdog.pdb" "$(SolutionDir)Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\IVServiceWatchdog"
-xcopy /Y /R "$(SolutionDir)IVServiceWatchdog\IVserviceWatchdog.Config.xml" "$(SolutionDir)Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\IVServiceWatchdog"</PostBuildEvent>
+    <PostBuildEvent>if not exist "$(SolutionDir)Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)\IVServiceWatchdog" mkdir "$(SolutionDir)Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)\IVServiceWatchdog"
+xcopy /Y /R "$(SolutionDir)IVServiceWatchdog\bin\$(ConfigurationName)\IVServiceWatchdog.dll" "$(SolutionDir)Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)\IVServiceWatchdog"
+xcopy /Y /R "$(SolutionDir)IVServiceWatchdog\bin\$(ConfigurationName)\IVServiceWatchdog.pdb" "$(SolutionDir)Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)\IVServiceWatchdog"
+xcopy /Y /R "$(SolutionDir)IVServiceWatchdog\IVserviceWatchdog.Config.xml" "$(SolutionDir)Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)\IVServiceWatchdog"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

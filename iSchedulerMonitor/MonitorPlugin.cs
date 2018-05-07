@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Vrh.ApplicationContainer;
+using Vrh.Logger;
 using VRH.Common;
 
 namespace iSchedulerMonitor
@@ -81,21 +82,23 @@ namespace iSchedulerMonitor
         /// </summary>
         public override void Start()
         {
-            BeginStart();
-            System.Diagnostics.Debug.WriteLine("MonitorPlugin START.");
-
-            // Implement Plugin logic here
-            // Ha netán újra indítják, akkor az előzőt el kell dobni!
-            if (_monitor != null) _monitor.Dispose();
-
-            string pluginConfig = String.IsNullOrEmpty(_myData.InstanceConfig) ? _myData.Type.PluginConfig : _myData.InstanceConfig;
-            string pluginData = _myData.InstanceData == null ? null : (string)_myData.InstanceData; 
-            System.Diagnostics.Debug.WriteLine($"MonitorPlugin pluginConfig={pluginConfig};pluginData={pluginData}");
-
-            _monitor = new Monitor(pluginConfig, pluginData);
-
             try
             {
+                BeginStart();
+                VrhLogger.Log("MonitorPlugin START.", LogLevel.Debug, this.GetType());
+                System.Diagnostics.Debug.WriteLine("MonitorPlugin START.");
+
+                // Implement Plugin logic here
+                // Ha netán újra indítják, akkor az előzőt el kell dobni!
+                if (_monitor != null) _monitor.Dispose();
+
+                string pluginConfig = String.IsNullOrEmpty(_myData.InstanceConfig) ? _myData.Type.PluginConfig : _myData.InstanceConfig;
+                string pluginData = _myData.InstanceData == null ? null : (string)_myData.InstanceData;
+                VrhLogger.Log($"MonitorPlugin pluginConfig={pluginConfig};pluginData={pluginData}", LogLevel.Debug, this.GetType());
+                System.Diagnostics.Debug.WriteLine($"MonitorPlugin pluginConfig={pluginConfig};pluginData={pluginData}");
+
+                _monitor = new Monitor(pluginConfig, pluginData);
+
                 System.Diagnostics.Debug.WriteLine($"MonitorPlugin _monitor.Start");
                 _monitor.Start();
                 base.Start();

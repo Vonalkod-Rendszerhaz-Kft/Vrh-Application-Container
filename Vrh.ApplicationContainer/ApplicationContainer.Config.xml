@@ -2,7 +2,7 @@
 <Vrh.ApplicationContainer>
   <Config>
     <InstanceFactoryAssembly>InstanceFactory.FromXML.dll</InstanceFactoryAssembly>
-    <InstanceFactoryType>InstanceFactory.FromXML.IntsnceFactoryFromXML</InstanceFactoryType>
+    <InstanceFactoryType>InstanceFactory.FromXML.InstanceFactoryFromXML</InstanceFactoryType>
     <InstanceFactoryVersion>1.0.0</InstanceFactoryVersion>
     <MessageStackSize>1000</MessageStackSize>
   </Config>

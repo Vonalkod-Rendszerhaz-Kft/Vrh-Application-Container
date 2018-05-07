@@ -89,10 +89,10 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if not exist $(SolutionDir)Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\ServiceStarter mkdir $(SolutionDir)Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\ServiceStarter
-xcopy /Y /R "$(SolutionDir)Service.Starter\bin\$(ConfigurationName)\Service.Starter.dll" "$(SolutionDir)Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\ServiceStarter"
-xcopy /Y /R "$(SolutionDir)Service.Starter\bin\$(ConfigurationName)\Service.Starter.pdb" "$(SolutionDir)Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\ServiceStarter"
-xcopy /Y /R "$(SolutionDir)Service.Starter\ServiceStarter.Config.xml" "$(SolutionDir)Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\ServiceStarter"</PostBuildEvent>
+    <PostBuildEvent>if not exist "$(SolutionDir)Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)\ServiceStarter" mkdir "$(SolutionDir)Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)\ServiceStarter"
+xcopy /Y /R "$(SolutionDir)Service.Starter\bin\$(ConfigurationName)\Service.Starter.dll" "$(SolutionDir)Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)\ServiceStarter"
+xcopy /Y /R "$(SolutionDir)Service.Starter\bin\$(ConfigurationName)\Service.Starter.pdb" "$(SolutionDir)Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)\ServiceStarter"
+xcopy /Y /R "$(SolutionDir)Service.Starter\ServiceStarter.Config.xml" "$(SolutionDir)Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)\ServiceStarter"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

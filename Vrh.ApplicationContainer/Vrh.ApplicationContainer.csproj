@@ -33,6 +33,15 @@
     <DocumentationFile>bin\Release\Vrh.ApplicationContainer.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.Extended, Version=6.0.0.0, Culture=neutral, PublicKeyToken=05b7e29bdd433584, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.Extended.6.1.0.168\lib\net45\EntityFramework.Extended.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Diagnostics.Runtime, Version=0.8.31.1, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Diagnostics.Runtime.Latest.0.8.31.3\lib\net45\Microsoft.Diagnostics.Runtime.dll</HintPath>
       <Private>True</Private>
@@ -44,6 +53,7 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.ComponentModel.Composition.registration" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Reflection.Context" />
@@ -58,6 +68,9 @@
     <Reference Include="VRH.Common, Version=1.13.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\VRH.Common.1.13.0\lib\net35\VRH.Common.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="VRH.ConnectionStringStore, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\VRH.ConnectionStringStore.1.3.0\lib\net45\VRH.ConnectionStringStore.dll</HintPath>
     </Reference>
     <Reference Include="Vrh.LinqXMLProcessor.Base, Version=1.2.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Vrh.LinqXMLProcessor.Base.1.2.3\lib\net40\Vrh.LinqXMLProcessor.Base.dll</HintPath>

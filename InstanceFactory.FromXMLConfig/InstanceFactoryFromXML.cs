@@ -15,12 +15,12 @@ using Vrh.Logger;
 namespace InstanceFactory.FromXML
 {
     [Export(typeof(IInstanceFactory))]
-    public class IntsnceFactoryFromXML : IInstanceFactory
+    public class InstanceFactoryFromXML : IInstanceFactory
     {
         /// <summary>
         /// Constructor
         /// </summary>
-        public IntsnceFactoryFromXML()
+        public InstanceFactoryFromXML()
         {
             string configFile = ConfigurationManager.AppSettings[_configFileSettingKey];
             if (String.IsNullOrEmpty(configFile))
@@ -218,7 +218,7 @@ namespace InstanceFactory.FromXML
         /// <summary>
         /// Ez  adefiniált modul azonosító
         /// </summary>
-        internal const string MODULEPREFIX = "Vrh.ApplivationContainer.InstanceFactory.FromXML";
+        internal const string MODULEPREFIX = "Vrh.ApplicationContainer.InstanceFactory.FromXML";
 
         public Dictionary<string, IPlugin> BuildAll()
         {                                    

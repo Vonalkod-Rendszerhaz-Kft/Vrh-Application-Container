@@ -52,8 +52,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if not exist "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\Test" mkdir "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\Test"
-xcopy /Y /R  "$(SolutionDir)Plugin.Test\bin\$(ConfigurationName)\Plugin.Test.dll" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)\Test"</PostBuildEvent>
+    <PostBuildEvent>if not exist "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)\Test" mkdir "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)\Test"
+xcopy /Y /R  "$(SolutionDir)Plugin.Test\bin\$(ConfigurationName)\Plugin.Test.dll" "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)\Test"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

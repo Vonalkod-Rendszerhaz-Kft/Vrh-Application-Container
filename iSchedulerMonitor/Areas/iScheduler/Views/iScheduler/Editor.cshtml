@@ -1,0 +1,395 @@
+﻿@*
+    -----------------------------------
+    iScheduler - Editor.cshtml
+    -----------------------------------
+*@
+@using System.Text.RegularExpressions
+
+@model Vrh.iScheduler.iSchedulerModel
+
+@{
+    string areaName = (string)ViewContext.RouteData.DataTokens["area"];
+    string controllerName = (string)ViewContext.RouteData.DataTokens["controller"];
+    string callingViewMode = String.IsNullOrWhiteSpace(Model.CallingViewMode) ? "null" : ("'" + Model.CallingViewMode + "'");
+
+    string editorFormId = Model.BootboxId + "Form";
+    object ajaxArea = new { area = areaName };
+    AjaxOptions ajaxOptions = new AjaxOptions()
+    {
+        InsertionMode = InsertionMode.Replace,
+        HttpMethod = "POST",
+        UpdateTargetId = Model.BootboxId + "-body",
+    };
+    object ajaxAttributes = new { id = editorFormId };
+
+    //WA20170922: Elvileg már tudja
+    ////ez csak addig kell, ameddig az iSchedulerReport.Editor nem tudja a szabványos ablaknyitást.
+    //string reportXmlPath = "";
+    //string pattern = "xmlfile=.*\x2Exml";
+    //Match m = Regex.Match(Model.ObjectEditorUrl, pattern, RegexOptions.IgnoreCase);
+    //if (m.Success)
+    //{
+    //    reportXmlPath = m.Value.Substring(8);
+    //    System.Diagnostics.Debug.WriteLine("iScheduler.Editor.cshtml:url={0}, pattern={1}, reportXmlPath={2}", Model.ObjectEditorUrl, pattern, reportXmlPath);
+    //}
+
+    //wizard-okhoz szükséges dolgok
+    string nameSingle = Model.Translation(typeof(WordCodes.iScheduler.Editor.Wizard.Single)) + " (" + Vrh.iScheduler.iScheduler.ScheduleTypes.Single + ")";
+    string nameWeekly = Model.Translation(typeof(WordCodes.iScheduler.Editor.Wizard.Weekly)) + " (" + Vrh.iScheduler.iScheduler.ScheduleTypes.Weekly + ")";
+    HtmlString numberOfLabel = new HtmlString("");
+
+    string stateString = "";
+    switch (Model.State)
+    {
+        case ScheduleStates.Active:
+            stateString = Model.Translation(typeof(WordCodes.iScheduler.Manager.State.Active));
+            break;
+        case ScheduleStates.Failed:
+            stateString = Model.Translation(typeof(WordCodes.iScheduler.Manager.State.Failed));
+            break;
+        case ScheduleStates.Success:
+            stateString = Model.Translation(typeof(WordCodes.iScheduler.Manager.State.Success));
+            break;
+    }
+
+}
+
+@Styles.Render("~/Content/smalot-datetimepicker/bootstrap-datetimepicker.min.css")
+@Scripts.Render("~/Scripts/smalot-datetimepicker/bootstrap-datetimepicker.min.js")
+
+@Styles.Render("~/Content/VRHAutoComp.min.css")
+@Styles.Render("~/Areas/iScheduler/Content/Editor.min.css")
+
+<style>
+    .my-checkbox > input {
+        width: 20px;
+        height: 20px;
+        position: relative;
+        top: -2px;
+        vertical-align: middle;
+    }
+
+    .my-checkbox > label {
+        position: relative;
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    /*div#iSchedulerEditor .modal{
+        z-index: 1055;
+    }
+
+    .bootbox:not([id]){
+        z-index: 1056;
+    }
+
+    .bootbox:not([id]) .modal-dialog{
+        z-index: 1057;
+    }*/
+</style>
+
+<h1>@Html.Raw(Model.Translation(Model.Id == 0 ? typeof(WordCodes.iScheduler.Editor.TitleAdd) : typeof(WordCodes.iScheduler.Editor.TitleUpdate)))</h1>
+
+@Html.Partial("~/Areas/DataTables/Views/DataTables/_ValidationSummary.cshtml")
+
+@using (Ajax.BeginForm("Editor", controllerName, ajaxArea, ajaxOptions, ajaxAttributes))
+{
+    @Html.AntiForgeryToken()
+
+    @Html.HiddenFor(x => x.ObjectIdValue) @*A ObjectSelectedName autocomplete ide teszi a kiválasztott Id-ját.*@
+    @Html.HiddenFor(x => x.OperationIdValue) @*A OperationSelectedName autocomplete ide teszi a kiválasztott Id-ját.*@
+    @Html.HiddenFor(x => x.Id)
+    @Html.HiddenFor(x => x.ConnectionString)
+    @Html.HiddenFor(x => x.ObjectIdUrl)
+    @Html.HiddenFor(x => x.OperationIdUrl)
+    @Html.HiddenFor(x => x.ObjectEditorUrl)
+    @Html.HiddenFor(x => x.BootboxId)
+    @Html.HiddenFor(x => x.CallingViewMode)
+    @Html.HiddenFor(x => x.ScheduleExecuteUrl)
+    @Html.HiddenFor(x => x.PreviousScheduleType)
+    @Html.HiddenFor(x => x.SeriesId);
+    @Html.HiddenFor(x => x.ResponseTimeout);
+    @Html.HiddenFor(x => x.XMLFileName);
+
+    switch (Model.ScheduleType)
+    {
+        case Vrh.iScheduler.iScheduler.ScheduleTypes.Single:
+            @Html.HiddenFor(x => x.NumberOf)
+            @Html.HiddenFor(x => x.SeriesColor)
+            @Html.HiddenFor(x => x.SeriesName)
+            break;
+
+        case Vrh.iScheduler.iScheduler.ScheduleTypes.Weekly:
+            numberOfLabel = (HtmlString)Html.Raw(Model.Translation(typeof(WordCodes.iScheduler.Editor.Label.NumberOfWeeks)));
+            break;
+
+        case Vrh.iScheduler.iScheduler.ScheduleTypes.Monthly:
+            numberOfLabel = (HtmlString)Html.Raw(Model.Translation(typeof(WordCodes.iScheduler.Editor.Label.NumberOfMonths)));
+            break;
+
+        default:
+            break;
+    }
+
+    <table id="editortable">
+        <tr>
+            <td>
+                <div class="editor-label">
+                    @Html.LabelFor(x => x.ObjectType)
+                </div>
+                <div class="editor-field">
+                    <div class="editor-htmlattributes">
+                        @Html.TextBoxFor(x => x.ObjectType, new { @readonly = "" })
+                    </div>
+                    @Html.ValidationMessageFor(x => x.ObjectType)
+                    <br />
+                </div>
+            </td>
+            <td>
+                <div class="editor-label">
+                    @Html.LabelFor(x => x.ObjectGroupId)
+                </div>
+                <div class="editor-field">
+                    <div class="editor-htmlattributes">
+                        @Html.TextBoxFor(x => x.ObjectGroupId, String.IsNullOrEmpty(Model.ObjectGroupId) && Model.SeriesId == null ? null : new { @readonly = "" })
+                    </div>
+                    @Html.ValidationMessageFor(x => x.ObjectGroupId)
+                    <br />
+                </div>
+            </td>
+            <td>
+                <div class="editor-label">
+                    @Html.LabelFor(x => x.State)
+                </div>
+                <div class="editor-field">
+                    @if (Model.State == ScheduleStates.Failed)
+                    {
+                        <a href="#" onclick="javascript:showStateMessageFromEditor(@(Model.Id.ToString()));">@(stateString)</a>
+                    }
+                    else
+                    {
+                        @(stateString)
+                    }
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <div class="editor-label">
+                    @Html.LabelFor(x => x.ObjectIdText)
+                </div>
+                <div class="editor-field">
+                    <div class="editor-htmlattributes right-inner-addon">
+                        @if (Model.SeriesId == null)
+                        {
+                            @Html.TextBoxFor(x => x.ObjectIdText, new { autofocus = "" });
+                        }
+                        else
+                        {
+                            @Html.TextBoxFor(x => x.ObjectIdText, new { @readonly = "" });
+                        }
+                        <i class="glyphicon glyphicon-search" style="width:10px"></i>
+                    </div>
+                    @Html.ValidationMessageFor(x => x.ObjectIdText)
+                    <br />
+                </div>
+            </td>
+            <td>
+                <button type="button" class="btn btn-success" onclick="javascript:openObjectEditor();">
+                    @(Html.Raw(Model.Translation(typeof(WordCodes.iScheduler.Editor.Button.ObjectEditor))))
+                </button>
+            </td>
+        </tr>
+        <tr style="border-bottom: 2px solid black;">
+            <td>
+                <div class="editor-label">
+                    @Html.LabelFor(x => x.OperationIdText)
+                </div>
+                <div class="editor-field">
+                    <div class="editor-htmlattributes right-inner-addon">
+                        @if (Model.SeriesId == null)
+                        {
+                            @Html.TextBoxFor(x => x.OperationIdText, new { autofocus = "" });
+                        }
+                        else
+                        {
+                            @Html.TextBoxFor(x => x.OperationIdText, new { @readonly = "" });
+                        }
+                        <i class="glyphicon glyphicon-search" style="width:10px"></i>
+                    </div>
+                    @Html.ValidationMessageFor(x => x.OperationIdText)
+                    <br />
+                </div>
+            </td>
+            <td colspan="2" style="vertical-align:top;">
+                <div class="editor-label">
+                    @Html.LabelFor(x => x.ScheduleType)
+                </div>
+                @if (Model.SeriesId == null)
+                {
+                    <div class="editor-field">
+                        <label class="radio-inline">
+                            @Html.RadioButtonFor(x => x.ScheduleType, Vrh.iScheduler.iScheduler.ScheduleTypes.Single)
+                            @(nameSingle)
+                        </label>
+                        <label class="radio-inline">
+                            @Html.RadioButtonFor(x => x.ScheduleType, Vrh.iScheduler.iScheduler.ScheduleTypes.Weekly)
+                            @(nameWeekly)
+                        </label>
+                    </div>
+                }
+                else
+                {
+                    <div class="editor-field">
+                        <div class="editor-htmlattributes">
+                            @switch (Model.ScheduleType)
+                            {
+                                case Vrh.iScheduler.iScheduler.ScheduleTypes.Single:
+                                    <input type="text" value="@(nameSingle)" readonly />
+                                    break;
+                                case Vrh.iScheduler.iScheduler.ScheduleTypes.Weekly:
+                                    <input type="text" value="@(nameWeekly)" readonly />
+                                    break;
+                                default:
+                                    break;
+                            }
+                        </div>
+                    </div>
+                }
+                <br />
+            </td>
+        </tr>
+        @if (Model.SeriesId == null)
+        {
+            switch (Model.ScheduleType)
+            {
+                case Vrh.iScheduler.iScheduler.ScheduleTypes.Single:
+                    @Html.Partial("~/Areas/iScheduler/Views/iScheduler/EditorSingle.cshtml", Model)
+                    break;
+                case Vrh.iScheduler.iScheduler.ScheduleTypes.Weekly:
+                    @Html.Partial("~/Areas/iScheduler/Views/iScheduler/EditorWeekly.cshtml", Model)
+                    break;
+                default:
+                    break;
+            }
+        }
+        else
+        {
+            <tr>
+                <td>
+                    <div class="editor-label">
+                        @Html.LabelFor(x => x.OperationTime)
+                    </div>
+                    <div class="editor-field">
+                        <div class="editor-htmlattributes">
+                            @Html.TextBoxFor(x => x.OperationTime, new { @type = "datetime-local", @Value = Model.OperationTime.ToString("yyyy-MM-ddThh:mm"), @readonly = "" })
+                        </div>
+                        @Html.ValidationMessageFor(x => x.OperationTime)
+                        <br />
+                    </div>
+                </td>
+                <td colspan="2"></td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="editor-label">
+                        @Html.LabelFor(x => x.SeriesName)
+                    </div>
+                    <div class="editor-field">
+                        <div class="editor-htmlattributes">
+                            @Html.TextBoxFor(x => x.SeriesName)
+                        </div>
+                        @Html.ValidationMessageFor(x => x.SeriesName)
+                        <br />
+                    </div>
+                </td>
+                <td>
+                    <div class="editor-label">
+                        @Html.LabelFor(x => x.SeriesColor)
+                    </div>
+                    <div class="editor-field">
+                        <div class="editor-htmlattributes">
+                            @Html.TextBoxFor(x => x.SeriesColor, new { @type = "color" })
+                        </div>
+                        @Html.ValidationMessageFor(x => x.SeriesColor)
+                        <br />
+                    </div>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-danger" style="" onclick="javascript: removeScheduleFromSeries();">
+                        @(Html.Raw(Model.Translation(typeof(WordCodes.iScheduler.Editor.Button.DeleteFromSeries))))
+                    </button>
+                </td>
+            </tr>
+        }
+    </table>
+    <table style="width:100%;border-top: 2px solid black;">
+        <tr>
+            <td colspan="3" class="text-right my-checkbox" style="padding:0px;">
+                @Html.LabelFor(x => x.IsScheduleExecute)
+                @Html.CheckBoxFor(x => x.IsScheduleExecute)
+            </td>
+        </tr>
+        <tr id="buttoncontainer">
+            <td style="padding-top:7px;">
+                @if (Model.Id != 0)
+                {
+                    <button type="button" class="btn btn-danger"
+                            onclick="javascript:deleteScheduleFromEditor(@(Model.Id),@(callingViewMode), false);">
+                        @(Html.Raw(Model.Translation(typeof(WordCodes.iScheduler.Editor.Button.Remove))))
+                    </button>
+                }
+                @if (Model.SeriesId != null)
+                {
+                    <button type="button" class="btn btn-danger" style="margin-left:10px;"
+                            onclick="javascript:deleteScheduleFromEditor(@(Model.Id),@(callingViewMode), true);">
+                        @(Html.Raw(Model.Translation(typeof(WordCodes.iScheduler.Editor.Button.DeleteTheSeries))))
+                    </button>
+                }
+            </td>
+            <td style="text-align:right;padding-top:7px;">
+                <input type="submit" class="btn btn-primary" style="margin-right:10px;"
+                       value="@(Html.Raw(Model.Translation(typeof(WordCodes.iScheduler.Editor.Button.Save))))" />
+                <button type="button" class="btn btn-default" style=""
+                        onclick="javascript:bootboxActionHide('@(Model.BootboxId)');">
+                    @(Html.Raw(Model.Translation(typeof(WordCodes.iScheduler.Editor.Button.Exit))))
+                </button>
+            </td>
+        </tr>
+    </table>
+}@* Ajax.BeginForm VÉGE *@
+
+<script type="text/javascript">
+    function EditorConstantsInit() {    // A scriptek számára szükséges constans értékek, melyek a Html.Helper segítségével készülnek
+        'use strict'
+
+        // Feliratok, üzenetek
+        ivSch.WAIT_MESSAGE = '@Html.Raw(Model.Translation(typeof(WordCodes.iScheduler.Manager.WaitMessage)))';
+        ivSch.CONFIRM_HEADER = '@Html.Raw(Model.Translation(typeof(WordCodes.MasterData.Dialog.ConfirmationHeader)))';
+        ivSch.CONFIRM_DELETE = '@Html.Raw(Model.Translation(typeof(WordCodes.iScheduler.Manager.ConfirmDelete)))';
+        ivSch.CONFIRM_FROMSERIES = '@Html.Raw(Model.Translation(typeof(WordCodes.iScheduler.Manager.ConfirmDeleteFromSeries)))';
+        ivSch.CONFIRM_DELETESERIES = '@Html.Raw(Model.Translation(typeof(WordCodes.iScheduler.Manager.ConfirmDeleteSeries)))';
+        ivSch.BUTTON_LABEL_YES = '@Html.Raw(Model.Translation(typeof(WordCodes.MasterData.Dialog.Yes)))';
+        ivSch.BUTTON_LABEL_NO = '@Html.Raw(Model.Translation(typeof(WordCodes.MasterData.Dialog.No)))';
+        ivSch.NUMBER_OF_LABEL = '@(numberOfLabel)';
+        ivSch.EXECUTE_WAIT_MESSAGE = '@Html.Raw(Model.Translation(typeof(WordCodes.iScheduler.Editor.ExecuteWaitMessage)))';
+
+        // Url-ek
+        ivSch.URL_DELETE = '@Html.Raw(@Url.Action("Delete", controllerName, new { area = areaName }))';
+        ivSch.URL_FOR_OBJECTID = '@Html.Raw(Url.Content(Model.ObjectIdUrl))';
+        ivSch.URL_FOR_OPERATIONID = '@Html.Raw(Url.Content(Model.OperationIdUrl))';
+        ivSch.URL_OBJECTEDITOR = '@Html.Raw(Url.Content(Model.ObjectEditorUrl))';
+        ivSch.URL_SHOWSTATE = '@Html.Raw(Url.Action("ShowStateMessage", controllerName, new { area = areaName, connectionString = Model.ConnectionString }))';
+
+        // Egyéb állandók
+        ivSch.EDITOR_DIALOG_ID = '@(Model.BootboxId)';
+        ivSch.EDITOR_FORM_ID = '@(editorFormId)';
+        ivSch.VARIABLE_OBJECTID = '@(iScheduler.Variables.ObjectId)';
+        ivSch.VARIABLE_GROUPID = '@(iScheduler.Variables.GroupId)';
+        ivSch.CONNECTION_STRING = '@Html.Raw(Model.ConnectionString.Replace(@"\", @"\\"))';
+
+        ivSch.VIEWMODE_LIST = '@(iScheduler.ViewModes.List)';
+        ivSch.VIEWMODE_CALENDAR = '@(iScheduler.ViewModes.Calendar)';
+    }
+</script>
+<script src="~/Areas/iScheduler/Scripts/Editor.js"></script>

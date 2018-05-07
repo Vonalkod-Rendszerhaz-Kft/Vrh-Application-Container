@@ -4,7 +4,7 @@ using System.Text;
 using System.Timers;
 using System.Data.SqlClient;
 
-using Vrh.Common.Serialization.Structures;
+using Vrh.Web.Common.Lib;
 using Vrh.Logger;
 using System.Collections.Specialized;
 
@@ -52,30 +52,41 @@ namespace iSchedulerMonitor
         /// a távoli gépen. Ha egy gépen fut, akkor nem kötelező.</param>
         public Monitor(string localPath, string remotePath = null)
         {
-            log($"PREPARATION: xmlpath={localPath}");
+            //try
+            //{
+            MyLog($"PREPARATION: xmlpath={localPath}");
 
             m_xmlp = new iSchedulerXMLProcessor(localPath, remotePath);
-            log($"PREPARATION: XMLProcesszor OK. ObjectType={m_xmlp.ObjectType}, GroupId={m_xmlp.GroupId}, ResponseTimeout={m_xmlp.ResponseTimeout}s");
+            //MyLog($"PREPARATION: XMLProcesszor OK. ObjectType={m_xmlp.ObjectType}, GroupId={m_xmlp.GroupId}, ResponseTimeout={m_xmlp.ResponseTimeout}s");
+            MyLog($"PREPARATION: XMLProcesszor OK. ObjectType={m_xmlp.ObjectType}, GroupId={m_xmlp.GroupId}");
 
-            log($"PREPARATION: Set timer! CheckInterval={m_xmlp.CheckInterval}s");
+            MyLog($"PREPARATION: Set timer! CheckInterval={m_xmlp.CheckInterval}s");
             m_timer = new Timer(m_xmlp.CheckInterval * 1000); // !!! Ez itt a jó sor !!!
-            //m_timer = new Timer(5000); // !!! Ez meg itt a debug !!!
+                                                              //m_timer = new Timer(5000); // !!! Ez meg itt a debug !!!
             m_timer.Elapsed += OnExamination;
 
-            log("PREPARATION ready.", LogLevel.Verbose);
+            MyLog("PREPARATION ready.", LogLevel.Verbose);
+
+            //}
+            //catch (Exception ex)
+            //{
+            //    var message = String.Join(",", WebCommon.ErrorListBuilder(ex));
+            //    MyLog("PREPARATION ERROR. " + message);
+            //    throw new ApplicationException("PREPARATION ERROR. ", ex);
+            //}
         }
 
         #endregion Constructor
 
         public void Start()
         {
-            log("iSchedulerMonitor started.", LogLevel.Information);
+            MyLog("iSchedulerMonitor started.", LogLevel.Information);
             m_timer.Start();
         }
         public void Stop()
         {
             m_timer.Stop();
-            log("iSchedulerMonitor stopped.", LogLevel.Information);
+            MyLog("iSchedulerMonitor stopped.", LogLevel.Information);
         }
 
         #region Private methods
@@ -97,13 +108,13 @@ namespace iSchedulerMonitor
             try
             {
                 string thisfn = "EXAMINATION: ";
-                log($"{thisfn}START. Signal time = {signalTime:HH:mm:ss}", LogLevel.Verbose);
-                log($"{thisfn}DatabaseConnectionString={m_xmlp.DatabaseConnectionString}");
+                MyLog($"{thisfn}START. Signal time = {signalTime:HH:mm:ss}", LogLevel.Verbose);
+                MyLog($"{thisfn}DatabaseConnectionString={m_xmlp.DatabaseConnectionString}");
 
                 using (SqlConnection cnn = new SqlConnection(m_xmlp.DatabaseConnectionString))
                 {
                     cnn.Open();
-                    log($"{thisfn}Connection opened.");
+                    MyLog($"{thisfn}Connection opened.");
 
                     string scmd = String.Concat(
                         " select *",
@@ -120,99 +131,36 @@ namespace iSchedulerMonitor
                         SqlDataReader rdr = cmd.ExecuteReader(System.Data.CommandBehavior.CloseConnection);
                         if (rdr.HasRows)
                         {
-                            log($"{thisfn} Scheduled job is found!", LogLevel.Verbose);
-                            string xmlLoginUrl = m_xmlp.LoginUrl.GetUrl();
-                            log($"{thisfn}xmlLoginUrl= {xmlLoginUrl}");
+                            MyLog($"{thisfn}Scheduled job is found!", LogLevel.Verbose);
 
-                            Uri loginUri = new Uri(xmlLoginUrl);
-                            //log($"{thisfn}loginUri= {loginUri.AbsoluteUri}");
-                            using (CookieWebClient wc = new CookieWebClient(loginUri, "Developer", "Dev123"))
+                            int ixID = rdr.GetOrdinal("Id");
+                            Vrh.iScheduler.ScheduleExecute se = new Vrh.iScheduler.ScheduleExecute(m_xmlp.XmlLocalPath);
+
+                            while (rdr.Read())
                             {
-                                if (m_xmlp.ResponseTimeout > 0) wc.Timeout = m_xmlp.ResponseTimeout * 1000; // itt millisecundumban kell
-                                log($"{thisfn}Login success. WebClient.Timeout={wc.Timeout}ms");
-
-                                int ixID = rdr.GetOrdinal("Id");
-
-                                while (rdr.Read())
-                                {
-                                    int id = rdr.GetInt32(ixID);
-                                    ScheduleStates state = ScheduleStates.Failed; //pessszimistán hibát feltételezünk
-                                    ReturnInfoJSON ri;
-
-                                    log($"{thisfn}Scheduled job execute started. id = {id}", LogLevel.Verbose);
-                                    string execurl = m_xmlp.ExecuteUrl.GetUrl();
-                                    execurl = execurl.Replace("@PATH@", m_xmlp.XmlRemotePath);
-                                    execurl = execurl.Replace("@ID@", id.ToString());
-                                    log($"{thisfn}ScheduleExecute url = {execurl}");
-
-                                    #region Scheduled job is executing
-                                    string supd = String.Concat(
-                                        " update iScheduler.Schedules",
-                                        " set State = @state,",
-                                        "     ReturnValue = @rvalue,",
-                                        "     ReturnMessage = @rmessage",
-                                        " where Id = @id");
-                                    try
-                                    {
-                                        string resp = Encoding.UTF8.GetString(wc.DownloadData(execurl));
-                                        log($"{thisfn}ScheduleExecute OK response = {resp}");
-                                        ri = JsonConvert.DeserializeObject<ReturnInfoJSON>(resp);
-                                        log($"{thisfn}JsonConvert.DeserializeObject OK. ReturnValue={ri.ReturnValue}");
-
-                                        if (ri.ReturnValue == 0)
-                                        {
-                                            state = ScheduleStates.Success;    //0 sikeres, akkor success(1), ha nem 0, akkor failed(2), azaz marad 
-                                            supd = " update iScheduler.Schedules set State = @state where Id = @id";
-                                        }
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        Exception rex = wc.LastException == null ? ex : wc.LastException;
-                                        VrhLogger.Log(rex, this.GetType());
-                                        ri = new ReturnInfoJSON()
-                                        {
-                                            ReturnValue = -5,
-                                            ReturnMessage = $"{rex.Message}<br />ScheduleExecute url = {execurl}",
-                                        };
-                                    }
-                                    #endregion Scheduled job is executing
-
-                                    #region Eredmény bejegyzése az adatbázisba
-                                    using (SqlCommand upd = new SqlCommand(supd, cnn))
-                                    {
-                                        upd.Parameters.Add(new SqlParameter("id", id));
-                                        upd.Parameters.Add(new SqlParameter("state", state));
-                                        if (state == ScheduleStates.Failed)
-                                        {
-                                            upd.Parameters.Add(new SqlParameter("rvalue", ri.ReturnValue));
-                                            upd.Parameters.Add(new SqlParameter("rmessage", ri.ReturnMessage));
-                                        }
-                                        int affect = upd.ExecuteNonQuery();
-
-                                        LogLevel ll = ri.ReturnValue == 0 ? LogLevel.Information : LogLevel.Warning;
-                                        log($"{thisfn}Scheduled job (id={id}) has executed. ReturnValue = {ri.ReturnValue} ReturnMessage = {ri.ReturnMessage}", ll);
-                                    }
-                                    #endregion Eredmény bejegyzése az adatbázisba
-
-                                }
-                            }
-                        }
+                                int id = rdr.GetInt32(ixID);
+                                MyLog($"{thisfn}Scheduled job execute started. id = {id}", LogLevel.Verbose);
+                                se.Run(id);
+                                MyLog($"{thisfn}Scheduled job has executed. id = {id}", LogLevel.Verbose);
+                            }//while (rdr.Read())
+                        }//if (rdr.HasRows)
                         else
                         {
-                            log($"{thisfn}No scheduling job", LogLevel.Information);
+                            MyLog($"{thisfn}No scheduling job", LogLevel.Information);
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                VrhLogger.Log(ex, this.GetType());
+                MyLog(String.Join(System.Environment.NewLine,WebCommon.ErrorListBuilder(ex)));
             }
         }
         #endregion Examination
 
-        private void log(string message, LogLevel level = LogLevel.Debug)
+        private void MyLog(string message, LogLevel level = LogLevel.Debug)
         {
+            System.Diagnostics.Debug.WriteLine(message);
             VrhLogger.Log(message, level, this.GetType());
         }
 
