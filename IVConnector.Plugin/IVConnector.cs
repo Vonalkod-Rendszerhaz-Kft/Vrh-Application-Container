@@ -648,8 +648,18 @@ namespace IVConnector.Plugin
                     intervention.Parameters.Add("EntityType", "ASLINE");
                     intervention.Parameters.Add("ExternalSystem", externalSystemId.Value);
                     intervention.Parameters.Add("fId", assemblyLineId);
-                    string resultId = interventionService.DoIntervention(intervention, _configuration.UserGuid, null);
-                    Int32.TryParse(resultId, out asId);
+                    string resultId;
+                    try
+                    {
+                        resultId = interventionService.DoIntervention(intervention, _configuration.UserGuid, null);
+                    }
+                    catch
+                    {
+                        /// ezt valahogy máshogy kellene, mert ha nem a hiányzó külső azonosító a hiba, akkor is nem jó az üzenet szövege!
+                        /// biztosan csak exception-nel lehet megoldani, hogy nincs a fordítótáblában a külső kódhoz fordítás????
+                        throw new Exception($"Unknown Assembly line external identifyer (or some other error in requesting IdTranslation): {assemblyLineId}! Processed message {Vrh.Logger.LogHelper.HexControlChars(message)}");
+                    }
+                    if (!Int32.TryParse(resultId, out asId)) { asId = -1; }
                 }
                 if (asId == -1)
                 {
