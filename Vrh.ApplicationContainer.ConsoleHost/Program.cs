@@ -21,6 +21,7 @@ namespace Vrh.ApplicationContainer.ConsoleHost
     {
         static void Main(string[] args)
         {
+            VRH.Common.CommandLine.SetAppConfigFile(VRH.Common.CommandLine.GetCommandLineArgument(args, "-APPCONFIG"));
             if (!Debugger.IsAttached)
             {
                 Console.WriteLine("Attach the debugger now if need and press a key here to continue...");
@@ -29,7 +30,7 @@ namespace Vrh.ApplicationContainer.ConsoleHost
             ApplicationContainer appC = null;
             try
             {
-                appC = new ApplicationContainer();
+                appC = new ApplicationContainer(args);
             }
             catch (FatalException ex)
             {

@@ -12,12 +12,13 @@ namespace Vrh.ApplicationContainer.WindowsServiceHost
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
-        static void Main()
+        static void Main(string[] args)
         {
+            VRH.Common.CommandLine.SetAppConfigFile(VRH.Common.CommandLine.GetCommandLineArgument(args, "-APPCONFIG"));
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[]
             {
-                new ApplicationContainerService()
+                new ApplicationContainerService(args)
             };
             ServiceBase.Run(ServicesToRun);
         }

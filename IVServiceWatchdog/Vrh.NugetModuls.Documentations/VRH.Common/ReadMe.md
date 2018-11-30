@@ -1,11 +1,17 @@
 ﻿# Vrh.Common
 Ez a leírás a komponens **v0.0.0** kiadásáig bezáróan naprakész.
 Igényelt minimális framework verzió: **3.5**
-Teljes funkcionalítás és hatékonyság kihasználásához szükséges legalacsonyabb framework verzió: **3.5**
+Teljes funkcionalítás és hatékonyság kihasználásához szükséges legalacsonyabb framework verzió: **4.5**
 ### A komponens általános célú funkciókat tartalmaz.
 
 # TODO: Megírandó a komponens dokumentációja ebbe a fájlba!!!
 
+# Version History:
+## v2.0.0 (2018.11.28)
+### Braking change:
+1. 3.5-ös .Net framwork verzi támogatásának megszüntetése új target verzió: 4.5
+### Compatibility API changes:      
+1. CommandLine static segéd osztály hozzáadása 
 # Version History:
 ## v1.13.0 (2017.04.04)
 ### Compatibility API changes:      

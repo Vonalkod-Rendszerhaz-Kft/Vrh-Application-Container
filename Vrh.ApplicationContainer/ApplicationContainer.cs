@@ -23,8 +23,12 @@ namespace Vrh.ApplicationContainer
 {
     public class ApplicationContainer : IDisposable
     {
-        public ApplicationContainer()
+        public ApplicationContainer(string[] args)
         {
+            string inuseby = "TRUE";
+            string dummystring = VRH.Common.CommandLine.GetCommandLineArgument(args, "-INUSEBY");
+            if (dummystring != null) { inuseby = dummystring.ToUpper(); }
+
             _startupTimeStamp = DateTime.UtcNow;
             _wcfServiceInstance.ApplicationContainerReference = this;
             string configFile = ConfigurationManager.AppSettings[_configFileSettingKey];
@@ -44,7 +48,10 @@ namespace Vrh.ApplicationContainer
                 {
                     foreach (var instance in GetAllDefinedInstances(pluginType))
                     {
-                        Task.Run(() => StartUpInstance(instance));
+                        if (instance.InuseBy.ToUpper() == inuseby || (inuseby == "TRUE" && instance.InuseBy.ToUpper() != "FALSE"))
+                        {
+                            Task.Run(() => StartUpInstance(instance));
+                        }
                     }
                 }
             }

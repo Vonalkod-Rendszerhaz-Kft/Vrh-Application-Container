@@ -46,6 +46,13 @@ namespace Vrh.ApplicationContainer
         public string Description { set; get; }
 
         /// <summary>
+        /// A példányt betöltő szerviz által megadott Inuse név
+        /// </summary>
+        [DataMember]
+        public string InuseBy { set; get; }
+
+
+        /// <summary>
         /// Példány konfigurációja
         /// </summary>
         [DataMember]
