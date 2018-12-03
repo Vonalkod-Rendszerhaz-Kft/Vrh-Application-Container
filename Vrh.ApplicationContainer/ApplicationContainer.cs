@@ -21,12 +21,19 @@ using Microsoft.Diagnostics.Runtime;
 
 namespace Vrh.ApplicationContainer
 {
+    /// <summary>
+    /// Aplication container core class
+    /// </summary>
     public class ApplicationContainer : IDisposable
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="args">indítási argumentumok</param>
         public ApplicationContainer(string[] args)
         {
             string inuseby = "TRUE";
-            string dummystring = VRH.Common.CommandLine.GetCommandLineArgument(args, "-INUSEBY");
+            string dummystring = CommandLine.GetCommandLineArgument(args, "-INUSEBY");
             if (dummystring != null) { inuseby = dummystring.ToUpper(); }
 
             _startupTimeStamp = DateTime.UtcNow;
@@ -1125,8 +1132,10 @@ namespace Vrh.ApplicationContainer
             }
         }
 
+#pragma warning disable 0649
         [Import]
         private IInstanceFactory _usedInstanceFactory;
+#pragma warning restore 0649
 
         private CompositionContainer _container;
 

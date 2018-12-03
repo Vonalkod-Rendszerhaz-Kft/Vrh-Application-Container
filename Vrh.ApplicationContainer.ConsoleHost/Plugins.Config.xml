@@ -1,27 +1,32 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Plugins.Config>
   <Plugins StackSize="50">
-	<Plugin Description="Scheduler Monitor" 
-          Assembly="iSchedulerMonitor.dll" 
-			    Type="iSchedulerMonitor.MonitorPlugin" 
-          Version="1.0.0-alpha" Singletone="false" AutoStart ="true" 
-          PluginDirectory="iSchedulerMonitor">
-    <!-- ANTI: Ha nem azonos gépen fut a WebServer és a plugin, akkor az 
+<!--    
+	  <Plugin Description="Scheduler Monitor" 
+            Assembly="iSchedulerMonitor.dll" 
+			      Type="iSchedulerMonitor.MonitorPlugin" 
+            Version="1.0.0-alpha" Singletone="false" AutoStart ="true" 
+            PluginDirectory="iSchedulerMonitor">
+-->            
+      <!-- ANTI: Ha nem azonos gépen fut a WebServer és a plugin, akkor az 
                InstanceConfig a plugint futtató gépen az xml helye; InstanceData a távoli gépen az xml helye. 
                Ha azonos gépen fut, akkor az InstanceData nem kötelező. 
-    -->
-    <Instance	Id="Monitor1"
-				Name="SchedulerMonitor_for_LearALM"
-				Description="Időzített feladatok figyelése a LearALM-ben."
-				InstanceConfig="d:\Google Drive\!Dev\VRH\lear-dtm\Source\WebApplication\App_Data\iScheduler\iScheduler.xml"
-				InstanceData="~/App_Data/iScheduler/iScheduler.xml">
-    </Instance>
-    <!--VRH-->
-    <!--Instance	Id="Monitor1"
+      -->
+<!--    
+      <Instance	Id="Monitor1"
+			  	Name="SchedulerMonitor_for_LearALM"
+  				Description="Időzített feladatok figyelése a LearALM-ben."
+	  			InstanceConfig="d:\Google Drive\!Dev\VRH\lear-dtm\Source\WebApplication\App_Data\iScheduler\iScheduler.xml"
+		  		InstanceData="~/App_Data/iScheduler/iScheduler.xml">
+      </Instance>
+-->      
+      <!--VRH-->
+      <!--Instance	Id="Monitor1"
 					Name="SchedulerMonitor_for_LearALM"
 					Description="Időzített feladatok figyelése a LearALM-ben."
 					InstanceConfig="c:\ALM\wwwroot\App_Data\iScheduler\iScheduler.xml"/-->
-  </Plugin>  
+    
+    <!--</Plugin>-->  
 
 
     <!--<Plugin Description="IV Connevctor plugin"
@@ -42,7 +47,6 @@
             InstanceConfig="\IVConnector\IVConnector.Config.xml/IVConnectorConfig/Configuration_T1,\IVConnector\IVConnector.Config.xml/IVConnectorConfig/MessageDefinitions"/>
     </Plugin>-->
 
-<!--
   <Plugin Description="IV Service Watchdog plugin"
               Assembly="IVServiceWatchdog.dll"
               Type ="IVServiceWatchdog.IVServiceWatchdogPlugin"
@@ -50,12 +54,14 @@
               Singletone="false"
               AutoStart="true"
               PluginDirectory="IVServiceWatchdog"
-              PluginConfig="">
+              PluginConfig=""
+              Factory="">
       <Instance	Id="Intervention Service Watchdog"
             Name="Intervention Service Watchdog"
             Description="Check ALM intervention service, and restart them, if need"
             InstanceConfig="\IVServiceWatchdog\IVServiceWatchdog.Config.xml"/>
     </Plugin>
+<!--
     <Plugin Description="Windows Service Starter plugin"
               Assembly="Service.Starter.dll"
               Type ="Service.Starter.ServiceStarterPlugin"
@@ -69,37 +75,6 @@
             Description="Check all Windows service in ALM and start them, if not run"
             InstanceConfig="\ServiceStarter\ServiceStarter.Config.xml"/>
     </Plugin>
--->
-    
-<!--
-    <Plugin Description="Vrh Printing Service plugin"
-          Assembly="Vrh.PrintingService.dll"
-          Type ="Vrh.PrintingService.PrintingServicePlugin"
-          Version="1.0.0.0"
-          Singletone="true"
-          AutoStart="true"
-          PluginDirectory="VrhPrintingService"
-          PluginConfig="\VrhPrintingService\XmlParser.xml">
-      <Instance	Id="VRH Printing Service"
-            Name="VRH Printing Service"
-            Description="Description..."
-            InstanceConfig=""/>
-    </Plugin>
-
-    <Plugin Description="Vrh Camera Service plugin"
-      Assembly="Vrh.CameraService.dll"
-      Type ="Vrh.CameraService.CameraServicePlugin"
-      Version="1.0.0.0"
-      Singletone="false"
-      AutoStart="true"
-      PluginDirectory="VrhCameraService"
-      PluginConfig="\VrhCameraService\XmlParser.xml">
-      <Instance	Id="VRH Camera Service"
-            Name="VRH Camera Service"
-            Description="Description..."
-            InstanceConfig=""/>
-    </Plugin>
--->    
-    
+-->        
   </Plugins>
 </Plugins.Config>

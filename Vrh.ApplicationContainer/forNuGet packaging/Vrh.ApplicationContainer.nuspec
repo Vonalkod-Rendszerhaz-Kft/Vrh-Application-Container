@@ -11,8 +11,9 @@
     <description>$description$</description>
     <copyright>$copyright$</copyright>
     <releaseNotes>
-      v1.0.0 (2018.04.09)
-        Initial 1.0.0 release
+      1.1.1
+      - Patches:
+          1. Összeépítésre vonatkozó javítások, target framework igazítások, 
 
     </releaseNotes>
     <projectUrl>http://redmine.vonalkod.hu/projects/vrh-applicationcontainer</projectUrl>

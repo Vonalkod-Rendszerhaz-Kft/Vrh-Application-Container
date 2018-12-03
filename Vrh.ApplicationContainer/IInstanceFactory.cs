@@ -40,12 +40,34 @@ namespace Vrh.ApplicationContainer
         /// </summary>
         List<MessageStackEntry> Infos { get; }
 
+        /// <summary>
+        /// Betölti (létrehozza) az összes plugin definiált instancát
+        /// </summary>
+        /// <returns>betöltött pluginek listája</returns>
         Dictionary<string, IPlugin> BuildAll();
 
+        /// <summary>
+        /// A megadott típusú plugin összes instancának betöltése
+        /// </summary>
+        /// <param name="type">Plugion típus</param>
+        /// <returns>betöltött pluginek listája</returns>
         Dictionary<string, IPlugin> BuildAllFromThis(Type type);
 
+        /// <summary>
+        /// A megadott típusú és verziójú plugin összes instancának betöltése
+        /// </summary>
+        /// <param name="type">Plugin típusa</param>
+        /// <param name="version">Verzió</param>
+        /// <returns>betöltött pluginek listája</returns>
         Dictionary<string, IPlugin> BuildAllFromThisUnderThisVersion(Type type, String version);
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="name"></param>
+        /// <param name="version"></param>
+        /// <returns></returns>
         IPlugin BuildThis(Type type, String name, String version);
     }
 }

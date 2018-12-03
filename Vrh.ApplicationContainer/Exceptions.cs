@@ -6,8 +6,17 @@ using System.Threading.Tasks;
 
 namespace Vrh.ApplicationContainer
 {
+    /// <summary>
+    /// Fatal Exception exception class (összeálítás funkcionálását megakadályozó hibák)
+    /// </summary>
     public class FatalException : Exception
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="message">hibaüzenet</param>
+        /// <param name="innerException">belső exception</param>
+        /// <param name="datas">kiegészítő adatok</param>
         public FatalException(String message, Exception innerException = null, params KeyValuePair<string, string>[] datas)
             : base(String.Format("{0}: {1}", fatalPrefix, message), innerException)
         {
