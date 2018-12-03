@@ -526,14 +526,18 @@ namespace IVConnector.Plugin
         private string ProcessMessage(string message, Dictionary<string, string> logData, out bool harnessLoging)
         {
             string tmp = message;
+            string result;
             string messagePrefix = _configuration.MessagePrefix;
+            harnessLoging = false;
             if (!String.IsNullOrEmpty(messagePrefix))
             {
                 // Ha van üzenet prefix
                 if (!tmp.StartsWith(messagePrefix))
                 {
-                    var ex = new Exception($"Invalid Message! Excepted message prefix ({Vrh.Logger.LogHelper.HexControlChars(messagePrefix)}) not found in received message: {Vrh.Logger.LogHelper.HexControlChars(message)}");
-                    throw ex;
+                    result = $"Processing failed! Invalid Message! Excepted message prefix ({Vrh.Logger.LogHelper.HexControlChars(messagePrefix)}) not found in received message: {Vrh.Logger.LogHelper.HexControlChars(message)}";
+                    VrhLogger.Log(result, logData, null, LogLevel.Information, this.GetType());
+                    return result;
+                    ///throw new Exception($"Invalid Message! Excepted message prefix ({Vrh.Logger.LogHelper.HexControlChars(messagePrefix)}) not found in received message: {Vrh.Logger.LogHelper.HexControlChars(message)}");
                 }
                 tmp = tmp.Remove(0, messagePrefix.Length);
             }
@@ -543,8 +547,10 @@ namespace IVConnector.Plugin
                 // Ha van üzenet postfix
                 if (!tmp.EndsWith(messageSuffix))
                 {
-                    var ex = new Exception($"Invalid Message! Excepted message suffix ({Vrh.Logger.LogHelper.HexControlChars(messageSuffix)}) not found in received message: {Vrh.Logger.LogHelper.HexControlChars(message)}");
-                    throw ex;
+                    result = $"Processing failed! Invalid Message! Excepted message suffix ({Vrh.Logger.LogHelper.HexControlChars(messageSuffix)}) not found in received message: {Vrh.Logger.LogHelper.HexControlChars(message)}";
+                    VrhLogger.Log(result, logData, null, LogLevel.Information, this.GetType());
+                    return result;
+                    ///throw new Exception($"Invalid Message! Excepted message suffix ({Vrh.Logger.LogHelper.HexControlChars(messageSuffix)}) not found in received message: {Vrh.Logger.LogHelper.HexControlChars(message)}");
                 }
                 tmp = tmp.Remove(tmp.Length - messageSuffix.Length);
             }
@@ -589,7 +595,10 @@ namespace IVConnector.Plugin
             harnessLoging = ivId.ToLower() == "ivppl" || ivId.ToLower() == "ivppc";
             if (!_configuration.IsHandled(ivId))
             {
-                throw new Exception($"This message with '{Vrh.Logger.LogHelper.HexControlChars(ivId)}' id not handled by this connector! Processed message {Vrh.Logger.LogHelper.HexControlChars(message)}");
+                result = $"Processing failed! This message with '{Vrh.Logger.LogHelper.HexControlChars(ivId)}' id not handled by this connector! Processed message {Vrh.Logger.LogHelper.HexControlChars(message)}";
+                VrhLogger.Log(result, logData, null, LogLevel.Information, this.GetType());
+                return result;
+                ///throw new Exception($"This message with '{Vrh.Logger.LogHelper.HexControlChars(ivId)}' id not handled by this connector! Processed message {Vrh.Logger.LogHelper.HexControlChars(message)}");
             }
             // a maradék a paraméterek
             List<Parameter> inputParameters = new List<Parameter>();
@@ -624,11 +633,17 @@ namespace IVConnector.Plugin
             DefinedMessage def = _messagesConfiguration.GetMessage(ivId);
             if (def == null)
             {
-                throw new Exception($"Intervention definition not found this message id: {Vrh.Logger.LogHelper.HexControlChars(ivId)}! Processed message {Vrh.Logger.LogHelper.HexControlChars(message)}");
+                result = $"Processing failed! Intervention definition not found this message id: {Vrh.Logger.LogHelper.HexControlChars(ivId)}! Processed message {Vrh.Logger.LogHelper.HexControlChars(message)}";
+                VrhLogger.Log(result, logData, null, LogLevel.Information, this.GetType());
+                return result;
+                ///throw new Exception($"Intervention definition not found this message id: {Vrh.Logger.LogHelper.HexControlChars(ivId)}! Processed message {Vrh.Logger.LogHelper.HexControlChars(message)}");
             }
             if (String.IsNullOrEmpty(assemblyLineId))
             {
-                throw new Exception($"Assembly line id not present in received message: {Vrh.Logger.LogHelper.HexControlChars(message)}");
+                result = $"Processing failed! Assembly line id not present in received message: {Vrh.Logger.LogHelper.HexControlChars(message)}";
+                VrhLogger.Log(result, logData, null, LogLevel.Information, this.GetType());
+                return result;
+                ///throw new Exception($"Assembly line id not present in received message: {Vrh.Logger.LogHelper.HexControlChars(message)}");
             }
 
             Parameter externalSystemId = null;
@@ -648,12 +663,30 @@ namespace IVConnector.Plugin
                     intervention.Parameters.Add("EntityType", "ASLINE");
                     intervention.Parameters.Add("ExternalSystem", externalSystemId.Value);
                     intervention.Parameters.Add("fId", assemblyLineId);
-                    string resultId = interventionService.DoIntervention(intervention, _configuration.UserGuid, null);
-                    Int32.TryParse(resultId, out asId);
+                    string resultId;
+                    try
+                    {
+                        /// biztosan csak exception-nel lehet megoldani, hogy nincs a fordítótáblában a külső kódhoz fordítás????
+                        resultId = interventionService.DoIntervention(intervention, _configuration.UserGuid, null);
+                    }
+                    catch
+                    {
+                        /// másrészt ilyen felismert hiba esetekben nem throw exception-nel kellene megoldani a hiba naplózást, mert semmi értelme a 
+                        /// teljes exception stack beírásának, elég lenne a VrhLogger.Log használata, majd valami return visszatérő kód előállítása, 
+                        /// amire megszakad a feldolgozás.
+                        result = $"Processing failed! Unknown Assembly line external identifyer (or some other error in requesting IdTranslation): {assemblyLineId}! Processed message {Vrh.Logger.LogHelper.HexControlChars(message)}";
+                        VrhLogger.Log(result,logData, null, LogLevel.Information, this.GetType());
+                        return result;
+                        /// throw new Exception($"Unknown Assembly line external identifyer (or some other error in requesting IdTranslation): {assemblyLineId}! Processed message {Vrh.Logger.LogHelper.HexControlChars(message)}");
+                    }
+                    if (!Int32.TryParse(resultId, out asId)) { asId = -1; }
                 }
                 if (asId == -1)
                 {
-                    throw new Exception($"Unknown Assembly line: {assemblyLineId}! Processed message {Vrh.Logger.LogHelper.HexControlChars(message)}");
+                    result = $"Processing failed! Unknown Assembly line: {assemblyLineId}! Processed message {Vrh.Logger.LogHelper.HexControlChars(message)}";
+                    VrhLogger.Log(result, logData, null, LogLevel.Information, this.GetType());
+                    return result;
+                    ///throw new Exception($"Unknown Assembly line: {assemblyLineId}! Processed message {Vrh.Logger.LogHelper.HexControlChars(message)}");
                 }
             }
             InterventionDefination ivDef = null;
@@ -667,7 +700,10 @@ namespace IVConnector.Plugin
             }
             if (ivDef == null)
             {
-                throw new Exception($"Unknown intervention: {def.Intervention}! Processed message {Vrh.Logger.LogHelper.HexControlChars(message)}");
+                result = $"Processing failed! Unknown intervention: {def.Intervention}! Processed message {Vrh.Logger.LogHelper.HexControlChars(message)}";
+                VrhLogger.Log(result, logData, null, LogLevel.Information, this.GetType());
+                return result;
+                ///throw new Exception($"Unknown intervention: {def.Intervention}! Processed message {Vrh.Logger.LogHelper.HexControlChars(message)}");
             }
             if (harnessLoging)
             {
@@ -685,7 +721,7 @@ namespace IVConnector.Plugin
             intervention.Parameters = GetParameters(ivDef, def, inputParameters);
             Guid user = _configuration.UserGuid;
             //data.Add("User guid", user.ToString());
-            string result = interventionService.DoIntervention(intervention, user, null);
+            result = interventionService.DoIntervention(intervention, user, null);
             VrhLogger.Log($"Processing success! Message: {Vrh.Logger.LogHelper.HexControlChars(message)}{Environment.NewLine}Intervention result: {result}",
                      logData, null, LogLevel.Information, this.GetType());
             return result;

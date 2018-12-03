@@ -83,6 +83,7 @@ namespace InstanceFactory.FromXML
                     instance.Id = GetAttribute(item, ID_ATTRIBUTE_IN_INSTANCE_ELEMENT, String.Empty);
                     instance.Name = GetAttribute(item, NAME_ATTRIBUTE_IN_INSTANCE_ELEMENT, String.Empty);
                     instance.Description = GetAttribute(item, DESCRIPTION_ATTRIBUTE_IN_INSTANCE_ELEMENT, String.Empty);
+                    instance.InuseBy= GetAttribute(item, INUSE_ATTRIBUTE_IN_INSTANCE_ELEMENT, String.Empty);
                     instance.InstanceConfig = GetAttribute(item, INSTANCECONFIG_ATTRIBUTE_IN_INSTANCE_ELEMENT, String.Empty);
                     instance.InstanceData = GetAttribute(item, INSTANCEDATA_ATTRIBUTE_IN_INSTANCE_ELEMENT, String.Empty);
                     instance.Type = plugin;
@@ -172,6 +173,7 @@ namespace InstanceFactory.FromXML
         private const string ID_ATTRIBUTE_IN_INSTANCE_ELEMENT = "Id";
         private const string NAME_ATTRIBUTE_IN_INSTANCE_ELEMENT = "Name";
         private const string DESCRIPTION_ATTRIBUTE_IN_INSTANCE_ELEMENT = "Description";
+        private const string INUSE_ATTRIBUTE_IN_INSTANCE_ELEMENT = "Inuse";
         private const string INSTANCECONFIG_ATTRIBUTE_IN_INSTANCE_ELEMENT = "InstanceConfig";
         private const string INSTANCEDATA_ATTRIBUTE_IN_INSTANCE_ELEMENT = "InstanceData";
 
