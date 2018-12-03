@@ -11,9 +11,9 @@
     <description>$description$</description>
     <copyright>$copyright$</copyright>
     <releaseNotes>
-      1.1.1
+      1.1.2
       - Patches:
-          1. Összeépítésre vonatkozó javítások, target framework igazítások, 
+          1. Dokumentáció napra készre hozása 
 
     </releaseNotes>
     <projectUrl>http://redmine.vonalkod.hu/projects/vrh-applicationcontainer</projectUrl>
