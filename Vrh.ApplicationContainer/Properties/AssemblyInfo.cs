@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyCompany("Vonalkód Rendszerház Kft.")]
 [assembly: AssemblyProduct("Safe Application Container for Build High Availability & Loosely Coupled Systems")]
-[assembly: AssemblyCopyright("Copyright © Vonalkód Rendszerház Kft. 2017-2018")]
+[assembly: AssemblyCopyright("Copyright © Vonalkód Rendszerház Kft. 2017-present")]
 [assembly: AssemblyTrademark("VRH, Log4Pro, Application Container, High Avability")]
 
 // Version information for an assembly consists of the following four values:
@@ -33,6 +33,6 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.1.0.0")]
-[assembly: AssemblyFileVersion("1.1.0.0")]
-[assembly: AssemblyInformationalVersion("1.1.0")]
+[assembly: AssemblyVersion("1.1.2.0")]
+[assembly: AssemblyFileVersion("1.1.2.0")]
+[assembly: AssemblyInformationalVersion("1.1.2")]

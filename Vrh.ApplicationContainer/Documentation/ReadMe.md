@@ -1,7 +1,7 @@
 ﻿# Vrh.ApplicationContainer
 ![](http://nuget.vonalkod.hu/content/projectavatars/applicationcontainer.png)
 
-Ez a leírás a komponens a leírtakat tekintve **v1.0.0** kiadásáig bezáróan naprakész.
+Ez a leírás a komponens a leírtakat tekintve **v1.1.2** kiadásáig bezáróan naprakész.
 **A dokumentáció nem teljes!**
 Igényelt minimális framework verzió: **4.5**
 Teljes funkcionalitás és hatékonyság kihasználásához szükséges legalacsonyabb framework verzió: **4.5**
@@ -28,6 +28,22 @@ A tényleges funkciókat megvalósító egységek, melyeket az ApplicationContai
 Az ApplicationContainer  keret egy olyan szabadon cserélhető (pluginolható) része, mely azért felleős, hogy egy a programozáson kivüli eszlközkészletet biztosítson annak leírására, hogy milyen funkciókat (Pluginok) hostol az összeállítás, és milyen beállítások melett. Az InstanceFactory felleős ezen leírás alapján az összetevők betöltéért.
 ## ApplicationContainer keret használata
 Ez a rész az ApplicationContainer alapvető használatát, konfigurálását tárgyalja.
+### Copnsole és Service host paraméterek
+Mind a Console mind  aWindows service host indítható az alábbi paraméterekkel.
+#### APPCONFIG
+Segítségével megadható egy fájlnév (relatív, vagy abszolút), amit a futó példány app.configként fog használni. A fájlnak érvényes, szabvány app.confignak kell lennie.
+
+Használata:
+```shell
+Vrh.ApplicationContainer.ConsoleHost.exe -APPCONFIG /MyAppConfig.xml
+```
+#### INUSEBY
+Segítségével, megadható, hogy az indított példány melyik plugin példányokat (instance) hostolja (töltse be), azok közül, melyek az InstanceFactory.FromXML Factory pluginhoz tartozó xml-ben definiálva vannak. Azok kerülnek betöltésre, amelyek Inuse attribútuma egyezik az INUSEBY indítási paraméterben megadottal.
+
+Használata:
+```shell
+Vrh.ApplicationContainer.ConsoleHost.exe -INUSEBY workplace1
+```
 ### Logolással kapcsolatos konfiguráció
 Az ApplicationContainer a **Vrh.Logger** komponenst használja a Logolásra, minden logolással kapcsolatos beállítás a **Vrh.Logger** komponens dokumentációjában leírtak szerint tehető meg.
 ### Szabvány alkalmazás Config fájl, és az ott megtehető beállítások
@@ -184,7 +200,8 @@ Az Pluginok konfigurációját leíró XMl fájlt ekkor az alábbi XML példa sz
                 Name="SchedulerMonitor_for_LearALM"
                 Description="Időzített feladatok figyelése a LearALM-ben."
                 InstanceConfig="d:\Google Drive\!Dev\VRH\iScheduler\Vrh.iScheduler\App_Data\iScheduler\iScheduler.xml"
-                InstanceData="~/App_Data/iScheduler/iScheduler.xml">
+                InstanceData="~/App_Data/iScheduler/iScheduler.xml"
+                Inuse="schedulerhost"/>
       <Parameters>        
       </Parameters>
     </Instance>
@@ -200,11 +217,13 @@ Az Pluginok konfigurációját leíró XMl fájlt ekkor az alábbi XML példa sz
       <Instance	Id="MSMQIVConnector"
             Name="IVConnector for MSMQ"
             Description="MSQMQ-n érkező bevartkozások kezelőfelülete LearALM-ben."
-            InstanceConfig="\IVConnector\IVConnector.Config.xml/IVConnectorConfig/Configuration_M1,\IVConnector\IVConnector.Config.xml/IVConnectorConfig/MessageDefinitions"/>
+            InstanceConfig="\IVConnector\IVConnector.Config.xml/IVConnectorConfig/Configuration_M1,\IVConnector\IVConnector.Config.xml/IVConnectorConfig/MessageDefinitions"
+            Inuse="connectorhost"/>
       <Instance	Id="TCPIVConnector"
             Name="IVConnector for TCP"
             Description="TCP-n érkező bevartkozások kezelőfelülete LearALM-ben."
-            InstanceConfig="\IVConnector\IVConnector.Config.xml/IVConnectorConfig/Configuration_T1,\IVConnector\IVConnector.Config.xml/IVConnectorConfig/MessageDefinitions"/>
+            InstanceConfig="\IVConnector\IVConnector.Config.xml/IVConnectorConfig/Configuration_T1,\IVConnector\IVConnector.Config.xml/IVConnectorConfig/MessageDefinitions"
+            Inuse="connectorhost"/>
     </Plugin>
   </Plugins>
 </Plugins.Config>
@@ -230,9 +249,22 @@ Minden ApplicationContainer plugin kötelezően a PluginAncestor leszármazott, 
 <hr></hr>
 
 # Version History:
+## 1.1.2 (2018.12.03)
+### Patches: 
+1. Dokumentáció kiegészítése az 1.1.0-ban létrehozott váltzozásokhoz
+
+## 1.1.1 (2018.12.03)
+### Patches: 
+1. VISX, NUGET igazítás, target framework rendezés, projekt atríbútumok az 1.1.0-modósításaihoz
+
+## 1.1.0 (2018.11.30)
+### Compatibility API Changes:
+1. Console és Service Hostokra egyaránt bevezetésre kerül az APPCONFIG és INUSEBY indítási paraméter.
+2.  InstanceFactory.FromXML: Plugin.Config.xml-ben az Inuse attríbutúm bevezetése az Instance tag-ekl alá
 
 ## 1.0.0 (2018.04.09)
 Initial release version
 
 ## 1.0.0-alpha (2017.02.21)
 Working prototype
+
