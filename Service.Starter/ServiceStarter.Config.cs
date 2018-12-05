@@ -107,7 +107,7 @@ namespace Service.Starter
             get
             {
                 TimeSpan interval = new TimeSpan(0);
-                TimeSpan.TryParse(GetAttribute<string>(GetXElement(CONTROLLEDSERVICES_ELEMENT_NAME), CREATEREDISSEMAFOR_ATTRIBUTE_IN_CONTROLLEDSERVICE_ELEMENT, "00:00:00"), out interval);
+                TimeSpan.TryParse(GetAttribute<string>(GetXElement(CONTROLLEDSERVICES_ELEMENT_NAME), CREATEREDISSEMAFOR_ATTRIBUTE_IN_CONTROLLEDSERVICES_ELEMENT, "00:00:00"), out interval);
                 return interval;
             }
 
@@ -149,7 +149,7 @@ namespace Service.Starter
         private const string CHECKINTERVAL_ATTRIBUTE_IN_CONTROLLEDSERVICES_ELEMENT = "CheckInterval";
         private const string DEPENDENCIES_ATTRIBUTE_IN_CONTROLLEDSERVICES_ELEMENT = "DependenciesSemafor";
         private const string MAXSTARTINGTIME_ATTRIBUTE_IN_CONTROLLEDSERVICES_ELEMENT = "MaxStartingTime";
-        private const string CREATEREDISSEMAFOR_ATTRIBUTE_IN_CONTROLLEDSERVICE_ELEMENT = "CreateRedisSemafor";
+        private const string CREATEREDISSEMAFOR_ATTRIBUTE_IN_CONTROLLEDSERVICES_ELEMENT = "CreateRedisSemafor";
         // Service element
         private const string SERVICE_ELEMENT_NAME = "Service";
         private const string NAME_ATTRIBUTE_IN_SERVICE_ELEMENT = "Name";

@@ -40,6 +40,7 @@ namespace Service.Starter
         /// </summary>
         public override void Start()
         {
+            string Logheading = GetLogHeading();
             if (MyStatus == PluginStateEnum.Starting || MyStatus == PluginStateEnum.Running)
             {
                 return;
@@ -67,7 +68,7 @@ namespace Service.Starter
                         }
                         catch (Exception ex)
                         {
-                            LogThis($"Error in connect to Redis server: {_configuration.RedisConnection}", null, ex, LogLevel.Fatal, this.GetType());
+                            LogThis($"{Logheading} Error to connect to Redis server: {_configuration.RedisConnection}", null, ex, LogLevel.Fatal, this.GetType());
                             return null;
                         }
                     }
@@ -147,11 +148,20 @@ namespace Service.Starter
         }
 
         /// <summary>
+        /// Log rekordokhoz fejlécet állít elő
+        /// </summary>
+        private string GetLogHeading()
+        {
+            return $"ServiceStarterPlugin - {(new System.Diagnostics.StackTrace()).GetFrame(1).GetMethod().Name}.";
+        }
+
+        /// <summary>
         /// A konfiguráció feldolgozás üzeneteit logoló metódus
         /// </summary>
         /// <param name="e">Eseményargumentum</param>
         private void ConfigProcessorEvent(Vrh.LinqXMLProcessor.Base.ConfigProcessorEventArgs e)
         {
+            string Logheading = GetLogHeading();
             LogLevel level =
                 e.Exception.GetType().Name == typeof(ConfigProcessorWarning).Name
                     ? LogLevel.Warning
@@ -161,7 +171,7 @@ namespace Service.Starter
                 { "ConfigProcessor class", e.ConfigProcessor },
                 { "Config file", e.ConfigFile },
             };
-            LogThis($"Configuration issue: {e.Message}", data, e.Exception, level);
+            LogThis($"{Logheading} Configuration issue: {e.Message}", data, e.Exception, level);
         }
 
         /// <summary>

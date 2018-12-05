@@ -65,7 +65,7 @@ namespace IVServiceWatchdog
 
                 ThreadStart ts = new ThreadStart(WatchdogProcess);
                 _process = new Thread(ts);
-                _process.Name = String.Format("IVService Watchdog Process Thread ({0})", _myData.Id);
+                _process.Name = String.Format(GetLogHeading() + " Thread ({0})", _myData.Id);
                 _process.Start();
                 if (_configuration.CheckInterval > 0)
                 {
@@ -140,6 +140,7 @@ namespace IVServiceWatchdog
         /// <param name="e">Eseményargumentum</param>
         private void ConfigProcessorEvent(Vrh.LinqXMLProcessor.Base.ConfigProcessorEventArgs e)
         {
+            string Logheading = GetLogHeading();
             LogLevel level =
                 e.Exception.GetType().Name == typeof(ConfigProcessorWarning).Name
                     ? LogLevel.Warning
@@ -149,7 +150,7 @@ namespace IVServiceWatchdog
                 { "ConfigProcessor class", e.ConfigProcessor },
                 { "Config file", e.ConfigFile },
             };
-            LogThis($"Configuration issue: {e.Message}", data, e.Exception, level);
+            LogThis($"{Logheading} Configuration issue: {e.Message}", data, e.Exception, level);
         }
 
         /// <summary>
@@ -168,7 +169,10 @@ namespace IVServiceWatchdog
         /// </summary>
         private void WatchdogProcess()
         {
-            LogThis($"IVService watchdog process started: {Thread.CurrentThread.Name}", null, null, LogLevel.Debug, this.GetType());
+            string Logheading = GetLogHeading();
+            var logData = new Dictionary<string, string>();
+            logData.Add("Service name", _configuration.WindowsServiceName);
+            LogThis($"{Logheading} Started: {Thread.CurrentThread.Name}", logData, null, LogLevel.Debug, this.GetType());
             _stopped = false;
             while (!disposedValue && !_stopped)
             {
@@ -178,7 +182,7 @@ namespace IVServiceWatchdog
                     {
                         try
                         {
-                            Check();
+                            ProcessHealthCheck();
                         }
                         finally
                         {
@@ -188,73 +192,56 @@ namespace IVServiceWatchdog
                 }
                 catch(Exception ex)
                 {
-                    LogThis("Exception occured!", null, ex, LogLevel.Error, this.GetType());
+                    LogThis($"{Logheading} Exception occured!", null, ex, LogLevel.Error, this.GetType());
                 }
             }
-            var logData = new Dictionary<string, string>();
             logData.Add("disposed", disposedValue.ToString());
             logData.Add("stopped", _stopped.ToString());
-            LogThis($"IVService watchdog process exited: {Thread.CurrentThread.Name}", logData, null, LogLevel.Debug);
+            LogThis($"{Logheading} Exited: {Thread.CurrentThread.Name}", logData, null, LogLevel.Debug);
         }
 
         /// <summary>
         /// Ellenőrzi az Intervention szolgáltatás müködőképességét
         /// </summary>
-        private void Check()
+        private void ProcessHealthCheck()
         {
             if (!HasRedisSemafor())
             {
-                LogThis("Check started", null, null, LogLevel.Verbose, this.GetType());
-                Exception occuredException = null;
-                DateTime checkStart = DateTime.UtcNow;                
-                var logData = new Dictionary<string, string>();
-                if (_configuration.MinimalResponseTime.TotalMilliseconds > 0)
+                string Logheading = GetLogHeading();
+                Dictionary<string, string> logData = new Dictionary<string, string>();
+                logData.Add("Service name", _configuration.WindowsServiceName);
+                Dictionary<string, string> logData2 = new Dictionary<string, string>();
+                LogThis($"{Logheading} Process health check started", logData, null, LogLevel.Verbose, this.GetType());
+
+                bool _anytestError = false;
+                _anytestError = _anytestError || HealthCheck_ResponseTimeMaximumExceeded();
+                _anytestError = _anytestError || HealthCheck_ThreadMaximumExceeded();
+
+                if (_anytestError)
                 {
-                    try
+                    if (_lastErrorTimeStamp != null)
                     {
-                        InterventionServiceClient interventionService = new InterventionServiceClient();
-                        var response = interventionService.GetInterventionedObject(null);
-                        TimeSpan responseTime = DateTime.UtcNow.Subtract(checkStart);
-                        if (_configuration.MinimalResponseTime < responseTime)
+                        TimeSpan _lastNoIssuePeriodeLength = DateTime.UtcNow.Subtract(_lastErrorTimeStamp.Value);
+                        if (_configuration.LapsesInterval.TotalMilliseconds > 0 && _lastNoIssuePeriodeLength > _configuration.LapsesInterval)
                         {
-                            occuredException = new Exception($"Response time is too long: {responseTime} (Allowed maximum response time is: {_configuration.MinimalResponseTime})");
+                            logData2.Clear(); logData.ToList().ForEach(x => logData2.Add(x.Key, x.Value));
+                            logData2.Add("No-issue periode length", _lastNoIssuePeriodeLength.ToString());
+                            logData2.Add("Lapse timeout", _configuration.LapsesInterval.ToString());
+                            LogThis($"{Logheading} Failed combined health checks lapsed, counter restarted.", logData2, null, LogLevel.Verbose, this.GetType());
+                            _errorCount = 1;
                         }
-                        logData.Add("Response Time", responseTime.ToString());
                     }
-                    catch (Exception ex)
-                    {
-                        occuredException = ex;
-                    }
-                }
-                int pid = GetHostProcessPid();
-                if (TooManyThreadNumber(pid))
-                {
-                    occuredException = new Exception("There is too many thread!");
-                }
-                logData.Add("Count of error", $"{_errorCount}");
-                logData.Add("Maximum error count", $"{_configuration.MaxErrorCount}");
-                if (occuredException == null)
-                {                    
-                    LogThis("Check OK!", logData, null, LogLevel.Information, this.GetType());
-                }
-                else
-                {
-                    if (_lastErrorTimeStamp != null &&
-                        _configuration.LapsesInterval.TotalMilliseconds > 0 &&
-                        DateTime.UtcNow.Subtract(_lastErrorTimeStamp.Value) > _configuration.LapsesInterval)
-                    {
-                        _errorCount = 0;
-                    }
-                    _lastErrorTimeStamp = DateTime.UtcNow;
                     _errorCount++;
-                    LogThis("Check NOK!", logData, occuredException, LogLevel.Error, this.GetType());
+                    _lastErrorTimeStamp = DateTime.UtcNow;
+                    logData.Add("Current number of failed checks", $"{_errorCount}");
+                    logData.Add("Maximum number of failed checks", $"{_configuration.MaxErrorCount}");
+                    LogThis($"{Logheading} Combined health check result: ERROR!", logData, null, LogLevel.Error, this.GetType());
                 }
+                else { LogThis($"{Logheading} Combined health check result: OK!", logData, null, LogLevel.Verbose, this.GetType()); }
+
                 if (_errorCount >= _configuration.MaxErrorCount)
-                {                    
-                    if (pid > -1)
-                    {
-                        ErrorHandling(pid);
-                    }
+                {
+                    ErrorHandling();
                 }
             }
         }
@@ -265,6 +252,9 @@ namespace IVServiceWatchdog
         /// <returns></returns>
         private bool HasRedisSemafor()
         {
+            string Logheading = GetLogHeading();
+            Dictionary<string, string> logData = new Dictionary<string, string>();
+            logData.Add("Service name", _configuration.WindowsServiceName);
             try
             {
                 var redisDb = RedisConnection?.GetDatabase();
@@ -273,14 +263,14 @@ namespace IVServiceWatchdog
                     var key = redisDb.StringGet($"Service.Starter.Semafor.{_configuration.WindowsServiceName}");
                     if (!key.IsNullOrEmpty)
                     {
-                        LogThis($"There is Redis semafor, with '{key}' valaue. Check is skiped.", null, null, LogLevel.Information, this.GetType());
+                        LogThis($"{Logheading} Redis semafor exists. Semafor key:{key}. Health check due, but skipped.", logData, null, LogLevel.Information, this.GetType());
                         return true;
                     }
                 }
             }
             catch(Exception ex)
             {
-                LogThis("Error occured!", null, ex, LogLevel.Error, this.GetType());
+                LogThis($"{Logheading} Exception during checking semafor.", logData, ex, LogLevel.Error, this.GetType());
             }
             return false;
         }
@@ -291,6 +281,9 @@ namespace IVServiceWatchdog
         /// <returns></returns>
         private int GetHostProcessPid()
         {
+            string Logheading = GetLogHeading();
+            Dictionary<string, string> logData = new Dictionary<string, string>();
+            logData.Add("Service name", _configuration.WindowsServiceName);
             ServiceController[] services = ServiceController.GetServices();
             ServiceController service = services.FirstOrDefault();
             uint? processId = null;
@@ -302,62 +295,115 @@ namespace IVServiceWatchdog
             }
             if (!processId.HasValue)
             {
-                LogThis($"'{_configuration.WindowsServiceName}' windows service is not installed in this machine!", null, null, LogLevel.Warning, this.GetType());
+                LogThis($"{Logheading} Service is not installed in this machine!", logData, null, LogLevel.Warning, this.GetType());
                 return -1;
             }
             if (processId == 0)
             {
-                LogThis($"Process not found for '{_configuration.WindowsServiceName}' service!", null, null, LogLevel.Warning, this.GetType());
+                LogThis($"{Logheading} Process not found for service!", logData, null, LogLevel.Warning, this.GetType());
                 return -1;
             }
             return (int)processId.Value;
         }
 
         /// <summary>
-        /// Megállapítja, hogy túl sok száll van-e a processzben
+        /// Megállapítja, hogy a WCF válaszidő túl hosszú-e
         /// </summary>
-        /// <param name="pid"></param>
         /// <returns></returns>
-        private bool TooManyThreadNumber(int pid)
+        private bool HealthCheck_ResponseTimeMaximumExceeded()
         {
-            if (pid == -1 || _configuration.MaximumAlloewedThreadNumber == 0)
-            {
-                return false;
-            }
-            var process = Process.GetProcessById(pid);
-            int threadNumber = process.Threads.Count;
+            if (_configuration.MinimalResponseTime.TotalMilliseconds <= 0) { return false; }
+            string Logheading = GetLogHeading();
             Dictionary<string, string> logData = new Dictionary<string, string>();
-            logData.Add("Current thread number", $"{threadNumber}");
-            logData.Add("Maximum allowed thread number", $"{_configuration.MaximumAlloewedThreadNumber}");
-            if (threadNumber > _configuration.MaximumAlloewedThreadNumber)
+            logData.Add("Service name", _configuration.WindowsServiceName);
+            try
             {
-                LogThis("There is too Many thread number!", logData, null, LogLevel.Error, this.GetType());
+                InterventionServiceClient interventionService = new InterventionServiceClient();
+                DateTime requestTime = DateTime.UtcNow;
+                var response = interventionService.GetInterventionedObject(null);
+                TimeSpan responseTime = DateTime.UtcNow.Subtract(requestTime);
+                logData.Add("Actual response Time", responseTime.ToString());
+                logData.Add("Maximum response Time", _configuration.MinimalResponseTime.ToString());
+                if (_configuration.MinimalResponseTime < responseTime)
+                {
+                    string exceptiontext = $"{Logheading} ERROR occured! Actual response time: {responseTime}. Allowed maximum response time: {_configuration.MinimalResponseTime}";
+                    LogThis(exceptiontext, logData, null, LogLevel.Error, this.GetType());
+                    return true;
+                }
+                else
+                {
+                    LogThis($"{Logheading} is OK!", logData, null, LogLevel.Verbose, this.GetType());
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogThis($"{Logheading} Exception in execution of HealthCheck_ResponseTimeMaximumExceeded!", logData, ex, LogLevel.Error, this.GetType());
                 return true;
             }
-            else
+        }
+
+        /// <summary>
+        /// Megállapítja, hogy túl sok száll van-e a processzben
+        /// </summary>
+        /// <returns></returns>
+        private bool HealthCheck_ThreadMaximumExceeded()
+        {
+            if (_configuration.MaximumAlloewedThreadNumber == 0) { return false; }
+            string Logheading = GetLogHeading();
+            Dictionary<string, string> logData = new Dictionary<string, string>();
+            logData.Add("Service name", _configuration.WindowsServiceName);
+            try
             {
-                LogThis("Check thread number, and it's OK.", logData, null, LogLevel.Verbose, this.GetType());
-                return false;
+                int pid = GetHostProcessPid();
+                if (pid == -1 || _configuration.MaximumAlloewedThreadNumber == 0) { return false; }
+                var process = Process.GetProcessById(pid);
+                int threadNumber = process.Threads.Count;
+                logData.Add("Process name", process.ProcessName);
+                logData.Add("Current thread number", $"{threadNumber}");
+                logData.Add("Maximum allowed thread number", $"{_configuration.MaximumAlloewedThreadNumber}");
+                if (threadNumber > _configuration.MaximumAlloewedThreadNumber)
+                {
+                    string exceptiontext = $"{Logheading} ERROR occured! Current number of threads: {threadNumber}. Allowed maximum number of threads: {_configuration.MaximumAlloewedThreadNumber}";
+                    LogThis(exceptiontext, logData, null, LogLevel.Error, this.GetType());
+                    return true;
+                }
+                else
+                {
+                    LogThis($"{Logheading} is OK.", logData, null, LogLevel.Verbose, this.GetType());
+                    return false;
+                }
             }
-        } 
+            catch (Exception ex)
+            {
+                LogThis($"{Logheading} Exception in execution of HealthCheck_ResponseTimeMaximumExceeded!", logData, ex, LogLevel.Error, this.GetType());
+                return true;
+            }
+        }
 
         /// <summary>
         /// Hibakezelés 
         /// </summary>
-        private void ErrorHandling(int pid)
+        private void ErrorHandling()
         {
+            string Logheading = GetLogHeading();
+            int pid = GetHostProcessPid(); if (pid == -1) { return; }
+            var process = Process.GetProcessById(pid);
+            Dictionary<string, string> logData = new Dictionary<string, string>();
+            logData.Add("Service name", _configuration.WindowsServiceName);
+            logData.Add("Process name", process.ProcessName);
+            Dictionary<string, string> logData2 = new Dictionary<string, string>();
             try
             {
                 _errorCount = 0;
-                Dictionary<string, string> logData = new Dictionary<string, string>();
-                logData.Add("CreateDumpNeed", $"{_configuration.CreateDumpNeed}");
-                logData.Add("KillProcessNeed", $"{_configuration.KillProcessNeed}");
-                LogThis($"There is Error! Start error handling...", logData, null, LogLevel.Warning, this.GetType());
-                logData.Clear();
-                var process = Process.GetProcessById(pid);                
+                logData2.Clear(); logData.ToList().ForEach(x => logData2.Add(x.Key, x.Value));
+                logData2.Add("CreateDumpRequested", $"{_configuration.CreateDumpNeed}");
+                logData2.Add("KillProcessRequested", $"{_configuration.KillProcessNeed}");
+                LogThis($"{Logheading} Start error handling...", logData2, null, LogLevel.Warning, this.GetType());
+
                 if (_configuration.CreateDumpNeed)
                 {
-                    LogThis($"Create dump file from process: {process.ProcessName}", null, null, LogLevel.Verbose, this.GetType());
+                    LogThis($"{Logheading} Create dump file from process.", logData, null, LogLevel.Verbose, this.GetType());
                     Process p = new Process();
                     p.StartInfo.FileName = Path.Combine(_configuration.ProcdumpPath, "procdump.exe");
                     p.StartInfo.Arguments = $"-ma -o {pid} {_configuration.DumpTargetPath}";
@@ -365,26 +411,42 @@ namespace IVServiceWatchdog
                     p.StartInfo.RedirectStandardOutput = true;
                     p.Start();
                     string output = p.StandardOutput.ReadToEnd();
-                    p.WaitForExit();
+                    while (!p.HasExited)
+                    {
+                        LogThis($"{Logheading}  Waiting for procdump.exe to complete.", logData, null, LogLevel.Verbose, this.GetType());
+                        p.WaitForExit();
+                    }
                     int i = 0;
+                    logData2.Clear();logData.ToList().ForEach(x => logData2.Add(x.Key, x.Value));
                     foreach (var line in output.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries))
                     {
-                        logData.Add($"Line{i}", line);
+                        logData2.Add($"Line{i}", line);
                         i++;
                     }
-                    LogThis("Dump create is success", logData, null, LogLevel.Information, this.GetType());
-                    logData.Clear();
+                    LogThis($"{Logheading} Dump create DONE.", logData2, null, LogLevel.Information, this.GetType());
                 }
                 if (_configuration.KillProcessNeed)
                 {
-                    LogThis($"Kill the  process: {process.ProcessName}", null, null, LogLevel.Verbose, this.GetType());
-                    process.Kill();
+                    while (!process.HasExited)
+                    {
+                        LogThis($"{Logheading} Kill process.", logData, null, LogLevel.Verbose, this.GetType());
+                        process.Kill();
+                        process.WaitForExit();
+                    }
                 }
             }
             catch (Exception ex)
             {
-                LogThis("Error occured!!!", null, ex, LogLevel.Error, this.GetType());
+                LogThis($"{Logheading} Exception occured in ErrorHandling.", logData, ex, LogLevel.Error, this.GetType());
             }
+        }
+
+        /// <summary>
+        /// Creates heading for the Watchdog log records.
+        /// </summary>
+        private string GetLogHeading()
+        {
+            return $"IVServiceWatchdogPlugin - {(new System.Diagnostics.StackTrace()).GetFrame(1).GetMethod().Name}.";
         }
 
         /// <summary>
@@ -438,6 +500,7 @@ namespace IVServiceWatchdog
         /// <returns></returns>
         private ConnectionMultiplexer RedisConnectionInitializer()
         {
+            string Logheading = GetLogHeading();
             if (!String.IsNullOrEmpty(_configuration.RedisConnection))
             {
                 try
@@ -448,7 +511,7 @@ namespace IVServiceWatchdog
                 }
                 catch (Exception ex)
                 {
-                    LogThis($"Error in connect to Redis server: {_configuration.RedisConnection}", null, ex, LogLevel.Fatal, this.GetType());
+                    LogThis($"{Logheading} Error in connect to Redis server: {_configuration.RedisConnection}", null, ex, LogLevel.Fatal, this.GetType());
                     return null;
                 }
             }

@@ -22,16 +22,20 @@ namespace Service.Starter
         /// <param name="properties"></param>
         public ControlledService(ServiceProperties properties, ServiceStarterPlugin pluginReference)
         {
-            _myOwnerPlugin = pluginReference;            
+            string Logheading = GetLogHeading();
+            _myOwnerPlugin = pluginReference;
             Properties = properties;
+            Dictionary<string, string> logData = new Dictionary<string, string>();
+            logData.Add("Defined service name", Properties.ServiceName);
+            logData.Add("Thread id", Thread.CurrentThread.ManagedThreadId.ToString());
+            logData.Add("Check interval", Properties.CheckInterval.ToString());
+            logData.Add("Check dependencies", Properties.DependenciesSemafor.ToString());
+            _myOwnerPlugin.LogThis($"{Logheading} Started.", logData, null, LogLevel.Information, this.GetType());
+
             _timer = new System.Timers.Timer(properties.CheckInterval.TotalMilliseconds);
             _timer.Elapsed += CheckTime;
             _timer.AutoReset = false;
-            _timer.Start();
-            Dictionary<string, string> logData = new Dictionary<string, string>();
-            logData.Add("Interval", Properties.CheckInterval.ToString());
-            logData.Add("Check dependencies", Properties.DependenciesSemafor.ToString());
-            _myOwnerPlugin.LogThis($"{Properties.ServiceName} is under controll now.", logData, null, LogLevel.Information, this.GetType());
+            MonitorTimerStart();
         }
 
         /// <summary>
@@ -46,71 +50,48 @@ namespace Service.Starter
         /// <param name="e"></param>
         private void CheckTime(object sender, System.Timers.ElapsedEventArgs e)
         {
+            string Logheading = GetLogHeading();
             try
             {
-                DateTime start = DateTime.UtcNow;
                 Dictionary<string, string> logData = new Dictionary<string, string>();
+                logData.Add("Thread id", Thread.CurrentThread.ManagedThreadId.ToString());
+                logData.Add("Defined service name", Properties.ServiceName);
                 try
-                {                    
-                    logData.Add("Thread id", Thread.CurrentThread.ManagedThreadId.ToString());
-                    logData.Add("Defined service name", Properties.ServiceName);
-                    _myOwnerPlugin.LogThis($"Checking...", logData, null, LogLevel.Verbose, this.GetType());
+                {
+                    DateTime start = DateTime.UtcNow;
+                    _myOwnerPlugin.LogThis($"{Logheading} Cycle started for service definition.", logData, null, LogLevel.Verbose, this.GetType());
                     var service = new ServiceController(Properties.ServiceName);
                     if (String.IsNullOrEmpty(service.ServiceName))
                     {
-                        _myOwnerPlugin.LogThis("Service not found in this machine!", logData, null, LogLevel.Error, this.GetType());
+                        _myOwnerPlugin.LogThis($"{Logheading} Defined service not found on this machine!", logData, null, LogLevel.Error, this.GetType());
                         return;
                     }
-                    logData.Add("Service name", service.ServiceName);
                     logData.Add("Service display name", service.DisplayName);
-                    logData.Add("Service status", service.Status.ToString());                                        
-                    _myOwnerPlugin.LogThis("Service found", logData, null, LogLevel.Debug, this.GetType());
-                    CheckServiceStatus(service);
-                    logData.Add("Full check time", DateTime.UtcNow.Subtract(start).ToString());
-                    _myOwnerPlugin.LogThis("Is checked.", logData, null, LogLevel.Verbose, this.GetType());
+                    string serviceStatusString = service.Status.ToString();
+                    logData.Add("Service status", serviceStatusString);
+                    _myOwnerPlugin.LogThis($"{Logheading} Service found, status checked!", logData, null, LogLevel.Verbose, this.GetType());
+                    /// ha pont itt megváltozik a státusz, akkor az zavaró lehet, mert a log és a történtek nem lesznek szinkronban.!
+                    if (service.Status == ServiceControllerStatus.Stopped) { StartThis(service); }
+
+                    logData.Add("Service cycle lenght", DateTime.UtcNow.Subtract(start).ToString());
+                    _myOwnerPlugin.LogThis($"{Logheading} Cycle finished. ", logData, null, LogLevel.Verbose, this.GetType());
                 }
                 catch (Exception ex)
                 {
-                    _myOwnerPlugin.LogThis("Exception occured!!!", logData, ex, LogLevel.Error, this.GetType());
+                    _myOwnerPlugin.LogThis($"{Logheading} Exception occured!!!", logData, ex, LogLevel.Error, this.GetType());
                 }
             }
-            finally
-            {
-                _timer.Start();
-                _myOwnerPlugin.LogThis($"{Properties.ServiceName} timer is restarted...", null, null, LogLevel.Debug, this.GetType());
-            }
+            finally {MonitorTimerStart();}
         }
 
         /// <summary>
-        /// Ellenőrzi a service állapotát
+        /// Újraindítja és logolja az ellenőrzési ciklus indítás időzítőt
         /// </summary>
-        /// <param name="service">Az elelnőrizebndő service</param>
-        private void CheckServiceStatus(ServiceController service)
+        private void MonitorTimerStart()
         {
-            Dictionary<string, string> logData = new Dictionary<string, string>();
-            logData.Add("Service name", service.ServiceName);
-            logData.Add("Service display name", service.DisplayName);
-            logData.Add("Service current status", service.Status.ToString());
-            _myOwnerPlugin.LogThis($"Check this service status: {service.DisplayName}", logData, null, LogLevel.Verbose, this.GetType());
-            switch (service.Status)
-            {
-                case ServiceControllerStatus.ContinuePending:
-                case ServiceControllerStatus.PausePending:
-                case ServiceControllerStatus.StartPending:
-                case ServiceControllerStatus.StopPending:
-                    _myOwnerPlugin.LogThis("Service is Pending status!", logData, null, LogLevel.Warning, this.GetType());
-                    break;
-                case ServiceControllerStatus.Paused:
-                    _myOwnerPlugin.LogThis("Service is Paused status!", logData, null, LogLevel.Warning, this.GetType());
-                    break;
-                case ServiceControllerStatus.Running:
-                    _myOwnerPlugin.LogThis("OK! Service is Running status.", logData, null, LogLevel.Information, this.GetType());
-                    break;
-                case ServiceControllerStatus.Stopped:
-                    _myOwnerPlugin.LogThis("Service is Stopped status! Restarting...", logData, null, LogLevel.Error, this.GetType());
-                    StartThis(service);
-                    break;
-            }
+            string Logheading = GetLogHeading(); 
+            _timer.Start();
+            _myOwnerPlugin.LogThis($"{Logheading} Check interval timer restarted for service: {Properties.ServiceName}", null, null, LogLevel.Debug, this.GetType());
         }
 
         /// <summary>
@@ -119,6 +100,7 @@ namespace Service.Starter
         /// <param name="service">Az elindítandó service</param>
         private void StartThis(ServiceController service)
         {
+            string Logheading = GetLogHeading();
             CreateRedisSemafor(service);
             DateTime startTime = DateTime.UtcNow;
             service.Start();
@@ -126,17 +108,17 @@ namespace Service.Starter
             {
                 Thread.Sleep(100);
                 service.Refresh();
-                if (disposedValue)
-                {
-                    break;
-                }
+                if (disposedValue){break;}
+
                 if (DateTime.UtcNow.Subtract(startTime) > Properties.MaxStartingWait)
                 {
-                    throw new Exception($"Timout occured! Started service: {service.DisplayName}; Service status: {service.Status}; Used timout: {Properties.MaxStartingWait}");
+                    throw new Exception($"Service restart timout occured! Service: {service.ServiceName}, status: {service.Status}, timout: {Properties.MaxStartingWait}");
                 }
             }
             CreateRedisSemafor(service);
-            _myOwnerPlugin.LogThis($"Service starting succesfull: { service.ServiceName }", null, null, LogLevel.Information, this.GetType());
+            Dictionary<string, string> logData = new Dictionary<string, string>();
+            logData.Add("Service name", service.ServiceName);
+            _myOwnerPlugin.LogThis($"{Logheading} Service restart was succesfull!", logData, null, LogLevel.Information, this.GetType());
         }
 
         /// <summary>
@@ -145,31 +127,33 @@ namespace Service.Starter
         /// <param name="service"></param>
         private void CreateRedisSemafor(ServiceController service)
         {
+            string Logheading = GetLogHeading();
             Dictionary<string, string> logData = new Dictionary<string, string>();
             TimeSpan redisSemaforTime = _myOwnerPlugin.Configuration.DefaultRedisSemaforTime;
             string semaforName = service.ServiceName;
-            var serviceDefination = _myOwnerPlugin.Configuration.GetControlledService(service.ServiceName);
-            if (serviceDefination == null)
+            var serviceDefinition = _myOwnerPlugin.Configuration.GetControlledService(service.ServiceName);
+            if (serviceDefinition == null)
             {
-                serviceDefination = _myOwnerPlugin.Configuration.GetControlledService(service.DisplayName);
+                serviceDefinition = _myOwnerPlugin.Configuration.GetControlledService(service.DisplayName);
             }
-            if (serviceDefination != null)
+            if (serviceDefinition != null)
             {
-                redisSemaforTime = serviceDefination.CreateRedisSemaforTime;
-                semaforName = serviceDefination.ServiceName;
+                redisSemaforTime = serviceDefinition.CreateRedisSemaforTime;
+                semaforName = serviceDefinition.ServiceName;
             }
             semaforName = RedisSemafor(semaforName);
-            logData.Add("Redis defined?", _myOwnerPlugin.RedisConnection != null ? "Yes" : "No");
+            logData.Add("Service name", service.ServiceName);
+            logData.Add("Redis connection established", _myOwnerPlugin.RedisConnection != null ? "Yes" : "No");
             logData.Add("Redis Semafor Time", redisSemaforTime.ToString());
             logData.Add("Redis Semafor Name", semaforName);
-            _myOwnerPlugin.LogThis("Is Redis Semafore Need?", logData, null, LogLevel.Verbose, this.GetType());
+            _myOwnerPlugin.LogThis($"{Logheading} Attempting to create semafor...", logData, null, LogLevel.Verbose, this.GetType());
             if (redisSemaforTime.TotalMilliseconds > 0)
             {
                 var redisDb = _myOwnerPlugin.RedisConnection?.GetDatabase();
                 if (redisDb != null)
                 {
                     redisDb.StringSet(semaforName, DateTime.Now.ToString(), Properties.CreateRedisSemaforTime);
-                    _myOwnerPlugin.LogThis("Redis semafor is created.", logData, null, LogLevel.Information, this.GetType());
+                    _myOwnerPlugin.LogThis($"{Logheading} Redis semafor is created.", logData, null, LogLevel.Information, this.GetType());
                 }
             }
             if (Properties.DependenciesSemafor && service.ServicesDependedOn.Length > 0)
@@ -187,6 +171,14 @@ namespace Service.Starter
         private string RedisSemafor(string serviceName)
         {
             return $"Service.Starter.Semafor.{serviceName}";
+        }
+
+        /// <summary>
+        /// Log rekordokhoz fejlécet állít elő
+        /// </summary>
+        private string GetLogHeading()
+        {
+            return $"RestartServiceMonitor - {(new System.Diagnostics.StackTrace()).GetFrame(1).GetMethod().Name}.";
         }
 
         /// <summary>
