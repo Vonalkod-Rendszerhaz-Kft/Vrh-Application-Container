@@ -45,7 +45,6 @@ namespace IVConnector.Plugin
         /// </summary>
         public void Start()
         {
-            string Logheading = GetLogHeading();
             try
             {
                 if (_process == null)
@@ -128,7 +127,7 @@ namespace IVConnector.Plugin
                         data.Add("Intervention Id separator", _configuration.IDSeparator);
                         data.Add("Intervention parameter separator", _configuration.FieldSeparator);
                     }
-                    _pluginReference.LogThis($"{Logheading} Instance successfull started and watching!", data, null, Vrh.Logger.LogLevel.Information, this.GetType());
+                    _pluginReference.LogThis($"Instance successfull started and watching!", data, null, Vrh.Logger.LogLevel.Information, this.GetType());
                 }
             }
             catch (Exception ex)
@@ -148,7 +147,6 @@ namespace IVConnector.Plugin
         /// </summary>
         public void Stop()
         {
-            string Logheading = GetLogHeading();
             try
             {
                 if (_process != null)
@@ -165,12 +163,12 @@ namespace IVConnector.Plugin
                         { "IVConnector plugin instance", _pluginReference.InstanceName },
                         { "IVConnector plugin version", _pluginReference.PluginVersion },
                     };
-                    _pluginReference.LogThis($"{Logheading} Instance successfull stoped!", data, null, Vrh.Logger.LogLevel.Information, this.GetType());
+                    _pluginReference.LogThis($"Instance successfull stoped!", data, null, Vrh.Logger.LogLevel.Information, this.GetType());
                 }
             }
             catch (Exception ex)
             {
-                throw new FatalException($"{Logheading}. Stop error!", ex, null);
+                throw new FatalException($"Stop error!", ex, null);
             }
         }
 
@@ -216,7 +214,6 @@ namespace IVConnector.Plugin
         /// </summary>
         private void ProcessMSMQ()
         {
-            string Logheading = GetLogHeading();
             var logData = new Dictionary<string, string>()
                     {
                         { "IVConnector plugin instance", _pluginReference.InstanceName },
@@ -324,7 +321,7 @@ namespace IVConnector.Plugin
                                 }
                                 catch (Exception ex)
                                 {
-                                    _pluginReference.LogThis($"{Logheading} Message processing error occured!", logData, ex, LogLevel.Error, this.GetType());
+                                    _pluginReference.LogThis($"Message processing error occured!", logData, ex, LogLevel.Error, this.GetType());
                                     if (harnessLoging)
                                     {
                                         CallErrorLoging(msgBody, ex.Message, 2);
@@ -370,7 +367,7 @@ namespace IVConnector.Plugin
                                                 {
                                                     { "Output Queue", _configuration.ResponseQueue },
                                                 };
-                                                _pluginReference.LogThis(String.Format($"{Logheading} Error occured when send response in MSMQ!"), null, ex, LogLevel.Error, this.GetType());
+                                                _pluginReference.LogThis(String.Format($"Error occured when send response in MSMQ!"), null, ex, LogLevel.Error, this.GetType());
                                             }
                                         }
                                     }
@@ -421,7 +418,6 @@ namespace IVConnector.Plugin
         /// <param name="state">The Accepted socket which must be processed</param>
         private void TCPProcessMessage(object state)
         {
-            string Logheading = GetLogHeading();
             bool harnessLogging = false;
             string message = String.Empty;
             var logData = new Dictionary<string, string>()
@@ -439,7 +435,7 @@ namespace IVConnector.Plugin
                     // Setting up timeouts
                     s.ReceiveTimeout = _socketTimeout;
                     s.SendTimeout = _socketTimeout;
-                    _pluginReference?.LogThis($"{Logheading} Receiving msg...", logData, null, Vrh.Logger.LogLevel.Debug, this.GetType());
+                    _pluginReference?.LogThis($"Receiving msg...", logData, null, Vrh.Logger.LogLevel.Debug, this.GetType());
                     int rcvd = 0;
                     do
                     {
@@ -470,24 +466,24 @@ namespace IVConnector.Plugin
                 catch(Exception ex)
                 {
                     s.Send(Encoding.ASCII.GetBytes("/x15".FromHexOrThis() + "Timeout or tcp socket error occured." + _configuration.Ack));
-                    _pluginReference?.LogThis($"{Logheading} ERROR: No data received on socket.", logData, ex, Vrh.Logger.LogLevel.Warning, this.GetType());
+                    _pluginReference?.LogThis($"ERROR: No data received on socket.", logData, ex, Vrh.Logger.LogLevel.Warning, this.GetType());
                     return;
                 }                
                 try
                 {
                     harnessLogging = message.Contains("IVPPL") || message.Contains("IVPPC");
-                    _pluginReference.LogThis($"{Logheading} Received message: {Vrh.Logger.LogHelper.HexControlChars(message)}", logData, null, Vrh.Logger.LogLevel.Information, this.GetType());
+                    _pluginReference.LogThis($"Received message: {Vrh.Logger.LogHelper.HexControlChars(message)}", logData, null, Vrh.Logger.LogLevel.Information, this.GetType());
                     ProcessMessage(message, logData, out harnessLogging);
                 }
                 catch(EndpointNotFoundException e)
                 {
                     s.Send(Encoding.ASCII.GetBytes("/x15".FromHexOrThis() + "ALM side WCF service currently not available!" + _configuration.Ack));
-                    _pluginReference.LogThis($"{Logheading} Message processing error occured!", logData, e, Vrh.Logger.LogLevel.Error, this.GetType());
+                    _pluginReference.LogThis($"Message processing error occured!", logData, e, Vrh.Logger.LogLevel.Error, this.GetType());
                     return;
                 }
                 catch (Exception e)
                 {
-                    _pluginReference.LogThis($"{Logheading} Message processing error occured!", logData, e, Vrh.Logger.LogLevel.Error, this.GetType());
+                    _pluginReference.LogThis($"Message processing error occured!", logData, e, Vrh.Logger.LogLevel.Error, this.GetType());
                     if (harnessLogging)
                     {
                         CallErrorLoging(message, e.Message, 1);
@@ -504,7 +500,7 @@ namespace IVConnector.Plugin
             }
             catch (Exception e)
             {
-                _pluginReference.LogThis($"{Logheading} Message processing error occured!", logData, e, Vrh.Logger.LogLevel.Error, this.GetType());
+                _pluginReference.LogThis($"Message processing error occured!", logData, e, Vrh.Logger.LogLevel.Error, this.GetType());
                 if (harnessLogging)
                 {
                     CallErrorLoging(message, e.Message, 1);
@@ -529,7 +525,6 @@ namespace IVConnector.Plugin
         /// <returns></returns>
         private string ProcessMessage(string message, Dictionary<string, string> logData, out bool harnessLoging)
         {
-            string Logheading = GetLogHeading();
             string tmp = message;
             string result;
             string messagePrefix = _configuration.MessagePrefix;
@@ -539,7 +534,7 @@ namespace IVConnector.Plugin
                 // Ha van üzenet prefix
                 if (!tmp.StartsWith(messagePrefix))
                 {
-                    result = $"{Logheading} Processing failed! Invalid Message! Excepted message prefix not found in received message.";
+                    result = $"Processing failed! Invalid Message! Excepted message prefix not found in received message.";
                     logData.Add("Excepted message prefix", Vrh.Logger.LogHelper.HexControlChars(messagePrefix));
                     logData.Add("Received message", Vrh.Logger.LogHelper.HexControlChars(message));
                     _pluginReference.LogThis(result, logData, null, Vrh.Logger.LogLevel.Information, this.GetType());
@@ -554,7 +549,7 @@ namespace IVConnector.Plugin
                 // Ha van üzenet postfix
                 if (!tmp.EndsWith(messageSuffix))
                 {
-                    result = $"{Logheading} Processing failed! Invalid Message! Excepted message suffix not found in received message.";
+                    result = $"Processing failed! Invalid Message! Excepted message suffix not found in received message.";
                     logData.Add("Excepted message suffix", Vrh.Logger.LogHelper.HexControlChars(messageSuffix));
                     logData.Add("Received message", Vrh.Logger.LogHelper.HexControlChars(message));
                     _pluginReference.LogThis(result, logData, null, Vrh.Logger.LogLevel.Information, this.GetType());
@@ -604,7 +599,7 @@ namespace IVConnector.Plugin
             harnessLoging = ivId.ToLower() == "ivppl" || ivId.ToLower() == "ivppc";
             if (!_configuration.IsHandled(ivId))
             {
-                result = $"{Logheading} Processing failed! The received message IVD is not handled by this connector!";
+                result = $"Processing failed! The received message IVD is not handled by this connector!";
                 logData.Add("Message IVID", Vrh.Logger.LogHelper.HexControlChars(ivId));
                 logData.Add("Received message", Vrh.Logger.LogHelper.HexControlChars(message));
                 _pluginReference.LogThis(result, logData, null, Vrh.Logger.LogLevel.Information, this.GetType());
@@ -644,7 +639,7 @@ namespace IVConnector.Plugin
             DefinedMessage def = _messagesConfiguration.GetMessage(ivId);
             if (def == null)
             {
-                result = $"{Logheading} Processing failed! Intervention definition not found for the IVID of the processed message.";
+                result = $"Processing failed! Intervention definition not found for the IVID of the processed message.";
                 logData.Add("Message IVID", Vrh.Logger.LogHelper.HexControlChars(ivId));
                 logData.Add("Received message", Vrh.Logger.LogHelper.HexControlChars(message));
                 _pluginReference.LogThis(result, logData, null, Vrh.Logger.LogLevel.Information, this.GetType());
@@ -654,7 +649,7 @@ namespace IVConnector.Plugin
             }
             if (String.IsNullOrEmpty(assemblyLineId))
             {
-                result = $"{Logheading} Processing failed! Assembly line id not present in received message.";
+                result = $"Processing failed! Assembly line id not present in received message.";
                 logData.Add("Received message", Vrh.Logger.LogHelper.HexControlChars(message));
                 _pluginReference.LogThis(result, logData, null, Vrh.Logger.LogLevel.Information, this.GetType());
                 return result;
@@ -689,7 +684,7 @@ namespace IVConnector.Plugin
                         /// másrészt ilyen felismert hiba esetekben nem throw exception-nel kellene megoldani a hiba naplózást, mert semmi értelme a 
                         /// teljes exception stack beírásának, elég lenne a VrhLogger.Log használata, majd valami return visszatérő kód előállítása, 
                         /// amire megszakad a feldolgozás.
-                        result = $"{Logheading} Processing failed! Unknown Assembly line external identifyer in received message (or some other error in requesting IdTranslation)!";
+                        result = $"Processing failed! Unknown Assembly line external identifyer in received message (or some other error in requesting IdTranslation)!";
                         logData.Add("Assembly line external id", assemblyLineId);
                         logData.Add("Received message", Vrh.Logger.LogHelper.HexControlChars(message));
                         _pluginReference.LogThis(result, logData, null, Vrh.Logger.LogLevel.Information, this.GetType());
@@ -700,7 +695,7 @@ namespace IVConnector.Plugin
                 }
                 if (asId == -1)
                 {
-                    result = $"{Logheading} Processing failed! Unknown Assembly line referenced in received message.";
+                    result = $"Processing failed! Unknown Assembly line referenced in received message.";
                     logData.Add("Assembly line", assemblyLineId);
                     logData.Add("Received message", Vrh.Logger.LogHelper.HexControlChars(message));
                     _pluginReference.LogThis(result, logData, null, Vrh.Logger.LogLevel.Information, this.GetType());
@@ -719,7 +714,7 @@ namespace IVConnector.Plugin
             }
             if (ivDef == null)
             {
-                result = $"{Logheading} Processing failed! Unknown intervention is referenced in received message.";
+                result = $"Processing failed! Unknown intervention is referenced in received message.";
                 logData.Add("Intervention", def.Intervention);
                 logData.Add("Received message", Vrh.Logger.LogHelper.HexControlChars(message));
                 _pluginReference.LogThis(result, logData, null, Vrh.Logger.LogLevel.Information, this.GetType());
@@ -742,7 +737,7 @@ namespace IVConnector.Plugin
             intervention.Parameters = GetParameters(ivDef, def, inputParameters);
             Guid user = _configuration.UserGuid;
             //data.Add("User guid", user.ToString());
-            result = $"{Logheading} Processing received message was successful!";
+            result = $"Processing received message was successful!";
             logData.Add("Received message", Vrh.Logger.LogHelper.HexControlChars(message));
             logData.Add("Intervention response", interventionService.DoIntervention(intervention, user, null));
             _pluginReference.LogThis(result, logData, null, Vrh.Logger.LogLevel.Information, this.GetType());
@@ -893,7 +888,6 @@ namespace IVConnector.Plugin
         /// <param name="e">eseményargumentum</param>
         private void _configuration_ConfigProcessorEvent(ConfigProcessorEventArgs e)
         {
-            string Logheading = GetLogHeading();
             LogLevel level =
                 e.Exception.GetType().Name == typeof(ConfigProcessorWarning).Name
                     ? LogLevel.Warning
@@ -903,16 +897,12 @@ namespace IVConnector.Plugin
                 { "ConfigProcessor class", e.ConfigProcessor },
                 { "Config file", e.ConfigFile },
             };
-            _pluginReference.LogThis(String.Format($"{Logheading} Configuration issue: {0}", e.Message), data, e.Exception, level);
+            _pluginReference.LogThis(String.Format($"Configuration issue: {0}", e.Message), data, e.Exception, level);
         }
 
         /// <summary>
         /// Log rekordokhoz fejlécet állít elő
         /// </summary>
-        private string GetLogHeading()
-        {
-            return $"IVConnectorPlugin - {(new System.Diagnostics.StackTrace()).GetFrame(1).GetMethod().Name}.";
-        }
 
         /// <summary>
         /// Referencia az iv connector pluginra (a szolgáltatásai közvetlen eléréséhez)
