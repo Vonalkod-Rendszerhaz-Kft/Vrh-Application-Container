@@ -317,7 +317,7 @@ namespace IVConnector.Plugin
                                 string response = String.Empty;
                                 try
                                 {
-                                    response = ProcessMessage(msgBody, null, out harnessLoging);
+                                    response = ProcessMessage(msgBody, logData, out harnessLoging);
                                 }
                                 catch (Exception ex)
                                 {
@@ -535,7 +535,7 @@ namespace IVConnector.Plugin
                 if (!tmp.StartsWith(messagePrefix))
                 {
                     result = $"Processing failed! Invalid Message! Excepted message prefix not found in received message.";
-                    logData.Add("Excepted message prefix", Vrh.Logger.LogHelper.HexControlChars(messagePrefix));
+                    logData.Add("Expected message prefix", Vrh.Logger.LogHelper.HexControlChars(messagePrefix));
                     logData.Add("Received message", Vrh.Logger.LogHelper.HexControlChars(message));
                     _pluginReference.LogThis(result, logData, null, Vrh.Logger.LogLevel.Information, this.GetType());
                     return result;
