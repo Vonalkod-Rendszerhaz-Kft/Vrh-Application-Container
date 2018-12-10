@@ -1,11 +1,15 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Linq;
 using System.Text;
 using System.Timers;
 using System.Data.SqlClient;
+using System.Xml.Linq;
+using System.Collections.Generic;
 
 using Vrh.Web.Common.Lib;
 using Vrh.Logger;
+using Vrh.LinqXMLProcessor.Base;
 using System.Collections.Specialized;
 
 namespace iSchedulerMonitor
@@ -39,6 +43,7 @@ namespace iSchedulerMonitor
 
         private Timer m_timer;
         private iSchedulerXMLProcessor m_xmlp;
+        private MonitorPlugin _pluginReference = null;
 
         #endregion Privates
 
@@ -49,23 +54,25 @@ namespace iSchedulerMonitor
         /// </summary>
         /// <param name="localPath">iScheduler.xml elérési helye a névvel együtt a plugin futtató környezetében.</param>
         /// <param name="remotePath">ScheduleExecute akció által használt iScheduler.xml elérési helye a névvel együtt
+        /// <param name="pluginReference">Az indító plugin példányra mutató referencia
         /// a távoli gépen. Ha egy gépen fut, akkor nem kötelező.</param>
-        public Monitor(string localPath, string remotePath = null)
+        public Monitor(string localPath, string remotePath, MonitorPlugin pluginReference)
         {
             //try
             //{
-            MyLog($"PREPARATION: xmlpath={localPath}");
 
+            _pluginReference = pluginReference;
             m_xmlp = new iSchedulerXMLProcessor(localPath, remotePath);
-            //MyLog($"PREPARATION: XMLProcesszor OK. ObjectType={m_xmlp.ObjectType}, GroupId={m_xmlp.GroupId}, ResponseTimeout={m_xmlp.ResponseTimeout}s");
-            MyLog($"PREPARATION: XMLProcesszor OK. ObjectType={m_xmlp.ObjectType}, GroupId={m_xmlp.GroupId}");
-
-            MyLog($"PREPARATION: Set timer! CheckInterval={m_xmlp.CheckInterval}s");
             m_timer = new Timer(m_xmlp.CheckInterval * 1000); // !!! Ez itt a jó sor !!!
                                                               //m_timer = new Timer(5000); // !!! Ez meg itt a debug !!!
             m_timer.Elapsed += OnExamination;
 
-            MyLog("PREPARATION ready.", LogLevel.Verbose);
+            var logData = new Dictionary<string, string>();
+            logData.Add("xmlpath", localPath);
+            logData.Add("Scheduled object type", m_xmlp.ObjectType);
+            logData.Add("Group Id", m_xmlp.GroupId);
+            logData.Add("Check interval", m_xmlp.CheckInterval.ToString());
+            _pluginReference.LogThis("Preparation ready.", logData, null, LogLevel.Debug, this.GetType());
 
             //}
             //catch (Exception ex)
@@ -80,13 +87,13 @@ namespace iSchedulerMonitor
 
         public void Start()
         {
-            MyLog("iSchedulerMonitor started.", LogLevel.Information);
+            _pluginReference.LogThis("iSchedulerMonitor started.", null, null, LogLevel.Information, this.GetType());
             m_timer.Start();
         }
         public void Stop()
         {
             m_timer.Stop();
-            MyLog("iSchedulerMonitor stopped.", LogLevel.Information);
+            _pluginReference.LogThis("iSchedulerMonitor stopped.", null, null, LogLevel.Information, this.GetType());
         }
 
         #region Private methods
@@ -107,14 +114,17 @@ namespace iSchedulerMonitor
         {
             try
             {
-                string thisfn = "EXAMINATION: ";
-                MyLog($"{thisfn}START. Signal time = {signalTime:HH:mm:ss}", LogLevel.Verbose);
-                MyLog($"{thisfn}DatabaseConnectionString={m_xmlp.DatabaseConnectionString}");
+                var logData = new Dictionary<string, string>()
+                    {
+                        { "Start time", $"{signalTime:HH:mm:ss}"}
+                    };
+                _pluginReference.LogThis($"Examination cycle started.", logData, null, LogLevel.Verbose, this.GetType());
 
                 using (SqlConnection cnn = new SqlConnection(m_xmlp.DatabaseConnectionString))
                 {
                     cnn.Open();
-                    MyLog($"{thisfn}Connection opened.");
+                    logData.Add("Database connection string", m_xmlp.DatabaseConnectionString);
+                    _pluginReference.LogThis($"Database connection opened.", logData, null, LogLevel.Verbose, this.GetType());
 
                     string scmd = String.Concat(
                         " select *",
@@ -131,38 +141,39 @@ namespace iSchedulerMonitor
                         SqlDataReader rdr = cmd.ExecuteReader(System.Data.CommandBehavior.CloseConnection);
                         if (rdr.HasRows)
                         {
-                            MyLog($"{thisfn}Scheduled job is found!", LogLevel.Verbose);
+                            _pluginReference.LogThis($"Scheduled job found!", logData, null, LogLevel.Verbose, this.GetType());
 
                             int ixID = rdr.GetOrdinal("Id");
                             Vrh.iScheduler.ScheduleExecute se = new Vrh.iScheduler.ScheduleExecute(m_xmlp.XmlLocalPath);
 
+                            int ScheduledJobCounter = 0;
                             while (rdr.Read())
                             {
+                                ScheduledJobCounter += 1;
                                 int id = rdr.GetInt32(ixID);
-                                MyLog($"{thisfn}Scheduled job execute started. id = {id}", LogLevel.Verbose);
+                                DateTime jobstartedat = DateTime.Now;
+                                logData.Add("Scheduled job Id", id.ToString());
+                                _pluginReference.LogThis($"Scheduled job execution started (job index in cycle: #{ScheduledJobCounter.ToString()})!", logData, null, LogLevel.Verbose, this.GetType());
                                 se.Run(id);
-                                MyLog($"{thisfn}Scheduled job has executed. id = {id}", LogLevel.Verbose);
+                                DateTime jobfinishedat = DateTime.Now;
+                                string jobexecutiontime = jobfinishedat.Subtract(jobstartedat).ToString(@"hh\:mm\:ss");
+
+                                _pluginReference.LogThis($"Scheduled job execution finished (execution time: {jobexecutiontime} !", logData, null, LogLevel.Verbose, this.GetType());
                             }//while (rdr.Read())
                         }//if (rdr.HasRows)
                         else
                         {
-                            MyLog($"{thisfn}No scheduling job", LogLevel.Information);
+                            _pluginReference.LogThis($"No scheduled job found!", logData, null, LogLevel.Verbose, this.GetType());
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                MyLog(String.Join(System.Environment.NewLine,WebCommon.ErrorListBuilder(ex)));
+                _pluginReference.LogThis($"Exception in scheduled job execution.", null, ex, LogLevel.Error, this.GetType());
             }
         }
         #endregion Examination
-
-        private void MyLog(string message, LogLevel level = LogLevel.Debug)
-        {
-            System.Diagnostics.Debug.WriteLine(message);
-            VrhLogger.Log(message, level, this.GetType());
-        }
 
         #endregion Private methods
 

@@ -85,8 +85,6 @@ namespace iSchedulerMonitor
             try
             {
                 BeginStart();
-                VrhLogger.Log("MonitorPlugin START.", LogLevel.Debug, this.GetType());
-                System.Diagnostics.Debug.WriteLine("MonitorPlugin START.");
 
                 // Implement Plugin logic here
                 // Ha netán újra indítják, akkor az előzőt el kell dobni!
@@ -94,12 +92,13 @@ namespace iSchedulerMonitor
 
                 string pluginConfig = String.IsNullOrEmpty(_myData.InstanceConfig) ? _myData.Type.PluginConfig : _myData.InstanceConfig;
                 string pluginData = _myData.InstanceData == null ? null : (string)_myData.InstanceData;
-                VrhLogger.Log($"MonitorPlugin pluginConfig={pluginConfig};pluginData={pluginData}", LogLevel.Debug, this.GetType());
-                System.Diagnostics.Debug.WriteLine($"MonitorPlugin pluginConfig={pluginConfig};pluginData={pluginData}");
+                var logData = new Dictionary<string, string>();
+                logData.Add("Plugin config xml", pluginConfig);
+                logData.Add("Plugin data xml", pluginData);
+                LogThis("MonitorPlugin started.", logData, null, LogLevel.Debug, this.GetType());
 
-                _monitor = new Monitor(pluginConfig, pluginData);
+                _monitor = new Monitor(pluginConfig, pluginData, this);
 
-                System.Diagnostics.Debug.WriteLine($"MonitorPlugin _monitor.Start");
                 _monitor.Start();
                 base.Start();
             }

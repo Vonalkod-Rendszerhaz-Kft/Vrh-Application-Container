@@ -313,20 +313,32 @@ namespace IVConnector.Plugin
                                         break;
                                 }
                                 string msgBody = reader.ReadToEnd();
-                                bool harnessLoging = false;
+                                bool harnessLogging = false;
                                 string response = String.Empty;
                                 try
                                 {
-                                    response = ProcessMessage(msgBody, logData, out harnessLoging);
+                                    response = ProcessMessage(msgBody, logData, out harnessLogging);
+                                }
+                                catch (EndpointNotFoundException ex)
+                                {
+                                    response = $"ALM side WCF service currently not available!";
+                                    _pluginReference.LogThis(response, logData, null, Vrh.Logger.LogLevel.Error, this.GetType());
+                                    //Ennek a hívásnak nincs értelme, mert ez is a WCF-et használja!
+                                    //if (harnessLogging) {CallErrorLogging(msgBody, response, 1);}
+                                }
+                                catch (System.TimeoutException ex)
+                                {
+                                    response = $"ALM side WCF service response timeout exceeded!";
+                                    _pluginReference.LogThis(response, logData, null, Vrh.Logger.LogLevel.Error, this.GetType());
+                                    //Ennek a hívásnak nincs értelme, mert ez is a WCF-et használja!
+                                    //if (harnessLogging) {CallErrorLogging(msgBody, response, 1);}
                                 }
                                 catch (Exception ex)
                                 {
-                                    _pluginReference.LogThis($"Message processing error occured!", logData, ex, LogLevel.Error, this.GetType());
-                                    if (harnessLoging)
-                                    {
-                                        CallErrorLoging(msgBody, ex.Message, 2);
-                                    }
-                                    response = ex.Message;
+                                    response = $"Message processing error occured!";
+                                    _pluginReference.LogThis(response, logData, ex, LogLevel.Error, this.GetType());
+                                    response += " " + ex.Message;
+                                    if (harnessLogging){CallErrorLogging(msgBody, ex.Message, 2);}
                                 }
 
                                 if (!String.IsNullOrEmpty(_configuration.ResponseQueue))
@@ -367,7 +379,7 @@ namespace IVConnector.Plugin
                                                 {
                                                     { "Output Queue", _configuration.ResponseQueue },
                                                 };
-                                                _pluginReference.LogThis(String.Format($"Error occured when send response in MSMQ!"), null, ex, LogLevel.Error, this.GetType());
+                                                _pluginReference.LogThis($"Error occured when send response in MSMQ!", null, ex, LogLevel.Error, this.GetType());
                                             }
                                         }
                                     }
@@ -386,12 +398,19 @@ namespace IVConnector.Plugin
         /// <param name="fullMessage">a feldolgozott üzenet</param>
         /// <param name="errorTxt">hibaszöveg</param>
         /// <param name="src">forrás: 0 - LJS, 1 - CP</param>
-        private void CallErrorLoging(string fullMessage, string errorTxt, int src)
+        private void CallErrorLogging(string fullMessage, string errorTxt, int src)
         {
+            var logData = new Dictionary<string, string>();
             try
             {
                 if (_configuration.CallWCFWithProcessingErrors)
                 {
+
+                    logData.Add("Intervention name", "HarnessErrorLog");
+                    logData.Add("Intervention parameter ProcessorSideError", errorTxt);
+                    logData.Add("Intervention parameter Message", fullMessage);
+                    logData.Add("Message source", src==0?"LJS":"CabPack");
+
                     InterventionServiceClient interventionService = new InterventionServiceClient();
                     Guid user = _configuration.UserGuid;
                     Dictionary<string, object> parameters = new Dictionary<string, object>();
@@ -408,7 +427,7 @@ namespace IVConnector.Plugin
             }
             catch (Exception ex)
             {
-                VrhLogger.Log(ex, this.GetType(), LogLevel.Error);
+                _pluginReference.LogThis($"Exception in Harness error logging!", logData, ex, Vrh.Logger.LogLevel.Error, this.GetType());
             }
         }
 
@@ -468,25 +487,31 @@ namespace IVConnector.Plugin
                     s.Send(Encoding.ASCII.GetBytes("/x15".FromHexOrThis() + "Timeout or tcp socket error occured." + _configuration.Ack));
                     _pluginReference?.LogThis($"ERROR: No data received on socket.", logData, ex, Vrh.Logger.LogLevel.Warning, this.GetType());
                     return;
-                }                
+                }
                 try
                 {
                     harnessLogging = message.Contains("IVPPL") || message.Contains("IVPPC");
                     _pluginReference.LogThis($"Received message: {Vrh.Logger.LogHelper.HexControlChars(message)}", logData, null, Vrh.Logger.LogLevel.Information, this.GetType());
                     ProcessMessage(message, logData, out harnessLogging);
                 }
-                catch(EndpointNotFoundException e)
+                catch (EndpointNotFoundException e)
                 {
                     s.Send(Encoding.ASCII.GetBytes("/x15".FromHexOrThis() + "ALM side WCF service currently not available!" + _configuration.Ack));
-                    _pluginReference.LogThis($"Message processing error occured!", logData, e, Vrh.Logger.LogLevel.Error, this.GetType());
+                    _pluginReference.LogThis($"Message processing error occured!", logData, null, Vrh.Logger.LogLevel.Error, this.GetType());
                     return;
+                }
+                //catch (System.TimeoutException e)
+                catch (System.ServiceModel.CommunicationException e)
+                    {
+                    s.Send(Encoding.ASCII.GetBytes("/x15".FromHexOrThis() + "ALM side WCF service response timeout exceeded!" + _configuration.Ack));
+                    _pluginReference.LogThis($"WCF timeout eception occured!", logData, null, Vrh.Logger.LogLevel.Error, this.GetType());
                 }
                 catch (Exception e)
                 {
                     _pluginReference.LogThis($"Message processing error occured!", logData, e, Vrh.Logger.LogLevel.Error, this.GetType());
                     if (harnessLogging)
                     {
-                        CallErrorLoging(message, e.Message, 1);
+                        CallErrorLogging(message, e.Message, 1);
                     }
                 }
                 if (String.IsNullOrEmpty(_configuration.MessageSuffix) || message.Contains(_configuration.MessageSuffix))
@@ -503,7 +528,7 @@ namespace IVConnector.Plugin
                 _pluginReference.LogThis($"Message processing error occured!", logData, e, Vrh.Logger.LogLevel.Error, this.GetType());
                 if (harnessLogging)
                 {
-                    CallErrorLoging(message, e.Message, 1);
+                    CallErrorLogging(message, e.Message, 1);
                 }                
             }
             finally
