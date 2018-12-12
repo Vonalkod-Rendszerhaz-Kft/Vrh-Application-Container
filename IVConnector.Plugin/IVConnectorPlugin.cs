@@ -27,10 +27,12 @@ namespace IVConnector.Plugin
         /// <param name="instanceDefinition">A példány definiciója</param>
         /// <param name="instanceData">Not used in this plugin</param>
         /// <returns></returns>
-        public static IVConnectorPlugin IVConnectorPluginFactory(InstanceDefinition instanceDefinition, Object instanceData)
+        public static IVConnectorPlugin IVConnectorPluginFactory(InstanceDefinition instanceDefinition, object instanceData)
         {
-            var instance = new IVConnectorPlugin();
-            instance._myData = instanceDefinition;
+            var instance = new IVConnectorPlugin
+            {
+                _myData = instanceDefinition
+            };
             return instance;
         }
 
@@ -47,8 +49,8 @@ namespace IVConnector.Plugin
             }
             string pluginTmp = _myData.Type.PluginConfig;
             string[] pluginConfigParts = pluginTmp.Split(",".ToCharArray(), StringSplitOptions.None);
-            string pluginConfig = String.Empty;
-            string pluginMessageDefinitions = String.Empty;
+            string pluginConfig = string.Empty;
+            string pluginMessageDefinitions = string.Empty;
             if (pluginConfigParts.Length > 0)
             {
                 pluginConfig = pluginConfigParts[0];
@@ -59,8 +61,8 @@ namespace IVConnector.Plugin
             }
             string instanceTmp = _myData.InstanceConfig;
             string[] instanceConfigParts = instanceTmp.Split(",".ToCharArray(), StringSplitOptions.None);
-            string instanceConfig = String.Empty;
-            string instanceMessageDefinitions = String.Empty;
+            string instanceConfig = string.Empty;
+            string instanceMessageDefinitions = string.Empty;
             if (instanceConfigParts.Length > 0)
             {
                 instanceConfig = instanceConfigParts[0];
@@ -69,16 +71,16 @@ namespace IVConnector.Plugin
             {
                 instanceMessageDefinitions = instanceConfigParts[1];
             }
-            instanceConfig = !String.IsNullOrEmpty(instanceConfig) 
+            instanceConfig = !string.IsNullOrEmpty(instanceConfig) 
                                 ? instanceConfig 
                                 : pluginConfig;
-            instanceMessageDefinitions = !String.IsNullOrEmpty(instanceMessageDefinitions) 
+            instanceMessageDefinitions = !string.IsNullOrEmpty(instanceMessageDefinitions) 
                                             ? instanceMessageDefinitions 
                                             : pluginMessageDefinitions;
-            instanceConfig = !String.IsNullOrEmpty(instanceConfig) 
+            instanceConfig = !string.IsNullOrEmpty(instanceConfig) 
                                 ? instanceConfig 
                                 : "IVConnector.Config.xml/Configuration";
-            instanceMessageDefinitions = !String.IsNullOrEmpty(instanceMessageDefinitions) 
+            instanceMessageDefinitions = !string.IsNullOrEmpty(instanceMessageDefinitions) 
                                 ? instanceMessageDefinitions 
                                 : "IVConnector.Config.xml/MessageDefinitions";                        
             _ivConnector = new IVConnector(instanceConfig, instanceMessageDefinitions, this);

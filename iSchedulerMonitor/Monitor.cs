@@ -67,11 +67,13 @@ namespace iSchedulerMonitor
                                                               //m_timer = new Timer(5000); // !!! Ez meg itt a debug !!!
             m_timer.Elapsed += OnExamination;
 
-            var logData = new Dictionary<string, string>();
-            logData.Add("xmlpath", localPath);
-            logData.Add("Scheduled object type", m_xmlp.ObjectType);
-            logData.Add("Group Id", m_xmlp.GroupId);
-            logData.Add("Check interval", m_xmlp.CheckInterval.ToString());
+            var logData = new Dictionary<string, string>
+            {
+                { "xmlpath", localPath },
+                { "Scheduled object type", m_xmlp.ObjectType },
+                { "Group Id", m_xmlp.GroupId },
+                { "Check interval", m_xmlp.CheckInterval.ToString() }
+            };
             _pluginReference.LogThis("Preparation ready.", logData, null, LogLevel.Debug, this.GetType());
 
             //}
@@ -126,7 +128,7 @@ namespace iSchedulerMonitor
                     logData.Add("Database connection string", m_xmlp.DatabaseConnectionString);
                     _pluginReference.LogThis($"Database connection opened.", logData, null, LogLevel.Verbose, this.GetType());
 
-                    string scmd = String.Concat(
+                    string scmd = string.Concat(
                         " select *",
                         " from iScheduler.Schedules s",
                         "    inner join iScheduler.ScheduleObjects so on s.ScheduleObjectId = so.Id",

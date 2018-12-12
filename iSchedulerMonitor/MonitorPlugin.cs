@@ -64,10 +64,12 @@ namespace iSchedulerMonitor
         /// <param name="instanceDefinition">A példány definiciója</param>
         /// <param name="instanceData">Not used in this plugin</param>
         /// <returns></returns>
-        public static MonitorPlugin MonitorPluginFactory(InstanceDefinition instanceDefinition, Object instanceData)
+        public static MonitorPlugin MonitorPluginFactory(InstanceDefinition instanceDefinition, object instanceData)
         {
-            var instance = new MonitorPlugin();
-            instance._myData = instanceDefinition;
+            var instance = new MonitorPlugin
+            {
+                _myData = instanceDefinition
+            };
             return instance;
         }
 
@@ -88,13 +90,15 @@ namespace iSchedulerMonitor
 
                 // Implement Plugin logic here
                 // Ha netán újra indítják, akkor az előzőt el kell dobni!
-                if (_monitor != null) _monitor.Dispose();
+                if (_monitor != null) { _monitor.Dispose(); }
 
-                string pluginConfig = String.IsNullOrEmpty(_myData.InstanceConfig) ? _myData.Type.PluginConfig : _myData.InstanceConfig;
+                string pluginConfig = string.IsNullOrEmpty(_myData.InstanceConfig) ? _myData.Type.PluginConfig : _myData.InstanceConfig;
                 string pluginData = _myData.InstanceData == null ? null : (string)_myData.InstanceData;
-                var logData = new Dictionary<string, string>();
-                logData.Add("Plugin config xml", pluginConfig);
-                logData.Add("Plugin data xml", pluginData);
+                var logData = new Dictionary<string, string>
+                {
+                    { "Plugin config xml", pluginConfig },
+                    { "Plugin data xml", pluginData }
+                };
                 LogThis("MonitorPlugin started.", logData, null, LogLevel.Debug, this.GetType());
 
                 _monitor = new Monitor(pluginConfig, pluginData, this);

@@ -28,10 +28,12 @@ namespace Service.Starter
         /// <param name="instanceDefinition">A példány definiciója</param>
         /// <param name="instanceData">Not used in this plugin</param>
         /// <returns></returns>
-        public static ServiceStarterPlugin ServiceStarterPluginFactory(InstanceDefinition instanceDefinition, Object instanceData)
+        public static ServiceStarterPlugin ServiceStarterPluginFactory(InstanceDefinition instanceDefinition, object instanceData)
         {
-            var instance = new ServiceStarterPlugin();
-            instance._myData = instanceDefinition;
+            var instance = new ServiceStarterPlugin
+            {
+                _myData = instanceDefinition
+            };
             return instance;
         }
 
@@ -49,25 +51,25 @@ namespace Service.Starter
             {
                 // Implement Start logic here 
                 string configParameterFile = _myData.InstanceConfig;
-                if (String.IsNullOrEmpty(configParameterFile))
+                if (string.IsNullOrEmpty(configParameterFile))
                 {
                     configParameterFile = _myData.Type.PluginConfig;
                 }
-                _configuration = new ServiceStarterParameterFileProcessor(configParameterFile);
-                _configuration.ConfigProcessorEvent += ConfigProcessorEvent;
+                Configuration = new ServiceStarterParameterFileProcessor(configParameterFile);
+                Configuration.ConfigProcessorEvent += ConfigProcessorEvent;
                 _lazyRedisConnection = new Lazy<ConnectionMultiplexer>(() =>
                 {
-                    if (!String.IsNullOrEmpty(_configuration.RedisConnection))
+                    if (!string.IsNullOrEmpty(Configuration.RedisConnection))
                     {
                         try
                         {
-                            var cm = ConnectionMultiplexer.Connect(ConfigurationOptions.Parse(_configuration.RedisConnection, true));
+                            var cm = ConnectionMultiplexer.Connect(ConfigurationOptions.Parse(Configuration.RedisConnection, true));
                             cm.PreserveAsyncOrder = false;
                             return cm;
                         }
                         catch (Exception ex)
                         {
-                            LogThis($"Error to connect to Redis server: {_configuration.RedisConnection}", null, ex, LogLevel.Fatal, this.GetType());
+                            LogThis($"Error to connect to Redis server: {Configuration.RedisConnection}", null, ex, LogLevel.Fatal, this.GetType());
                             return null;
                         }
                     }
@@ -76,7 +78,7 @@ namespace Service.Starter
                         return null;
                     }
                 });
-                foreach (var service in _configuration.AllControlledServices)
+                foreach (var service in Configuration.AllControlledServices)
                 {
                     _controlledServices.Add(new ControlledService(service, this));
                 }
@@ -138,13 +140,7 @@ namespace Service.Starter
         /// <summary>
         /// A plugin konfigurációja
         /// </summary>
-        internal ServiceStarterParameterFileProcessor Configuration
-        {
-            get
-            {
-                return _configuration;
-            }
-        }
+        internal ServiceStarterParameterFileProcessor Configuration { get; private set; }
 
         /// <summary>
         /// A konfiguráció feldolgozás üzeneteit logoló metódus
@@ -165,11 +161,6 @@ namespace Service.Starter
         }
 
         /// <summary>
-        /// A ServiceStarter által használt konfiguráció
-        /// </summary>
-        private ServiceStarterParameterFileProcessor _configuration;
-
-        /// <summary>
         /// A kontrolált servicek listája
         /// </summary>
         private List<ControlledService> _controlledServices = new List<ControlledService>();
@@ -177,7 +168,7 @@ namespace Service.Starter
         /// <summary>
         /// Jelzi, hogy a plugin áll
         /// </summary>
-        private bool _stopped = true;
+        //private bool _stopped = true;
 
         /// <summary>
         /// Lazy StackExchange.Redis connection multiplexer

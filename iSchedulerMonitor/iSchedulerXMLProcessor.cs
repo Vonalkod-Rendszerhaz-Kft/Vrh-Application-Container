@@ -34,7 +34,7 @@
         /// <summary>
         /// Feldolgozás közben keletkezett hibaüzenetek.
         /// </summary>
-        public string ErrorMessage { get; private set; } = String.Empty;
+        public string ErrorMessage { get; private set; } = string.Empty;
 
         /// <summary>
         /// Itt a model létrejöttekor egy fix érték: "en-US".
@@ -72,7 +72,7 @@
                 if (_ObjectType == null)
                 {
                     _ObjectType = GetElementValue(GetXElement(Elements.OBJECTTYPE), "");
-                    if (String.IsNullOrWhiteSpace(_ObjectType)) throw new ApplicationException($"The <{Elements.OBJECTTYPE}> element is missing or empty!");
+                    if (string.IsNullOrWhiteSpace(_ObjectType)) { throw new ApplicationException($"The <{Elements.OBJECTTYPE}> element is missing or empty!"); }
                 }
                 return _ObjectType;
             }
@@ -92,8 +92,8 @@
                 if (_GroupId == null)
                 {
                     _GroupId = GetElementValue(GetXElement(Elements.GROUPID), "");
-                    if (String.IsNullOrWhiteSpace(_GroupId)) throw new ApplicationException($"The <{Elements.GROUPID}> element is missing or empty!");
-                    else if (_GroupId.Trim() == "*") throw new ApplicationException($"The value of the <{Elements.GROUPID}> element can not equal '*'!");
+                    if (string.IsNullOrWhiteSpace(_GroupId)) { throw new ApplicationException($"The <{Elements.GROUPID}> element is missing or empty!"); }
+                    else if (_GroupId.Trim() == "*") { throw new ApplicationException($"The value of the <{Elements.GROUPID}> element can not equal '*'!"); }
                 }
                 return _GroupId;
             }
@@ -111,18 +111,18 @@
         {
             get
             {
-                if (_CheckInterval < this.CheckIntervalMinimum)
+                if (_CheckInterval < CheckIntervalMinimum)
                 {
                     string chckint = GetElementValue(GetXElement(Elements.MONITORSERVICE, Elements.CHECKINTERVAL), "");
-                    if (String.IsNullOrEmpty(chckint))
+                    if (string.IsNullOrEmpty(chckint))
                     {
-                        _CheckInterval = this.CheckIntervalMinimum;
+                        _CheckInterval = CheckIntervalMinimum;
                     }
                     else
                     {
-                        if (!Int32.TryParse(chckint, out _CheckInterval)) _CheckInterval = this.CheckIntervalMinimum;
+                        if (!int.TryParse(chckint, out _CheckInterval)) { _CheckInterval = CheckIntervalMinimum; }
                     }
-                    _CheckInterval = Math.Min(Math.Max(_CheckInterval, this.CheckIntervalMinimum), this.CheckIntervalMaximum);
+                    _CheckInterval = Math.Min(Math.Max(_CheckInterval, CheckIntervalMinimum), CheckIntervalMaximum);
                 }
                 return _CheckInterval;
             }
@@ -150,19 +150,19 @@
         {
             try
             {
-                _xmlNameSpace = String.Empty;
+                _xmlNameSpace = string.Empty;
                 _xmlFileDefinition = "@" + localPath;
 
-                this.LCID = "en-US";    //fix érték, mert nincs honnan megtudni a beállítást!
-                this.CheckIntervalMinimum = 60; // 1 perc
-                this.CheckIntervalMaximum = 86400; // 1 nap
-                this.XmlLocalPath = localPath;
-                this.XmlRemotePath = String.IsNullOrEmpty(remotePath) ? localPath : remotePath;
+                LCID = "en-US";    //fix érték, mert nincs honnan megtudni a beállítást!
+                CheckIntervalMinimum = 60; // 1 perc
+                CheckIntervalMaximum = 86400; // 1 nap
+                XmlLocalPath = localPath;
+                XmlRemotePath = string.IsNullOrEmpty(remotePath) ? localPath : remotePath;
 
                 this._CheckInterval = -1;   // annak jelzése, hogy a beállítás még nem történt meg.
 
                 #region strings load
-                this.Strings = new List<NameValueXML>();
+                Strings = new List<NameValueXML>();
                 foreach (XElement item in GetAllXElements(NameValueXML.ElementNames.STRINGS, NameValueXML.ElementNames.STRING))
                 {
                     NameValueXML nv = new NameValueXML()
@@ -171,13 +171,13 @@
                         LCID = GetAttribute(item, NameValueXML.AttributeNames.STRING_LCID, ""),
                         Value = item.Value,
                     };
-                    if (String.IsNullOrEmpty(nv.Name)) AddErr("The 'name' attribute is missing or empty in the <string> element!");
-                    this.Strings.Add(nv);
+                    if (string.IsNullOrEmpty(nv.Name)) { AddErr("The 'name' attribute is missing or empty in the <string> element!"); }
+                    Strings.Add(nv);
                 }
                 #endregion strings load
 
                 #region connectionstrings load and parser
-                this.ConnectionStrings = new List<NameValueXML>();
+                ConnectionStrings = new List<NameValueXML>();
                 foreach (XElement item in GetAllXElements(NameValueXML.ElementNames.CONNECTIONSTRINGS, NameValueXML.ElementNames.CONNECTIONSTRING))
                 {
                     NameValueXML se = new NameValueXML()
@@ -186,30 +186,30 @@
                         LCID = GetAttribute(item, NameValueXML.AttributeNames.STRING_LCID, ""),
                         Value = item.Value,
                     };
-                    if (String.IsNullOrEmpty(se.Name)) AddErr("The 'name' attribute is missing or empty in the <connectionstring> element!");
-                    this.ConnectionStrings.Add(se);
+                    if (string.IsNullOrEmpty(se.Name)) { AddErr("The 'name' attribute is missing or empty in the <connectionstring> element!"); }
+                    ConnectionStrings.Add(se);
                 }
-                foreach (NameValueXML nv in this.ConnectionStrings) nv.Value = NameValueXML.FindString(this.Strings, nv.Value, this.LCID);
+                foreach (NameValueXML nv in ConnectionStrings) { nv.Value = NameValueXML.FindString(Strings, nv.Value, LCID); }
                 #endregion connectionstrings load and parser
 
                 #region DatabaseConnectionString parser
 
-                this.DatabaseConnectionString = GetElementValue(GetXElement(Elements.DATABASECONNECTIONSTRING), "");
-                if (String.IsNullOrWhiteSpace(this.DatabaseConnectionString))
+                DatabaseConnectionString = GetElementValue(GetXElement(Elements.DATABASECONNECTIONSTRING), "");
+                if (string.IsNullOrWhiteSpace(DatabaseConnectionString))
                 {
                     AddErr($"The <{Elements.DATABASECONNECTIONSTRING}> element is missing or empty!");
                 }
                 else
                 {
-                    string constr = NameValueXML.FindString(this.ConnectionStrings, this.DatabaseConnectionString, this.LCID);
-                    try { this.DatabaseConnectionString = VRH.ConnectionStringStore.VRHConnectionStringStore.GetConnectionString(constr, false); }
-                    catch (Exception) { this.DatabaseConnectionString = constr; }
+                    string constr = NameValueXML.FindString(ConnectionStrings, DatabaseConnectionString, LCID);
+                    try { DatabaseConnectionString = VRH.ConnectionStringStore.VRHConnectionStringStore.GetConnectionString(constr, false); }
+                    catch (Exception) { DatabaseConnectionString = constr; }
                     //this.DatabaseConnectionString = constr;
                 }
 
                 #endregion Database parser
 
-                if (this.ErrorMessage != String.Empty) throw new ApplicationException(this.ErrorMessage);
+                if (ErrorMessage != string.Empty) { throw new ApplicationException(ErrorMessage); }
             }
             catch (Exception ex)
             {
@@ -231,10 +231,10 @@
             {
                 result = new UrlElement(xurl);
                 //ha nincs már hiba, akkor a Strings változókat keressük meg és helyettesítsük be!
-                if (this.Strings != null && this.Strings.Count > 0)
+                if (Strings != null && Strings.Count > 0)
                 {   //előbb a nylvi változatot helyettesítsük be
-                    if (!String.IsNullOrEmpty(this.LCID)) foreach (NameValueXML nv in this.Strings.Where(x => x.LCID == this.LCID)) result.Substitution(nv);
-                    foreach (NameValueXML nv in this.Strings.Where(x => String.IsNullOrEmpty(x.LCID))) result.Substitution(nv);
+                    if (!string.IsNullOrEmpty(LCID)) { foreach (NameValueXML nv in Strings.Where(x => x.LCID == LCID)) {result.Substitution(nv); } }
+                    foreach (NameValueXML nv in Strings.Where(x => string.IsNullOrEmpty(x.LCID))) { result.Substitution(nv); }
                 }
             }
             return result;
@@ -242,7 +242,7 @@
 
         private void AddErr(string mess)
         {
-            this.ErrorMessage += (this.ErrorMessage == "" ? "" : "\n") + mess;
+            ErrorMessage += (ErrorMessage == "" ? "" : "\n") + mess;
         }
 
         #endregion Private methods

@@ -51,8 +51,7 @@ namespace IVConnector.Plugin
                 {
                     if (_configuration.ConnectorType == IVConnectorType.TCP)
                     {
-                        IPAddress ip;
-                        if (!IPAddress.TryParse(_configuration.IP, out ip))
+                        if (!IPAddress.TryParse(_configuration.IP, out IPAddress ip))
                         {
                             throw new FatalException("Configuration Error: invalid IP address.", null, null);
                         }
@@ -80,23 +79,25 @@ namespace IVConnector.Plugin
                         }
                     }
                     ThreadStart ts = new ThreadStart(ListenerProcess);
-                    _process = new Thread(ts);
-                    _process.Name = String.Format("IVConnector Process Thread ({0})", _pluginReference.InstanceName);
+                    _process = new Thread(ts)
+                    {
+                        Name = string.Format("IVConnector Process Thread ({0})", _pluginReference.InstanceName)
+                    };
                     _process.Start();
                     byte[] ba;
                     string hexString;
                     ba = Encoding.Default.GetBytes(_configuration.MessageSuffix);
                     hexString = BitConverter.ToString(ba);
-                    string msgSuffix = !String.IsNullOrEmpty(_configuration.MessageSuffix) ? String.Format("{0} ({1})", _configuration.MessageSuffix, hexString.Replace("-", "")) : "";
+                    string msgSuffix = !string.IsNullOrEmpty(_configuration.MessageSuffix) ? string.Format("{0} ({1})", _configuration.MessageSuffix, hexString.Replace("-", "")) : "";
                     ba = Encoding.Default.GetBytes(_configuration.MessagePrefix);
                     hexString = BitConverter.ToString(ba);
-                    string msgPrefix = !String.IsNullOrEmpty(_configuration.MessagePrefix) ? String.Format("{0} ({1})", _configuration.MessagePrefix, hexString.Replace("-", "")) : "";
+                    string msgPrefix = !string.IsNullOrEmpty(_configuration.MessagePrefix) ? string.Format("{0} ({1})", _configuration.MessagePrefix, hexString.Replace("-", "")) : "";
                     ba = Encoding.Default.GetBytes(_configuration.IDSeparator);
                     hexString = BitConverter.ToString(ba);
-                    string idSeparator = !String.IsNullOrEmpty(_configuration.IDSeparator) ? String.Format("{0} ({1})", _configuration.IDSeparator, hexString.Replace("-", "")) : "";
+                    string idSeparator = !string.IsNullOrEmpty(_configuration.IDSeparator) ? string.Format("{0} ({1})", _configuration.IDSeparator, hexString.Replace("-", "")) : "";
                     ba = Encoding.Default.GetBytes(_configuration.FieldSeparator);
                     hexString = BitConverter.ToString(ba);
-                    string paramSeparator = !String.IsNullOrEmpty(_configuration.FieldSeparator) ? String.Format("{0} ({1})", _configuration.FieldSeparator, hexString.Replace("-", "")) : "";
+                    string paramSeparator = !string.IsNullOrEmpty(_configuration.FieldSeparator) ? string.Format("{0} ({1})", _configuration.FieldSeparator, hexString.Replace("-", "")) : "";
                     var data = new Dictionary<string, string>()
                     {
                         { "IVConnector plugin instance", _pluginReference.InstanceName },
@@ -116,7 +117,7 @@ namespace IVConnector.Plugin
                     else
                     {
                         data.Add("Input queue", _configuration.InQueue);
-                        if (!String.IsNullOrEmpty(_configuration.ResponseQueue))
+                        if (!string.IsNullOrEmpty(_configuration.ResponseQueue))
                         {
                             data.Add("Response handling", true.ToString());
                             data.Add("Response queue", _configuration.ResponseQueue);
@@ -203,9 +204,11 @@ namespace IVConnector.Plugin
                     ProcessMSMQ();
                 }
             }
-            var logData = new Dictionary<string, string>();
-            logData.Add("disposed", disposed.ToString());
-            logData.Add("stopped", _stopped.ToString());
+            var logData = new Dictionary<string, string>
+            {
+                { "disposed", disposed.ToString() },
+                { "stopped", _stopped.ToString() }
+            };
             VrhLogger.Log<string>($"ListenerProcess exited: {Thread.CurrentThread.Name}", logData, null, LogLevel.Debug, this.GetType());
         }
 
@@ -224,13 +227,13 @@ namespace IVConnector.Plugin
             {
                 if (!MessageQueue.Exists(_configuration.InQueue))
                 {
-                    throw new FatalException(String.Format("Message queue not exists! {0}", _configuration.InQueue));
+                    throw new FatalException(string.Format("Message queue not exists! {0}", _configuration.InQueue));
                 }
             }
             catch (Exception ex)
             {
                 Stop();
-                _pluginReference.SetErrorState(new FatalException(String.Format("Error access input Message queue: {0}", _configuration.InQueue), ex));
+                _pluginReference.SetErrorState(new FatalException(string.Format("Error access input Message queue: {0}", _configuration.InQueue), ex));
                 return;
             }
             string[] filters = _configuration.LabelFilters.Split(new string[1] { "," }, StringSplitOptions.RemoveEmptyEntries);
@@ -250,7 +253,7 @@ namespace IVConnector.Plugin
                             bool processThis = true;
                             foreach (var filter in filters)
                             {
-                                if (!String.IsNullOrEmpty(filter))
+                                if (!string.IsNullOrEmpty(filter))
                                 {
                                     if (filter.StartsWith("!"))
                                     {
@@ -314,19 +317,19 @@ namespace IVConnector.Plugin
                                 }
                                 string msgBody = reader.ReadToEnd();
                                 bool harnessLogging = false;
-                                string response = String.Empty;
+                                string response = string.Empty;
                                 try
                                 {
                                     response = ProcessMessage(msgBody, logData, out harnessLogging);
                                 }
-                                catch (EndpointNotFoundException ex)
+                                catch (EndpointNotFoundException)
                                 {
                                     response = $"ALM side WCF service currently not available!";
                                     _pluginReference.LogThis(response, logData, null, Vrh.Logger.LogLevel.Error, this.GetType());
                                     //Ennek a hívásnak nincs értelme, mert ez is a WCF-et használja!
                                     //if (harnessLogging) {CallErrorLogging(msgBody, response, 1);}
                                 }
-                                catch (System.TimeoutException ex)
+                                catch (System.TimeoutException)
                                 {
                                     response = $"ALM side WCF service response timeout exceeded!";
                                     _pluginReference.LogThis(response, logData, null, Vrh.Logger.LogLevel.Error, this.GetType());
@@ -341,7 +344,7 @@ namespace IVConnector.Plugin
                                     if (harnessLogging){CallErrorLogging(msgBody, ex.Message, 2);}
                                 }
 
-                                if (!String.IsNullOrEmpty(_configuration.ResponseQueue))
+                                if (!string.IsNullOrEmpty(_configuration.ResponseQueue))
                                 {
                                     using (var responseQueue = new MessageQueue(_configuration.ResponseQueue))
                                     {
@@ -361,7 +364,7 @@ namespace IVConnector.Plugin
                                             string label = _configuration.ResponseLabel;
                                             if (_configuration.IdHandling == MSMQIdHandling.Label)
                                             {
-                                                label = String.Format(label, msg.Label);
+                                                label = string.Format(label, msg.Label);
                                             }
                                             if (_configuration.IdHandling == MSMQIdHandling.CorrelationId)
                                             {
@@ -413,9 +416,11 @@ namespace IVConnector.Plugin
 
                     InterventionServiceClient interventionService = new InterventionServiceClient();
                     Guid user = _configuration.UserGuid;
-                    Dictionary<string, object> parameters = new Dictionary<string, object>();
-                    parameters.Add("ProcessorSideError", errorTxt);
-                    parameters.Add("FullMessage", fullMessage);
+                    Dictionary<string, object> parameters = new Dictionary<string, object>
+                    {
+                        { "ProcessorSideError", errorTxt },
+                        { "FullMessage", fullMessage }
+                    };
                     Intervention intervention = new Intervention()
                     {
                         Name = "HarnessErrorLog",
@@ -438,7 +443,7 @@ namespace IVConnector.Plugin
         private void TCPProcessMessage(object state)
         {
             bool harnessLogging = false;
-            string message = String.Empty;
+            string message = string.Empty;
             var logData = new Dictionary<string, string>()
                     {
                         { "IVConnector plugin instance", _pluginReference.InstanceName },
@@ -461,7 +466,7 @@ namespace IVConnector.Plugin
                         rcvd = s.Receive(tmpBuffer);
                         //_buffer.Concat(tmpBuffer);
                         message += Encoding.ASCII.GetString(tmpBuffer, 0, rcvd);
-                        if (!String.IsNullOrEmpty(_configuration.MessageSuffix))
+                        if (!string.IsNullOrEmpty(_configuration.MessageSuffix))
                         {
                             if (message.Contains(_configuration.MessageSuffix))
                             {
@@ -494,14 +499,14 @@ namespace IVConnector.Plugin
                     _pluginReference.LogThis($"Received message: {Vrh.Logger.LogHelper.HexControlChars(message)}", logData, null, Vrh.Logger.LogLevel.Information, this.GetType());
                     ProcessMessage(message, logData, out harnessLogging);
                 }
-                catch (EndpointNotFoundException e)
+                catch (EndpointNotFoundException)
                 {
                     s.Send(Encoding.ASCII.GetBytes("/x15".FromHexOrThis() + "ALM side WCF service currently not available!" + _configuration.Ack));
                     _pluginReference.LogThis($"Message processing error occured!", logData, null, Vrh.Logger.LogLevel.Error, this.GetType());
                     return;
                 }
                 //catch (System.TimeoutException e)
-                catch (System.ServiceModel.CommunicationException e)
+                catch (System.ServiceModel.CommunicationException)
                     {
                     s.Send(Encoding.ASCII.GetBytes("/x15".FromHexOrThis() + "ALM side WCF service response timeout exceeded!" + _configuration.Ack));
                     _pluginReference.LogThis($"WCF timeout eception occured!", logData, null, Vrh.Logger.LogLevel.Error, this.GetType());
@@ -514,7 +519,7 @@ namespace IVConnector.Plugin
                         CallErrorLogging(message, e.Message, 1);
                     }
                 }
-                if (String.IsNullOrEmpty(_configuration.MessageSuffix) || message.Contains(_configuration.MessageSuffix))
+                if (string.IsNullOrEmpty(_configuration.MessageSuffix) || message.Contains(_configuration.MessageSuffix))
                 {
                     s.Send(Encoding.ASCII.GetBytes(_configuration.Ack));
                 }
@@ -554,7 +559,7 @@ namespace IVConnector.Plugin
             string result;
             string messagePrefix = _configuration.MessagePrefix;
             harnessLoging = false;
-            if (!String.IsNullOrEmpty(messagePrefix))
+            if (!string.IsNullOrEmpty(messagePrefix))
             {
                 // Ha van üzenet prefix
                 if (!tmp.StartsWith(messagePrefix))
@@ -569,7 +574,7 @@ namespace IVConnector.Plugin
                 tmp = tmp.Remove(0, messagePrefix.Length);
             }
             string messageSuffix = _configuration.MessageSuffix;
-            if (!String.IsNullOrEmpty(messageSuffix))
+            if (!string.IsNullOrEmpty(messageSuffix))
             {
                 // Ha van üzenet postfix
                 if (!tmp.EndsWith(messageSuffix))
@@ -586,7 +591,7 @@ namespace IVConnector.Plugin
             string ivIdSeparator = _configuration.IDSeparator;
             string assemblyLineId = null;
             string ivId = null;
-            if (!String.IsNullOrEmpty(ivIdSeparator))
+            if (!string.IsNullOrEmpty(ivIdSeparator))
             {
                 //string[] parts = tmp.Split(new string[] { ivIdSeparator }, StringSplitOptions.None);
                 //if (parts.Length > 2)
@@ -604,7 +609,7 @@ namespace IVConnector.Plugin
                 if (parts.Length == 1)
                 {
                     ivId = parts[0];
-                    tmp = String.Empty;
+                    tmp = string.Empty;
                 }
                 if (parts.Length == 2)
                 {
@@ -653,7 +658,7 @@ namespace IVConnector.Plugin
                 }
                 no++;
             }
-            if (_configuration.MessageFormat == MessageFormat.ByName && String.IsNullOrEmpty(assemblyLineId))
+            if (_configuration.MessageFormat == MessageFormat.ByName && string.IsNullOrEmpty(assemblyLineId))
             {
                 var prline = inputParameters.FirstOrDefault(x => x.Name.ToUpper() == "PRLINE");
                 if (prline != null)
@@ -672,7 +677,7 @@ namespace IVConnector.Plugin
                 return result;
                 ///throw new Exception($"Intervention definition not found this message id: {Vrh.Logger.LogHelper.HexControlChars(ivId)}! Processed message {Vrh.Logger.LogHelper.HexControlChars(message)}");
             }
-            if (String.IsNullOrEmpty(assemblyLineId))
+            if (string.IsNullOrEmpty(assemblyLineId))
             {
                 result = $"Processing failed! Assembly line id not present in received message.";
                 logData.Add("Received message", Vrh.Logger.LogHelper.HexControlChars(message));
@@ -694,10 +699,12 @@ namespace IVConnector.Plugin
                 if (externalSystemId != null)
                 {
                     intervention.Name = "TranslateId";
-                    intervention.Parameters = new Dictionary<string, object>();
-                    intervention.Parameters.Add("EntityType", "ASLINE");
-                    intervention.Parameters.Add("ExternalSystem", externalSystemId.Value);
-                    intervention.Parameters.Add("fId", assemblyLineId);
+                    intervention.Parameters = new Dictionary<string, object>
+                    {
+                        { "EntityType", "ASLINE" },
+                        { "ExternalSystem", externalSystemId.Value },
+                        { "fId", assemblyLineId }
+                    };
                     string resultId;
                     try
                     {
@@ -716,7 +723,7 @@ namespace IVConnector.Plugin
                         return result;
                         /// throw new Exception($"Unknown Assembly line external identifyer (or some other error in requesting IdTranslation): {assemblyLineId}! Processed message {Vrh.Logger.LogHelper.HexControlChars(message)}");
                     }
-                    if (!Int32.TryParse(resultId, out asId)) { asId = -1; }
+                    if (!int.TryParse(resultId, out asId)) { asId = -1; }
                 }
                 if (asId == -1)
                 {
@@ -778,14 +785,14 @@ namespace IVConnector.Plugin
         /// <returns>iv paraméter lista</returns>
         private Dictionary<string, object> GetParameters(InterventionDefination ivDef, DefinedMessage msgDef, List<Parameter> inputParameters)
         {
-            var returnParameters = new Dictionary<string, Object>();
+            var returnParameters = new Dictionary<string, object>();
             int i = 0;
             foreach (var item in ivDef.ParameterList)
             {
                 ParameterDefinition parameter = (ParameterDefinition)item;
-                Object parameterValue;
+                object parameterValue;
                 string inputStr = GetStringParameterValue(parameter, msgDef, inputParameters, i);
-                if (!String.IsNullOrEmpty(inputStr))
+                if (!string.IsNullOrEmpty(inputStr))
                 {
                     switch (((DataType)parameter.ParameterType))
                     {
@@ -831,7 +838,7 @@ namespace IVConnector.Plugin
                 {
                     if ((DataType) parameter.ParameterType == DataType.String)
                     {
-                        returnParameters.Add(parameter.Name, String.Empty);
+                        returnParameters.Add(parameter.Name, string.Empty);
                     }
                     else
                     {
@@ -874,7 +881,7 @@ namespace IVConnector.Plugin
                     }
                 }
             }
-            return String.Empty;
+            return string.Empty;
         }
 
         /// <summary>
@@ -897,7 +904,7 @@ namespace IVConnector.Plugin
                 if (splitedName.Count() > 1)
                 {
                     string key = splitedName[1];
-                    if (key == String.Format("{0})", assemblyLineId) || name == assemblyLineId)
+                    if (key == string.Format("{0})", assemblyLineId) || name == assemblyLineId)
                     {
                         asId = item.ObjectID;
                         break;
@@ -922,7 +929,7 @@ namespace IVConnector.Plugin
                 { "ConfigProcessor class", e.ConfigProcessor },
                 { "Config file", e.ConfigFile },
             };
-            _pluginReference.LogThis(String.Format($"Configuration issue: {0}", e.Message), data, e.Exception, level);
+            _pluginReference.LogThis(string.Format($"Configuration issue: {0}", e.Message), data, e.Exception, level);
         }
 
         /// <summary>
@@ -937,12 +944,12 @@ namespace IVConnector.Plugin
         /// <summary>
         /// TCP socket timeout
         /// </summary>
-        private static int _socketTimeout = 5000;
+        private static readonly int _socketTimeout = 5000;
 
         /// <summary>
         /// bejövő üenet méret
         /// </summary>
-        private static int _maxReceiveBufferSize = 200;
+        private static readonly int _maxReceiveBufferSize = 200;
 
         /// <summary>
         /// Folymatot futtató szál
@@ -964,7 +971,7 @@ namespace IVConnector.Plugin
         /// </summary>
         private TcpListener _listener;
 
-        private byte[] _buffer = new byte[_maxReceiveBufferSize];
+        private readonly byte[] _buffer = new byte[_maxReceiveBufferSize];
 
         /// <summary>
         /// Jelzi, hogy a connector nincs elindított állapotban
