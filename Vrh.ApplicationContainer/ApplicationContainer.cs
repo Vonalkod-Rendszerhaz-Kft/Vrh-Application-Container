@@ -45,6 +45,8 @@ namespace Vrh.ApplicationContainer
             }
             _config = new ApplicationContainerConfig(configFile);
             _config.ConfigProcessorEvent += _config_ConfigProcessorEvent;
+
+            
             _errorStack.Capacity = _config.MessageStackSize;
             _infoStack.Capacity = _config.MessageStackSize;
             LoadInstanceFactoryPlugin();
