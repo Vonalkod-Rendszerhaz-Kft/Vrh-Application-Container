@@ -22,10 +22,7 @@ namespace IVServiceWatchdog
         /// <summary>
         /// Constructor
         /// </summary>
-        private IVServiceWatchdogPlugin()
-        {
-            EndLoad();
-        }
+        private IVServiceWatchdogPlugin() {    EndLoad();    }
 
         /// <summary>
         /// Factory
@@ -45,40 +42,37 @@ namespace IVServiceWatchdog
         /// </summary>
         public override void Start()
         {
-            if (MyStatus == PluginStateEnum.Starting || MyStatus == PluginStateEnum.Running)
-            {
-                return;
-            }
+            if (MyStatus == PluginStateEnum.Starting || MyStatus == PluginStateEnum.Running)  {    return;    }
             BeginStart();
             try
             {
                 // Implement Start logic here 
                 string configParameterFile = _myData.InstanceConfig;
-                if (String.IsNullOrEmpty(configParameterFile))
-                {
-                    configParameterFile = _myData.Type.PluginConfig;
-                }
+                if (string.IsNullOrEmpty(configParameterFile)) {   configParameterFile = _myData.Type.PluginConfig;   }
                 _errorCount = 0;
                 _configuration = new IVServiceWatchdogParameterFileProcessor(configParameterFile);
                 _configuration.ConfigProcessorEvent += ConfigProcessorEvent;
                 _lazyRedisConnection = new Lazy<ConnectionMultiplexer>(RedisConnectionInitializer);
 
                 ThreadStart ts = new ThreadStart(WatchdogProcess);
-                _process = new Thread(ts);
-                _process.Name = String.Format("Thread ({0})", _myData.Id);
+                _process = new Thread(ts) {   Name = string.Format("Thread ({0})", _myData.Id)   };
                 _process.Start();
                 if (_configuration.CheckInterval > 0)
                 {
-                    _timer = new System.Timers.Timer(_configuration.CheckInterval);
+                    int timervalue = _configuration.CheckInterval;
+                    if (_configuration.StartDelayTime > TimeSpan.Zero)
+                    {
+                        timervalue += Convert.ToInt32(_configuration.StartDelayTime.TotalMilliseconds);
+                        LogThis($"Check timer first check delayed with {_configuration.StartDelayTime}", null, null, LogLevel.Information, this.GetType());
+                    }
+                    _timer = new System.Timers.Timer(timervalue);
                     _timer.Elapsed += CheckTimeElapsed;
                     _timer.Start();
+                    LogThis($"Check timer first start with timeout {_timer.Interval}", null, null, LogLevel.Information, this.GetType());
                 }
                 base.Start();
             }
-            catch (Exception ex)
-            {
-                SetErrorState(ex);
-            }
+            catch (Exception ex) {    SetErrorState(ex);    }
         }
 
         /// <summary>
@@ -184,7 +178,9 @@ namespace IVServiceWatchdog
                         }
                         finally
                         {
+                            _timer.Interval = _configuration.CheckInterval;
                             _timer.Start();
+                            LogThis($"Check timer restart with timeout {_timer.Interval}", null, null, LogLevel.Information, this.GetType());
                         }
                     }
                 }
@@ -310,6 +306,7 @@ namespace IVServiceWatchdog
             if (_configuration.MinimalResponseTime.TotalMilliseconds <= 0) { return false; }
             Dictionary<string, string> logData = new Dictionary<string, string>();
             logData.Add("Service name", _configuration.WindowsServiceName);
+            logData.Add("Maximum response Time", _configuration.MinimalResponseTime.ToString());
             try
             {
                 InterventionServiceClient interventionService = new InterventionServiceClient();
@@ -317,7 +314,6 @@ namespace IVServiceWatchdog
                 var response = interventionService.GetInterventionedObject(null);
                 TimeSpan responseTime = DateTime.UtcNow.Subtract(requestTime);
                 logData.Add("Actual response Time", responseTime.ToString());
-                logData.Add("Maximum response Time", _configuration.MinimalResponseTime.ToString());
                 if (_configuration.MinimalResponseTime < responseTime)
                 {
                     string exceptiontext = $"ERROR occured! Actual response time: {responseTime}. Allowed maximum response time: {_configuration.MinimalResponseTime}";
@@ -329,6 +325,11 @@ namespace IVServiceWatchdog
                     LogThis($"is OK!", logData, null, LogLevel.Verbose, this.GetType());
                     return false;
                 }
+            }
+            catch (System.ServiceModel.EndpointNotFoundException ex)
+            {
+                LogThis($"Nem található az 'InterventionService' WCF végpont!", logData, null, LogLevel.Error, this.GetType());
+                return true;
             }
             catch (Exception ex)
             {

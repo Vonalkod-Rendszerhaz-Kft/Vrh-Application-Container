@@ -60,16 +60,30 @@ namespace IVServiceWatchdog
         }
 
         /// <summary>
+        /// Indulás után ennyi ideig nem végez ellenőrzést
+        /// </summary>
+        public TimeSpan StartDelayTime
+        {
+            get
+            {
+                string strValue = GetElementValue<string>(GetXElement(STARTDELAYTIME_ELEMENT_NAME), "00:03:00");
+                TimeSpan Interval = new TimeSpan(0, 3, 0);
+                TimeSpan.TryParse(strValue, out Interval);
+                return Interval;
+            }
+        }
+
+        /// <summary>
         /// Ha ennyi ideig nem lép fel hiba, akkor nullázódik a hibaszámláló (elévülnek a korábbi hibák)
         /// </summary>
         public TimeSpan LapsesInterval
         {
             get
             {
-                string strValue = GetElementValue<string>(GetXElement(LAPSES_ELEMENT_NAME), "04:07:00");
-                TimeSpan lapsesInterval = new TimeSpan(4, 7, 0);
-                TimeSpan.TryParse(strValue, out lapsesInterval);
-                return lapsesInterval;
+                string strValue = GetElementValue<string>(GetXElement(LAPSES_ELEMENT_NAME), "00:07:00");
+                TimeSpan Interval = new TimeSpan(0, 7, 0);
+                TimeSpan.TryParse(strValue, out Interval);
+                return Interval;
             }
         }
 
@@ -170,6 +184,7 @@ namespace IVServiceWatchdog
         private const string MINIMALRESPONSETIME_ELEMENT_NAME = "MinimalResponseTime";
         private const string MAXERRORCOUNT_ELEMENT_NAME = "MaxErrorCount";
         private const string LAPSES_ELEMENT_NAME = "Lapses";
+        private const string STARTDELAYTIME_ELEMENT_NAME = "StartDelayTime";
         private const string CREATEDUMP_ELEMENT_NAME = "CreateDump";
         private const string KILLPROCESS_ELEMENT_NAME = "KillProcess";
         private const string WINDOWSSERVICENAME_ELEMENT_NAME = "WindowsServiceName";
