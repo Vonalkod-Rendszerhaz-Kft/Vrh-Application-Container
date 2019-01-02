@@ -205,53 +205,33 @@ namespace Vrh.ApplicationContainer
         public void LogThis(string message, Dictionary<string, string> dataIn, Exception ex, Vrh.Logger.LogLevel level, Type type = null, [CallerMemberName]string caller = "", [CallerLineNumber]int line = 0)
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
-            if (dataIn != null)
-            {
-                foreach (var item in dataIn)
-                {
-                    data.Add(item.Key, item.Value);
-                }
-            }
+            if (dataIn != null) {    foreach (var item in dataIn) {   data.Add(item.Key, item.Value);   }    }
             VrhLogger.Log<string>(message, data, ex, level, type != null ? type : this.GetType(), caller, line);
-            MessageStackEntry e = new MessageStackEntry()
-            {
-                Body = message,
-                Data = data,
-                TimeStamp = DateTime.UtcNow,
-            };
+
+
+            // itt azért kell a data2 (korábban itt ehelyett is a data volt használatban), mert ha ugyenezt a data-ban csinálnánk, 
+            // akkor a referencia átadás miatt a fenti VrhLogger.Log hívásnak átadott paraméterben, és ezáltal az ott keletkezett log rekorban is látszódna a változás!!!!!
+
+            Dictionary<string, string> data2 = new Dictionary<string, string>();
+            if (dataIn != null) { foreach (var item in dataIn) { data2.Add(item.Key, item.Value); } }
+            if (ex != null) {    data2.Add("Exception", Vrh.Logger.LogHelper.GetExceptionInfo(ex));    }
+
+            MessageStackEntry e = new MessageStackEntry() {   Body = message,Data = data2,TimeStamp = DateTime.UtcNow     };
+
             switch (level)
             {
                 case Vrh.Logger.LogLevel.Information:
                 case Vrh.Logger.LogLevel.Warning:
-                    if (ex != null)
-                    {
-                        if (e.Data == null)
-                        {
-                            e.Data = new Dictionary<string, string>();
-                        }
-                        e.Data.Add("Exception", Vrh.Logger.LogHelper.GetExceptionInfo(ex));
-                    }
                     e.Type = level == Vrh.Logger.LogLevel.Warning ? Level.Warning : Level.Info;
-                    lock (_infos)
-                    {
-                        _infos.DropItem(e);
-                    }
+                    lock (_infos) {   _infos.DropItem(e);   }
                     break;
                 case Vrh.Logger.LogLevel.Error:
                 case Vrh.Logger.LogLevel.Fatal:
-                    if (e.Data == null)
-                    {
-                        e.Data = new Dictionary<string, string>();
-                    }
-                    e.Data.Add("Exception", Vrh.Logger.LogHelper.GetExceptionInfo(ex));
                     e.Type = level == Vrh.Logger.LogLevel.Fatal ? Level.FatalError : Level.Error;
-                    lock (_errors)
-                    {
-                        _errors.DropItem(e);
-                    }
+                    lock (_errors) {    _errors.DropItem(e);    }
                     break;
                 default:
-                    return;
+                    break;
             }
         }
 
