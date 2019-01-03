@@ -42,52 +42,19 @@ namespace Service.Starter
         /// </summary>
         public override void Start()
         {
-            if (MyStatus == PluginStateEnum.Starting || MyStatus == PluginStateEnum.Running)
-            {
-                return;
-            }
+            if (MyStatus == PluginStateEnum.Starting || MyStatus == PluginStateEnum.Running) {    return;    }
             BeginStart();
             try
             {
-                // Implement Start logic here 
                 string configParameterFile = _myData.InstanceConfig;
-                if (string.IsNullOrEmpty(configParameterFile))
-                {
-                    configParameterFile = _myData.Type.PluginConfig;
-                }
+                if (string.IsNullOrEmpty(configParameterFile))  {    configParameterFile = _myData.Type.PluginConfig;   }
                 Configuration = new ServiceStarterParameterFileProcessor(configParameterFile);
                 Configuration.ConfigProcessorEvent += ConfigProcessorEvent;
-                _lazyRedisConnection = new Lazy<ConnectionMultiplexer>(() =>
-                {
-                    if (!string.IsNullOrEmpty(Configuration.RedisConnection))
-                    {
-                        try
-                        {
-                            var cm = ConnectionMultiplexer.Connect(ConfigurationOptions.Parse(Configuration.RedisConnection, true));
-                            cm.PreserveAsyncOrder = false;
-                            return cm;
-                        }
-                        catch (Exception ex)
-                        {
-                            LogThis($"Error to connect to Redis server: {Configuration.RedisConnection}", null, ex, LogLevel.Fatal, this.GetType());
-                            return null;
-                        }
-                    }
-                    else
-                    {
-                        return null;
-                    }
-                });
-                foreach (var service in Configuration.AllControlledServices)
-                {
-                    _controlledServices.Add(new ControlledService(service, this));
-                }
+                _lazyRedisConnection = new Lazy<ConnectionMultiplexer>(RedisConnectionInitializer);
+                foreach (var service in Configuration.AllControlledServices) {   _controlledServices.Add(new ControlledService(service, this));    }
                 base.Start();
             }
-            catch (Exception ex)
-            {
-                SetErrorState(ex);
-            }
+            catch (Exception ex) {   SetErrorState(ex);   }
         }
 
         /// <summary>
@@ -123,17 +90,6 @@ namespace Service.Starter
             catch (Exception ex)
             {
                 SetErrorState(ex);
-            }
-        }
-
-        /// <summary>
-        /// Redis connection
-        /// </summary>
-        internal ConnectionMultiplexer RedisConnection
-        {
-            get
-            {
-                return _lazyRedisConnection.Value;
             }
         }
 
@@ -174,6 +130,36 @@ namespace Service.Starter
         /// Lazy StackExchange.Redis connection multiplexer
         /// </summary>
         private Lazy<ConnectionMultiplexer> _lazyRedisConnection;
+        /// <summary>
+        /// Redis connection
+        /// </summary>
+        internal ConnectionMultiplexer RedisConnection
+        {
+            get { return _lazyRedisConnection.Value; }
+        }
+        private ConnectionMultiplexer RedisConnectionInitializer()
+        {
+            if (!string.IsNullOrEmpty(Configuration.RedisConnection))
+            {
+                for (int i = 1; i < Configuration.RedisconnectRetries; i++)
+                {
+                    try
+                    {
+                        var cm = ConnectionMultiplexer.Connect(ConfigurationOptions.Parse(Configuration.RedisConnection, true));
+                        cm.PreserveAsyncOrder = false;
+                        return cm;
+                    }
+                    catch (Exception ex) { LogThis($"Attempting ({i} of {Configuration.RedisconnectRetries}) to establish connection to Redis server {Configuration.RedisConnection}", null, ex, LogLevel.Warning, this.GetType()); }
+                }
+                LogThis($"Error to connect to Redis server {Configuration.RedisConnection}. All {Configuration.RedisconnectRetries} connect attempt failed.", null, null, LogLevel.Fatal, this.GetType());
+                return null;
+            }
+            else
+            {
+                LogThis($"No Redis connection string is specified. No connection to Redis server {Configuration.RedisConnection} is established.", null, null, LogLevel.Fatal, this.GetType());
+                return null;
+            }
+        }
 
         #region IDisposable Support
         protected override void Dispose(bool disposing)

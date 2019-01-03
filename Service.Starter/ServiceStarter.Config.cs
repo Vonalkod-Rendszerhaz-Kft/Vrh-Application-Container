@@ -132,9 +132,17 @@ namespace Service.Starter
         /// <returns></returns>
         public string RedisConnection
         {
+            get {   return GetElementValue<string>(GetXElement(REDISCONNECTION_ELEMENT_NAME), String.Empty);    }
+        }
+        public int RedisconnectRetries
+        {
             get
             {
-                return GetElementValue<string>(GetXElement(REDISCONNECTION_ELEMENT_NAME), String.Empty);
+                var e = GetXElement(REDISCONNECTION_ELEMENT_NAME); if (e == null) { return 1; }
+                var a = e.Attribute(RETRIES_ATTRIBUTE_NAME_IN_REDISCONNECTION_ELEMENT); if (a == null) { return 1; }
+                if (!int.TryParse(a.Value, out int result)) { result = 1; };
+                if (result < 1) { result = 1; }
+                return result;
             }
         }
 
@@ -159,6 +167,7 @@ namespace Service.Starter
         private const string CREATEREDISSEMAFOR_ATTRIBUTE_IN_SERVICE_ELEMENT = "CreateRedisSemafor";
         // RedisConnection
         private const string REDISCONNECTION_ELEMENT_NAME = "RedisConnection";
+        private const string RETRIES_ATTRIBUTE_NAME_IN_REDISCONNECTION_ELEMENT = "Retries";
 
         #endregion Private Members
 

@@ -393,7 +393,7 @@ namespace IVServiceWatchdog
 
                 long memory1 = 0; long memory2 = 0; long memory3 = 0;
                 long summemory1 = 0; long summemory2 = 0; long summemory3 = 0; long maxmemory1 = 0;
-                PerformanceCounter pc = ProcessPerformanceCounter.GetPerfCounterForProcessId(pid, "Working Set - Private");
+                PerformanceCounter pc = ProcessPerformanceCounter.GetPerfCounterForProcessId(pid, "Process", "Working Set - Private");
                 for (int i = 1; i <= _configuration.MemoryUsageSamples; i++)
                 {
                     if (i > 1) { Thread.Sleep(1000); process.Refresh(); }
@@ -451,7 +451,7 @@ namespace IVServiceWatchdog
                 float cpuusagefloat = 0;
                 float sumusagefloat = 0;
                 float maxcpuusagefloat = 0;
-                PerformanceCounter pc = ProcessPerformanceCounter.GetPerfCounterForProcessId(pid, "% Processor Time");
+                PerformanceCounter pc = ProcessPerformanceCounter.GetPerfCounterForProcessId(pid, "Process", "% Processor Time");
                 for (int i = 1; i <= _configuration.CPUusageSamples; i++)
                 {
                     if (i > 1) { Thread.Sleep(50); process.Refresh(); }
@@ -662,12 +662,12 @@ namespace IVServiceWatchdog
     }
     public class ProcessPerformanceCounter
     {
-        public static PerformanceCounter GetPerfCounterForProcessId(int processId, string processCounterName = "% Processor Time")
+        public static PerformanceCounter GetPerfCounterForProcessId(int processId, string processcounterCategory, string processCounterName)
         {
             string instance = GetInstanceNameForProcessId(processId);
             if (string.IsNullOrEmpty(instance)) {   return null;   }
 
-            return new PerformanceCounter("Process", processCounterName, instance);
+            return new PerformanceCounter(processcounterCategory, processCounterName, instance);
         }
 
         public static string GetInstanceNameForProcessId(int processId)
