@@ -598,22 +598,24 @@ namespace IVServiceWatchdog
         /// <returns></returns>
         private ConnectionMultiplexer RedisConnectionInitializer()
         {
-            if (!String.IsNullOrEmpty(_configuration.RedisConnection))
+            if (!string.IsNullOrEmpty(_configuration.RedisConnection))
             {
-                try
+                for (int i=1;i<_configuration.RedisconnectRetries;i++)
                 {
-                    var cm = ConnectionMultiplexer.Connect(ConfigurationOptions.Parse(_configuration.RedisConnection, true));
-                    cm.PreserveAsyncOrder = false;
-                    return cm;
+                    try
+                    {
+                        var cm = ConnectionMultiplexer.Connect(ConfigurationOptions.Parse(_configuration.RedisConnection, true));
+                        cm.PreserveAsyncOrder = false;
+                        return cm;
+                    }
+                    catch (Exception ex) {   LogThis($"Attempting ({i} of {_configuration.RedisconnectRetries}) to establish connection to Redis server {_configuration.RedisConnection}", null, ex, LogLevel.Warning, this.GetType());   }
                 }
-                catch (Exception ex)
-                {
-                    LogThis($"Error in connect to Redis server: {_configuration.RedisConnection}", null, ex, LogLevel.Fatal, this.GetType());
-                    return null;
-                }
+                LogThis($"Error to connect to Redis server {_configuration.RedisConnection}. All {_configuration.RedisconnectRetries} connect attempt failed.", null, null, LogLevel.Fatal, this.GetType());
+                return null;
             }
             else
             {
+                LogThis($"No Redis connection string is specified. No connection to Redis server {_configuration.RedisConnection} is established.", null, null, LogLevel.Fatal, this.GetType());
                 return null;
             }
         }

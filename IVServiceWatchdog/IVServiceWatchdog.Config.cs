@@ -28,8 +28,7 @@ namespace IVServiceWatchdog
             get
             {
                 string strValue = GetElementValue<string>(GetXElement(CHECKINTERVAL_ELEMENT_NAME), "00:02:00");
-                TimeSpan interval = new TimeSpan(0, 2, 0);
-                TimeSpan.TryParse(strValue, out interval);
+                if (!TimeSpan.TryParse(strValue, out TimeSpan interval)) { interval = new TimeSpan(0, 2, 0); };
                 return (int)interval.TotalMilliseconds;
             }
         }
@@ -53,8 +52,7 @@ namespace IVServiceWatchdog
             get
             {
                 string strValue = GetElementValue<string>(GetXElement(STARTDELAYTIME_ELEMENT_NAME), "00:03:00");
-                TimeSpan Interval = new TimeSpan(0, 3, 0);
-                TimeSpan.TryParse(strValue, out Interval);
+                if (!TimeSpan.TryParse(strValue, out TimeSpan Interval)) { Interval = new TimeSpan(0, 3, 0); };
                 return Interval;
             }
         }
@@ -67,8 +65,7 @@ namespace IVServiceWatchdog
             get
             {
                 string strValue = GetElementValue<string>(GetXElement(LAPSES_ELEMENT_NAME), "00:07:00");
-                TimeSpan Interval = new TimeSpan(0, 7, 0);
-                TimeSpan.TryParse(strValue, out Interval);
+                if (!TimeSpan.TryParse(strValue, out TimeSpan Interval)) { Interval = new TimeSpan(0, 7, 0); };
                 return Interval;
             }
         }
@@ -138,7 +135,17 @@ namespace IVServiceWatchdog
                 return GetElementValue<string>(GetXElement(REDISCONNECTION_ELEMENT_NAME), String.Empty);
             }
         }
-
+        public int RedisconnectRetries
+        {
+            get
+            {
+                var e = GetXElement(REDISCONNECTION_ELEMENT_NAME); if (e == null) { return 1; }
+                var a = e.Attribute(RETRIES_ATTRIBUTE_NAME_IN_REDISCONNECTION_ELEMENT); if (a == null) { return 1; }
+                if (!int.TryParse(a.Value, out int result)) { result = 1; };
+                if (result < 1) { result = 1; }
+                return result;
+            }
+        }
         /// <summary>
         /// Ennyi lehet a szolgáltatást hostoló procesben maximum a szálak száma
         /// </summary>
@@ -148,8 +155,8 @@ namespace IVServiceWatchdog
             {
                 var e = GetXElement(CHECKTHREADUSAGE_ELEMENT_NAME); if (e == null) { return 0; }
                 var a = e.Attribute(MAXIMUM_ATTRIBUTE_NAME); if (a == null) { return 0; }
-                int.TryParse(a.Value, out int maxthreadusage);
-                if (maxthreadusage < 0) { return 0; }
+                if (!int.TryParse(a.Value, out int maxthreadusage)) { maxthreadusage = 0; };
+                if (maxthreadusage < 0) { maxthreadusage=0; }
                 return maxthreadusage;
             }
         }
@@ -172,8 +179,8 @@ namespace IVServiceWatchdog
             {
                 var e = GetXElement(CHECKMEMORYUSAGE_ELEMENT_NAME); if (e == null) { return 0; }
                 var a = e.Attribute(MAXIMUM_ATTRIBUTE_NAME); if (a == null) { return 0; }
-                int.TryParse(a.Value, out int maxmemoryusage);
-                if (maxmemoryusage < 0) { return 0; }
+                if (!int.TryParse(a.Value, out int maxmemoryusage)) { maxmemoryusage = 0; };
+                if (maxmemoryusage < 0) { maxmemoryusage = 0; }
                 return maxmemoryusage;
             }
         }
@@ -183,8 +190,8 @@ namespace IVServiceWatchdog
             {
                 var e = GetXElement(CHECKMEMORYUSAGE_ELEMENT_NAME); if (e == null) { return 1; }
                 var a = e.Attribute(SAMPLES_ATTRIBUTE_NAME); if (a == null) { return 1; }
-                int.TryParse(a.Value, out int samples);
-                if (samples < 1) { return 1; }
+                if (!int.TryParse(a.Value, out int samples)) { samples = 1; };
+                if (samples < 1) { samples = 1; }
                 return samples;
             }
         }
@@ -207,8 +214,8 @@ namespace IVServiceWatchdog
             {
                 var e = GetXElement(CHECKCPUUSAGE_ELEMENT_NAME); if (e == null) { return 0; }
                 var a = e.Attribute(MAXIMUM_ATTRIBUTE_NAME); if (a == null) { return 0; }
-                int.TryParse(a.Value, out int maxcpuusage);
-                if (maxcpuusage < 0) { return 0; }
+                if (!int.TryParse(a.Value, out int maxcpuusage)) { maxcpuusage = 0; };
+                if (maxcpuusage < 0) { maxcpuusage = 0; }
                 return maxcpuusage;
             }
         }
@@ -218,8 +225,8 @@ namespace IVServiceWatchdog
             {
                 var e = GetXElement(CHECKCPUUSAGE_ELEMENT_NAME); if (e == null) { return 1; }
                 var a = e.Attribute(SAMPLES_ATTRIBUTE_NAME); if (a == null) { return 1; }
-                int.TryParse(a.Value, out int samples);
-                if (samples < 1) { return 1; }
+                if (!int.TryParse(a.Value, out int samples)) { samples = 1; };
+                if (samples < 1) { samples = 1; }
                 return samples;
             }
         }
@@ -242,8 +249,7 @@ namespace IVServiceWatchdog
             {
                 var e = GetXElement(CHECKWCFRESPONSETIME_ELEMENT_NAME); if (e == null) { return new TimeSpan(0, 0, 0); }
                 var a = GetXElement(CHECKWCFRESPONSETIME_ELEMENT_NAME).Attribute(MAXIMUM_ATTRIBUTE_NAME); if (a == null) { return new TimeSpan(0, 0, 0); }
-                TimeSpan maximumResponseTime = new TimeSpan(0, 0, 0);
-                TimeSpan.TryParse(a.Value, out maximumResponseTime);
+                if (!TimeSpan.TryParse(a.Value, out TimeSpan maximumResponseTime)) { maximumResponseTime = new TimeSpan(0, 0, 0); };
                 return maximumResponseTime;
             }
         }
@@ -283,7 +289,7 @@ namespace IVServiceWatchdog
         private const string PROCDUMPATH_ELEMENT_NAME = "ProcdumpPath";
         private const string DUMPTARGETPATH_ELEMENT_NAME = "DumpTargetPath";
         private const string REDISCONNECTION_ELEMENT_NAME = "RedisConnection";
-
+        private const string RETRIES_ATTRIBUTE_NAME_IN_REDISCONNECTION_ELEMENT = "Retries";
         private const string CHECKWCFRESPONSETIME_ELEMENT_NAME = "CheckWCFResponseTime";
         private const string CHECKTHREADUSAGE_ELEMENT_NAME = "CheckThreadUsage";
         private const string CHECKMEMORYUSAGE_ELEMENT_NAME = "CheckMemoryUsage";
