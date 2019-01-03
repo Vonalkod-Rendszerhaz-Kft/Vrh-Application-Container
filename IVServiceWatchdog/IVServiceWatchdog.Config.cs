@@ -35,20 +35,6 @@ namespace IVServiceWatchdog
         }
 
         /// <summary>
-        /// A szolgáltatástól megköveztelt minimális válaszidő
-        /// </summary>
-        public TimeSpan MinimalResponseTime
-        {
-            get
-            {
-                string strValue = GetElementValue<string>(GetXElement(MINIMALRESPONSETIME_ELEMENT_NAME), "00:00:00");
-                TimeSpan minimalResponseTime = new TimeSpan(0, 0, 0);
-                TimeSpan.TryParse(strValue, out minimalResponseTime);
-                return minimalResponseTime;
-            }
-        }
-
-        /// <summary>
         /// Maximálisan megengedett hibaszám
         /// </summary>
         public int MaxErrorCount
@@ -90,7 +76,7 @@ namespace IVServiceWatchdog
         /// <summary>
         /// Jelzi, hogy dump fájltr kell készíteni, amikor hibát detektál
         /// </summary>
-        public bool CreateDumpNeed
+        public bool CreateDump
         {
             get
             {
@@ -101,7 +87,7 @@ namespace IVServiceWatchdog
         /// <summary>
         /// Jeltzi, hogy ha hiba lép fell, akkor ki kell-e lőni a processt
         /// </summary>
-        public bool KillProcessNeed
+        public bool KillProcess
         {
             get
             {
@@ -156,11 +142,118 @@ namespace IVServiceWatchdog
         /// <summary>
         /// Ennyi lehet a szolgáltatást hostoló procesben maximum a szálak száma
         /// </summary>
-        public int MaximumAlloewedThreadNumber
+        public int MaximumAllowedThreadNumber
         {
             get
             {
-                return GetElementValue<int>(GetXElement(MAXIMUMALLOWEDTHREADNUMBER_ELEMENT_NAME), 0);
+                var e = GetXElement(CHECKTHREADUSAGE_ELEMENT_NAME); if (e == null) { return 0; }
+                var a = e.Attribute(MAXIMUM_ATTRIBUTE_NAME); if (a == null) { return 0; }
+                int.TryParse(a.Value, out int maxthreadusage);
+                if (maxthreadusage < 0) { return 0; }
+                return maxthreadusage;
+            }
+        }
+        public bool CheckThreadNumberEnabled
+        {
+            get
+            {
+                var e = GetXElement(CHECKTHREADUSAGE_ELEMENT_NAME); if (e == null) { return false; }
+                var a = e.Attribute(ENABLED_ATTRIBUTE_NAME); if (a == null) { return true; }
+                return a.Value.ToUpper() != "FALSE";
+            }
+        }
+
+        /// <summary>
+        /// Ennyi lehet a szolgáltatást hostoló procesben maximum a szálak száma
+        /// </summary>
+        public int MaximumAllowedMemory
+        {
+            get
+            {
+                var e = GetXElement(CHECKMEMORYUSAGE_ELEMENT_NAME); if (e == null) { return 0; }
+                var a = e.Attribute(MAXIMUM_ATTRIBUTE_NAME); if (a == null) { return 0; }
+                int.TryParse(a.Value, out int maxmemoryusage);
+                if (maxmemoryusage < 0) { return 0; }
+                return maxmemoryusage;
+            }
+        }
+        public int MemoryUsageSamples
+        {
+            get
+            {
+                var e = GetXElement(CHECKMEMORYUSAGE_ELEMENT_NAME); if (e == null) { return 1; }
+                var a = e.Attribute(SAMPLES_ATTRIBUTE_NAME); if (a == null) { return 1; }
+                int.TryParse(a.Value, out int samples);
+                if (samples < 1) { return 1; }
+                return samples;
+            }
+        }
+        public bool CheckMemoryUsageEnabled
+        {
+            get
+            {
+                var e = GetXElement(CHECKMEMORYUSAGE_ELEMENT_NAME); if (e == null) { return false; }
+                var a = e.Attribute(ENABLED_ATTRIBUTE_NAME); if (a == null) { return true; }
+                return a.Value.ToUpper() != "FALSE";
+            }
+        }
+
+        /// <summary>
+        /// Ennyi lehet a szolgáltatást hostoló procesben maximum a szálak száma
+        /// </summary>
+        public int MaximumAllowedCPUusage
+        {
+            get
+            {
+                var e = GetXElement(CHECKCPUUSAGE_ELEMENT_NAME); if (e == null) { return 0; }
+                var a = e.Attribute(MAXIMUM_ATTRIBUTE_NAME); if (a == null) { return 0; }
+                int.TryParse(a.Value, out int maxcpuusage);
+                if (maxcpuusage < 0) { return 0; }
+                return maxcpuusage;
+            }
+        }
+        public int CPUusageSamples
+        {
+            get
+            {
+                var e = GetXElement(CHECKCPUUSAGE_ELEMENT_NAME); if (e == null) { return 1; }
+                var a = e.Attribute(SAMPLES_ATTRIBUTE_NAME); if (a == null) { return 1; }
+                int.TryParse(a.Value, out int samples);
+                if (samples < 1) { return 1; }
+                return samples;
+            }
+        }
+        public bool CheckCPUusageEnabled
+        {
+            get
+            {
+                var e = GetXElement(CHECKCPUUSAGE_ELEMENT_NAME); if (e == null) { return false; }
+                var a = e.Attribute(ENABLED_ATTRIBUTE_NAME); if (a == null) { return true; }
+                return a.Value.ToUpper() != "FALSE";
+            }
+        }
+
+        /// <summary>
+        /// A szolgáltatástól megköveztelt minimális válaszidő
+        /// </summary>
+        public TimeSpan MaxWCFResponseTime
+        {
+            get
+            {
+                var e = GetXElement(CHECKWCFRESPONSETIME_ELEMENT_NAME); if (e == null) { return new TimeSpan(0, 0, 0); }
+                var a = GetXElement(CHECKWCFRESPONSETIME_ELEMENT_NAME).Attribute(MAXIMUM_ATTRIBUTE_NAME); if (a == null) { return new TimeSpan(0, 0, 0); }
+                TimeSpan maximumResponseTime = new TimeSpan(0, 0, 0);
+                TimeSpan.TryParse(a.Value, out maximumResponseTime);
+                return maximumResponseTime;
+            }
+        }
+        public bool CheckWCFResponseTimeEnabled
+        {
+            get
+            {
+                var e = GetXElement(CHECKWCFRESPONSETIME_ELEMENT_NAME); if (e == null) { return false; }
+                var a = e.Attribute(ENABLED_ATTRIBUTE_NAME); if (a == null) { return true; }
+                return a.Value.ToUpper() != "FALSE";
             }
         }
 
@@ -181,7 +274,6 @@ namespace IVServiceWatchdog
 
         //COMMON Config
         private const string CHECKINTERVAL_ELEMENT_NAME = "CheckInterval";
-        private const string MINIMALRESPONSETIME_ELEMENT_NAME = "MinimalResponseTime";
         private const string MAXERRORCOUNT_ELEMENT_NAME = "MaxErrorCount";
         private const string LAPSES_ELEMENT_NAME = "Lapses";
         private const string STARTDELAYTIME_ELEMENT_NAME = "StartDelayTime";
@@ -191,8 +283,14 @@ namespace IVServiceWatchdog
         private const string PROCDUMPATH_ELEMENT_NAME = "ProcdumpPath";
         private const string DUMPTARGETPATH_ELEMENT_NAME = "DumpTargetPath";
         private const string REDISCONNECTION_ELEMENT_NAME = "RedisConnection";
-        private const string MAXIMUMALLOWEDTHREADNUMBER_ELEMENT_NAME = "MaximumAllowedThreadNumber";
 
+        private const string CHECKWCFRESPONSETIME_ELEMENT_NAME = "CheckWCFResponseTime";
+        private const string CHECKTHREADUSAGE_ELEMENT_NAME = "CheckThreadUsage";
+        private const string CHECKMEMORYUSAGE_ELEMENT_NAME = "CheckMemoryUsage";
+        private const string CHECKCPUUSAGE_ELEMENT_NAME = "CheckCPUusage";
+        private const string ENABLED_ATTRIBUTE_NAME = "Enable";
+        private const string MAXIMUM_ATTRIBUTE_NAME = "Maximum";
+        private const string SAMPLES_ATTRIBUTE_NAME = "Samples";
         #endregion Private Members
     }
 }

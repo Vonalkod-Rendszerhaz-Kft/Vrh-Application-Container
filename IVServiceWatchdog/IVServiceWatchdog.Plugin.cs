@@ -174,7 +174,7 @@ namespace IVServiceWatchdog
                     {
                         try
                         {
-                            ProcessHealthCheck();
+                            HealthCheck();
                         }
                         finally
                         {
@@ -192,51 +192,6 @@ namespace IVServiceWatchdog
             logData.Add("disposed", disposedValue.ToString());
             logData.Add("stopped", _stopped.ToString());
             LogThis($"Exited: {Thread.CurrentThread.Name}", logData, null, LogLevel.Debug);
-        }
-
-        /// <summary>
-        /// Ellenőrzi az Intervention szolgáltatás müködőképességét
-        /// </summary>
-        private void ProcessHealthCheck()
-        {
-            if (!HasRedisSemafor())
-            {
-                Dictionary<string, string> logData = new Dictionary<string, string>();
-                logData.Add("Service name", _configuration.WindowsServiceName);
-                Dictionary<string, string> logData2 = new Dictionary<string, string>();
-                LogThis($"Process health check started", logData, null, LogLevel.Verbose, this.GetType());
-
-                bool _anytestError = false;
-                _anytestError = _anytestError || HealthCheck_ResponseTimeMaximumExceeded();
-                _anytestError = _anytestError || HealthCheck_ThreadMaximumExceeded();
-
-                if (_anytestError)
-                {
-                    if (_lastErrorTimeStamp != null)
-                    {
-                        TimeSpan _lastNoIssuePeriodeLength = DateTime.UtcNow.Subtract(_lastErrorTimeStamp.Value);
-                        if (_configuration.LapsesInterval.TotalMilliseconds > 0 && _lastNoIssuePeriodeLength > _configuration.LapsesInterval)
-                        {
-                            logData2.Clear(); logData.ToList().ForEach(x => logData2.Add(x.Key, x.Value));
-                            logData2.Add("No-issue periode length", _lastNoIssuePeriodeLength.ToString());
-                            logData2.Add("Lapse timeout", _configuration.LapsesInterval.ToString());
-                            LogThis($"Failed combined health checks lapsed, counter restarted.", logData2, null, LogLevel.Verbose, this.GetType());
-                            _errorCount = 1;
-                        }
-                    }
-                    _errorCount++;
-                    _lastErrorTimeStamp = DateTime.UtcNow;
-                    logData.Add("Current number of failed checks", $"{_errorCount}");
-                    logData.Add("Maximum number of failed checks", $"{_configuration.MaxErrorCount}");
-                    LogThis($"Combined health check result: ERROR!", logData, null, LogLevel.Error, this.GetType());
-                }
-                else { LogThis($"Combined health check result: OK!", logData, null, LogLevel.Verbose, this.GetType()); }
-
-                if (_errorCount >= _configuration.MaxErrorCount)
-                {
-                    ErrorHandling();
-                }
-            }
         }
 
         /// <summary>
@@ -298,15 +253,64 @@ namespace IVServiceWatchdog
         }
 
         /// <summary>
+        /// Ellenőrzi az Intervention szolgáltatás müködőképességét
+        /// </summary>
+        private void HealthCheck()
+        {
+            if (!HasRedisSemafor())
+            {
+                if (!_configuration.CheckThreadNumberEnabled && !_configuration.CheckMemoryUsageEnabled && !_configuration.CheckCPUusageEnabled && !_configuration.CheckWCFResponseTimeEnabled) { return; }
+
+                Dictionary<string, string> logData = new Dictionary<string, string>();
+                logData.Add("Service name", _configuration.WindowsServiceName);
+                Dictionary<string, string> logData2 = new Dictionary<string, string>();
+                LogThis($"Process health check started", logData, null, LogLevel.Verbose, this.GetType());
+
+                bool _anytestError = false;
+                _anytestError = _anytestError || HealthCheck_ThreadMaximumExceeded();
+                _anytestError = _anytestError || HealthCheck_MemoryMaximumExceeded();
+                _anytestError = _anytestError || HealthCheck_CPUusageMaximumExceeded();
+                _anytestError = _anytestError || HealthCheck_WCFResponseTimeMaximumExceeded();
+
+                if (_anytestError)
+                {
+                    if (_lastErrorTimeStamp != null)
+                    {
+                        TimeSpan _lastNoIssuePeriodeLength = DateTime.UtcNow.Subtract(_lastErrorTimeStamp.Value);
+                        if (_configuration.LapsesInterval.TotalMilliseconds > 0 && _lastNoIssuePeriodeLength > _configuration.LapsesInterval)
+                        {
+                            logData2.Clear(); logData.ToList().ForEach(x => logData2.Add(x.Key, x.Value));
+                            logData2.Add("No-issue periode length", _lastNoIssuePeriodeLength.ToString());
+                            logData2.Add("Lapse timeout", _configuration.LapsesInterval.ToString());
+                            LogThis($"Failed combined health checks lapsed, counter restarted.", logData2, null, LogLevel.Verbose, this.GetType());
+                            _errorCount = 1;
+                        }
+                    }
+                    _errorCount++;
+                    _lastErrorTimeStamp = DateTime.UtcNow;
+                    logData.Add("Current number of failed checks", $"{_errorCount}");
+                    logData.Add("Maximum number of failed checks", $"{_configuration.MaxErrorCount}");
+                    LogThis($"Combined health check result: ERROR!", logData, null, LogLevel.Error, this.GetType());
+                }
+                else { LogThis($"Combined health check result: OK!", logData, null, LogLevel.Verbose, this.GetType()); }
+
+                if (_errorCount >= _configuration.MaxErrorCount)
+                {
+                    ErrorHandling();
+                }
+            }
+        }
+        /// <summary>
         /// Megállapítja, hogy a WCF válaszidő túl hosszú-e
         /// </summary>
         /// <returns></returns>
-        private bool HealthCheck_ResponseTimeMaximumExceeded()
+        private bool HealthCheck_WCFResponseTimeMaximumExceeded()
         {
-            if (_configuration.MinimalResponseTime.TotalMilliseconds <= 0) { return false; }
+            if (!_configuration.CheckWCFResponseTimeEnabled) { return false; }
+            if (_configuration.MaxWCFResponseTime.TotalMilliseconds <= 0) { return false; }
             Dictionary<string, string> logData = new Dictionary<string, string>();
             logData.Add("Service name", _configuration.WindowsServiceName);
-            logData.Add("Maximum response Time", _configuration.MinimalResponseTime.ToString());
+            logData.Add("Maximum response Time", _configuration.MaxWCFResponseTime.ToString());
             try
             {
                 InterventionServiceClient interventionService = new InterventionServiceClient();
@@ -314,15 +318,15 @@ namespace IVServiceWatchdog
                 var response = interventionService.GetInterventionedObject(null);
                 TimeSpan responseTime = DateTime.UtcNow.Subtract(requestTime);
                 logData.Add("Actual response Time", responseTime.ToString());
-                if (_configuration.MinimalResponseTime < responseTime)
+                if (_configuration.MaxWCFResponseTime < responseTime)
                 {
-                    string exceptiontext = $"ERROR occured! Actual response time: {responseTime}. Allowed maximum response time: {_configuration.MinimalResponseTime}";
+                    string exceptiontext = $"ERROR occured! Actual response time: {responseTime}. Allowed maximum response time: {_configuration.MaxWCFResponseTime}";
                     LogThis(exceptiontext, logData, null, LogLevel.Error, this.GetType());
                     return true;
                 }
                 else
                 {
-                    LogThis($"is OK!", logData, null, LogLevel.Verbose, this.GetType());
+                    LogThis($"HealthCheck_WCFResponseTimeMaximumExceeded is OK!", logData, null, LogLevel.Verbose, this.GetType());
                     return false;
                 }
             }
@@ -333,44 +337,152 @@ namespace IVServiceWatchdog
             }
             catch (Exception ex)
             {
-                LogThis($"Exception in execution of HealthCheck_ResponseTimeMaximumExceeded!", logData, ex, LogLevel.Error, this.GetType());
+                LogThis($"Exception in execution of HealthCheck_WCFResponseTimeMaximumExceeded!", logData, ex, LogLevel.Error, this.GetType());
                 return true;
             }
         }
-
         /// <summary>
-        /// Megállapítja, hogy túl sok száll van-e a processzben
+        /// Megállapítja, hogy túl sok szál van-e a processzben
         /// </summary>
         /// <returns></returns>
         private bool HealthCheck_ThreadMaximumExceeded()
         {
-            if (_configuration.MaximumAlloewedThreadNumber == 0) { return false; }
+            if (!_configuration.CheckThreadNumberEnabled) { return false; }
+            if(_configuration.MaximumAllowedThreadNumber == 0) { return false; }
             Dictionary<string, string> logData = new Dictionary<string, string>();
             logData.Add("Service name", _configuration.WindowsServiceName);
             try
             {
                 int pid = GetHostProcessPid();
-                if (pid == -1 || _configuration.MaximumAlloewedThreadNumber == 0) { return false; }
+                if (pid == -1) { return false; }
                 var process = Process.GetProcessById(pid);
                 int threadNumber = process.Threads.Count;
                 logData.Add("Process name", process.ProcessName);
                 logData.Add("Current thread number", $"{threadNumber}");
-                logData.Add("Maximum allowed thread number", $"{_configuration.MaximumAlloewedThreadNumber}");
-                if (threadNumber > _configuration.MaximumAlloewedThreadNumber)
+                logData.Add("Maximum allowed thread number", $"{_configuration.MaximumAllowedThreadNumber}");
+                if (threadNumber > _configuration.MaximumAllowedThreadNumber)
                 {
-                    string exceptiontext = $"ERROR occured! Current number of threads: {threadNumber}. Allowed maximum number of threads: {_configuration.MaximumAlloewedThreadNumber}";
+                    string exceptiontext = $"ERROR occured! Current number of threads: {threadNumber}. Allowed maximum number of threads: {_configuration.MaximumAllowedThreadNumber}";
                     LogThis(exceptiontext, logData, null, LogLevel.Error, this.GetType());
                     return true;
                 }
                 else
                 {
-                    LogThis($"is OK.", logData, null, LogLevel.Verbose, this.GetType());
+                    LogThis($"HealthCheck_ThreadMaximumExceeded is OK.", logData, null, LogLevel.Verbose, this.GetType());
                     return false;
                 }
             }
             catch (Exception ex)
             {
-                LogThis($"Exception in execution of HealthCheck_ResponseTimeMaximumExceeded!", logData, ex, LogLevel.Error, this.GetType());
+                LogThis($"Exception in execution of HealthCheck_ThreadMaximumExceeded!", logData, ex, LogLevel.Error, this.GetType());
+                return true;
+            }
+        }
+        /// <summary>
+        /// Megállapítja, hogy túl sok memóriát használ-e a processz
+        /// </summary>
+        /// <returns></returns>
+        private bool HealthCheck_MemoryMaximumExceeded()
+        {
+            if (!_configuration.CheckMemoryUsageEnabled) { return false; }
+            if (_configuration.MaximumAllowedMemory == 0) { return false; }
+            Dictionary<string, string> logData = new Dictionary<string, string>();
+            logData.Add("Service name", _configuration.WindowsServiceName);
+            try
+            {
+                int pid = GetHostProcessPid();
+                if (pid == -1) { return false; }
+                var process = Process.GetProcessById(pid);
+
+                long memory1 = 0; long memory2 = 0; long memory3 = 0;
+                long summemory1 = 0; long summemory2 = 0; long summemory3 = 0; long maxmemory1 = 0;
+                PerformanceCounter pc = ProcessPerformanceCounter.GetPerfCounterForProcessId(pid, "Working Set - Private");
+                for (int i = 1; i <= _configuration.MemoryUsageSamples; i++)
+                {
+                    if (i > 1) { Thread.Sleep(1000); process.Refresh(); }
+                    memory1 = (long)pc.NextValue();
+                    memory2 = process.PrivateMemorySize64;
+                    memory3 = process.WorkingSet64;
+                    summemory1 += memory1;
+                    summemory2 += memory2;
+                    summemory3 += memory3;
+                    if (memory1 > maxmemory1) { maxmemory1 = memory1; }
+                }
+                memory1 = summemory1 / _configuration.MemoryUsageSamples;
+                memory2 = summemory2 / _configuration.MemoryUsageSamples;
+                memory3 = summemory3 / _configuration.MemoryUsageSamples;
+
+                logData.Add("Process name/PID", $"{process.ProcessName}/{pid}");
+                logData.Add("Average memory usage", $"WorkingSet-Private:{memory1},PrivateMemorySize64:{memory2},WorkingSet64:{memory3}");
+                logData.Add("Max memory usage (#of samples)", $"WorkingSet-Private:{maxmemory1} ({_configuration.MemoryUsageSamples})");
+                logData.Add("Maximum allowed memory usage", $"{_configuration.MaximumAllowedMemory}");
+                if (memory1 > _configuration.MaximumAllowedMemory)
+                {
+                    string exceptiontext = $"ERROR occured! Current memory usage WorkingSet-Private:{memory1}. Allowed maximum number of memory: {_configuration.MaximumAllowedMemory}";
+                    LogThis(exceptiontext, logData, null, LogLevel.Error, this.GetType());
+                    return true;
+                }
+                else
+                {
+                    LogThis($"HealthCheck_MemoryMaximumExceeded is OK.", logData, null, LogLevel.Verbose, this.GetType());
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogThis($"Exception in execution of HealthCheck_MemoryMaximumExceeded!", logData, ex, LogLevel.Error, this.GetType());
+                return true;
+            }
+        }
+        /// <summary>
+        /// Megállapítja, hogy túl sok memóriát használ-e a processz
+        /// </summary>
+        /// <returns></returns>
+        private bool HealthCheck_CPUusageMaximumExceeded()
+        {
+            if (!_configuration.CheckCPUusageEnabled) { return false; }
+            if (_configuration.MaximumAllowedCPUusage == 0) { return false; }
+            Dictionary<string, string> logData = new Dictionary<string, string>();
+            logData.Add("Service name", _configuration.WindowsServiceName);
+            try
+            {
+                int pid = GetHostProcessPid();
+                if (pid == -1) { return false; }
+                var process = Process.GetProcessById(pid);
+
+                float cpuusagefloat = 0;
+                float sumusagefloat = 0;
+                float maxcpuusagefloat = 0;
+                PerformanceCounter pc = ProcessPerformanceCounter.GetPerfCounterForProcessId(pid, "% Processor Time");
+                for (int i = 1; i <= _configuration.CPUusageSamples; i++)
+                {
+                    if (i > 1) { Thread.Sleep(50); process.Refresh(); }
+                    cpuusagefloat = (long)pc.NextValue();
+                    sumusagefloat += cpuusagefloat;
+                    if (cpuusagefloat > maxcpuusagefloat) { maxcpuusagefloat = cpuusagefloat; }
+                }
+                cpuusagefloat = sumusagefloat / _configuration.CPUusageSamples;
+                long cpuusage = (long)cpuusagefloat;
+
+                logData.Add("Process name/PID", $"{process.ProcessName}/{pid}");
+                logData.Add("Current CPU usage", $"{cpuusagefloat}");
+                logData.Add("Maximum CPU usage (#of samples)", $"{maxcpuusagefloat} ({_configuration.CPUusageSamples})");
+                logData.Add("Maximum allowed CPU usage", $"{_configuration.MaximumAllowedCPUusage}");
+                if (cpuusage > _configuration.MaximumAllowedCPUusage)
+                {
+                    string exceptiontext = $"ERROR occured! Current CPU usage:{cpuusagefloat}. Allowed maximum number of memory: {_configuration.MaximumAllowedCPUusage}";
+                    LogThis(exceptiontext, logData, null, LogLevel.Error, this.GetType());
+                    return true;
+                }
+                else
+                {
+                    LogThis($"HealthCheck_CPUusageMaximumExceeded is OK.", logData, null, LogLevel.Verbose, this.GetType());
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogThis($"Exception in execution of HealthCheck_CPUusageMaximumExceeded!", logData, ex, LogLevel.Error, this.GetType());
                 return true;
             }
         }
@@ -384,22 +496,23 @@ namespace IVServiceWatchdog
             var process = Process.GetProcessById(pid);
             Dictionary<string, string> logData = new Dictionary<string, string>();
             logData.Add("Service name", _configuration.WindowsServiceName);
-            logData.Add("Process name", process.ProcessName);
+            logData.Add("Process name/PID", $"{process.ProcessName}/{pid}");
             Dictionary<string, string> logData2 = new Dictionary<string, string>();
             try
             {
                 _errorCount = 0;
                 logData2.Clear(); logData.ToList().ForEach(x => logData2.Add(x.Key, x.Value));
-                logData2.Add("CreateDumpRequested", $"{_configuration.CreateDumpNeed}");
-                logData2.Add("KillProcessRequested", $"{_configuration.KillProcessNeed}");
+                logData2.Add("CreateDumpRequested", $"{_configuration.CreateDump}");
+                logData2.Add("KillProcessRequested", $"{_configuration.KillProcess}");
                 LogThis($"Start error handling...", logData2, null, LogLevel.Warning, this.GetType());
 
-                if (_configuration.CreateDumpNeed)
+                if (_configuration.CreateDump)
                 {
                     LogThis($"Create dump file from process.", logData, null, LogLevel.Verbose, this.GetType());
                     Process p = new Process();
                     p.StartInfo.FileName = Path.Combine(_configuration.ProcdumpPath, "procdump.exe");
                     p.StartInfo.Arguments = $"-ma -o {pid} {_configuration.DumpTargetPath}";
+                    //p.StartInfo.FileName = "";
                     p.StartInfo.UseShellExecute = false;
                     p.StartInfo.RedirectStandardOutput = true;
                     p.Start();
@@ -418,7 +531,7 @@ namespace IVServiceWatchdog
                     }
                     LogThis($"Dump create DONE.", logData2, null, LogLevel.Information, this.GetType());
                 }
-                if (_configuration.KillProcessNeed)
+                if (_configuration.KillProcess)
                 {
                     while (!process.HasExited)
                     {
@@ -544,5 +657,34 @@ namespace IVServiceWatchdog
             // GC.SuppressFinalize(this);
         }
         #endregion
+    }
+    public class ProcessPerformanceCounter
+    {
+        public static PerformanceCounter GetPerfCounterForProcessId(int processId, string processCounterName = "% Processor Time")
+        {
+            string instance = GetInstanceNameForProcessId(processId);
+            if (string.IsNullOrEmpty(instance)) {   return null;   }
+
+            return new PerformanceCounter("Process", processCounterName, instance);
+        }
+
+        public static string GetInstanceNameForProcessId(int processId)
+        {
+            string processName = Path.GetFileNameWithoutExtension(Process.GetProcessById(processId).ProcessName);
+
+            PerformanceCounterCategory cat = new PerformanceCounterCategory("Process");
+            string[] instances = cat.GetInstanceNames().Where(inst => inst.StartsWith(processName)).ToArray();
+
+            foreach (string instance in instances)
+            {
+                if ((int)(new PerformanceCounter("Process", "ID Process", instance, true)).RawValue == processId) { return instance; }
+
+                //using (PerformanceCounter cnt = new PerformanceCounter("Process", "ID Process", instance, true))
+                //{
+                //    if ((int)cnt.RawValue == processId) { return instance; }
+                //}
+            }
+            return null;
+        }
     }
 }
