@@ -207,18 +207,16 @@ namespace IVServiceWatchdog
                 var redisDb = RedisConnection?.GetDatabase();
                 if (redisDb != null)
                 {
-                    var key = redisDb.StringGet($"Service.Starter.Semafor.{_configuration.WindowsServiceName}");
-                    if (!key.IsNullOrEmpty)
+                    string semaforname = $"Service.Starter.Semafor.{_configuration.WindowsServiceName}";
+                    var semaforvalue = redisDb.StringGet(semaforname);
+                    if (!semaforvalue.IsNullOrEmpty)
                     {
-                        LogThis($"Redis semafor exists. Semafor key:{key}. Health check due, but skipped.", logData, null, LogLevel.Information, this.GetType());
+                        LogThis($"Redis semafor '{semaforname}' exists. Semafor timestamp '{semaforvalue}'. Health check due, but skipped.", logData, null, LogLevel.Information, this.GetType());
                         return true;
                     }
                 }
             }
-            catch(Exception ex)
-            {
-                LogThis($"Exception during checking semafor.", logData, ex, LogLevel.Error, this.GetType());
-            }
+            catch(Exception ex) {    LogThis($"Exception during checking semafor.", logData, ex, LogLevel.Error, this.GetType());    }
             return false;
         }
 
@@ -235,15 +233,14 @@ namespace IVServiceWatchdog
             uint? processId = null;
             string qry = "SELECT PROCESSID FROM WIN32_SERVICE WHERE NAME = '" + _configuration.WindowsServiceName + "'";
             System.Management.ManagementObjectSearcher searcher = new System.Management.ManagementObjectSearcher(qry);
-            foreach (System.Management.ManagementObject mngntObj in searcher.Get())
-            {
-                processId = (uint)mngntObj["PROCESSID"];
-            }
+            foreach (System.Management.ManagementObject mngntObj in searcher.Get()) {    processId = (uint)mngntObj["PROCESSID"];    }
+
             if (!processId.HasValue)
             {
                 LogThis($"Service is not installed in this machine!", logData, null, LogLevel.Warning, this.GetType());
                 return -1;
             }
+
             if (processId == 0)
             {
                 LogThis($"Process not found for service!", logData, null, LogLevel.Warning, this.GetType());
@@ -413,8 +410,9 @@ namespace IVServiceWatchdog
                 memory3 = summemory3 / _configuration.MemoryUsageSamples;
 
                 logData.Add("Process name/PID", $"{process.ProcessName}/{pid}");
+                logData.Add("Number of samples", $"{_configuration.MemoryUsageSamples}");
                 logData.Add("Average memory usage", $"WorkingSet-Private:{memory1},PrivateMemorySize64:{memory2},WorkingSet64:{memory3}");
-                logData.Add("Max memory usage (#of samples)", $"WorkingSet-Private:{maxmemory1} ({_configuration.MemoryUsageSamples})");
+                logData.Add("Max memory usage", $"WorkingSet-Private:{maxmemory1}");
                 logData.Add("Maximum allowed memory usage", $"{_configuration.MaximumAllowedMemory}");
                 if (memory1 > _configuration.MaximumAllowedMemory)
                 {
@@ -457,7 +455,7 @@ namespace IVServiceWatchdog
                 for (int i = 1; i <= _configuration.CPUusageSamples; i++)
                 {
                     if (i > 1) { Thread.Sleep(50); process.Refresh(); }
-                    cpuusagefloat = (long)pc.NextValue();
+                    cpuusagefloat = (long)pc.NextValue() / Environment.ProcessorCount;
                     sumusagefloat += cpuusagefloat;
                     if (cpuusagefloat > maxcpuusagefloat) { maxcpuusagefloat = cpuusagefloat; }
                 }
@@ -465,8 +463,10 @@ namespace IVServiceWatchdog
                 long cpuusage = (long)cpuusagefloat;
 
                 logData.Add("Process name/PID", $"{process.ProcessName}/{pid}");
+                logData.Add("Logical processors", $"{Environment.ProcessorCount}");
+                logData.Add("Number of samples", $"{_configuration.CPUusageSamples}");
                 logData.Add("Current CPU usage", $"{cpuusagefloat}");
-                logData.Add("Maximum CPU usage (#of samples)", $"{maxcpuusagefloat} ({_configuration.CPUusageSamples})");
+                logData.Add("Maximum CPU usage", $"{maxcpuusagefloat}");
                 logData.Add("Maximum allowed CPU usage", $"{_configuration.MaximumAllowedCPUusage}");
                 if (cpuusage > _configuration.MaximumAllowedCPUusage)
                 {
