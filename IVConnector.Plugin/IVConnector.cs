@@ -403,6 +403,7 @@ namespace IVConnector.Plugin
         /// <param name="src">forrás: 0 - LJS, 1 - CP</param>
         private void CallErrorLogging(string fullMessage, string errorTxt, int src)
         {
+            string srcText = src==0 ? "LJS" : "CP";
             var logData = new Dictionary<string, string>();
             try
             {
@@ -412,19 +413,20 @@ namespace IVConnector.Plugin
                     logData.Add("Intervention name", "HarnessErrorLog");
                     logData.Add("Intervention parameter ProcessorSideError", errorTxt);
                     logData.Add("Intervention parameter Message", fullMessage);
-                    logData.Add("Message source", src==0?"LJS":"CabPack");
+                    logData.Add("Message source", srcText);
 
                     InterventionServiceClient interventionService = new InterventionServiceClient();
                     Guid user = _configuration.UserGuid;
                     Dictionary<string, object> parameters = new Dictionary<string, object>
                     {
                         { "ProcessorSideError", errorTxt },
-                        { "FullMessage", fullMessage }
+                        { "FullMessage", fullMessage },
+                        { "IvSrc", srcText }
                     };
                     Intervention intervention = new Intervention()
                     {
                         Name = "HarnessErrorLog",
-                        ObjectID = src,
+                        ObjectID = 0,
                         Parameters = parameters,
                     };
                     interventionService.DoIntervention(intervention, user, null);
@@ -699,11 +701,12 @@ namespace IVConnector.Plugin
                 if (externalSystemId != null)
                 {
                     intervention.Name = "TranslateId";
+                    intervention.ObjectID = 0;
                     intervention.Parameters = new Dictionary<string, object>
                     {
                         { "EntityType", "ASLINE" },
                         { "ExternalSystem", externalSystemId.Value },
-                        { "fId", assemblyLineId }
+                        { "ExternalId", assemblyLineId }
                     };
                     string resultId;
                     try
