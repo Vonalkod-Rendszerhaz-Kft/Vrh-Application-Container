@@ -44,7 +44,7 @@ namespace Vrh.ApplicationContainer
         {
             get
             {
-                string value = ConfigurationManager.AppSettings[GetApplicationConfigName(INSTANCEFACTORYASSEMBLY_ELEMENT_NAME)];
+                string value = ConfigurationManager.AppSettings[ApplicationContainer.GetApplicationConfigName(INSTANCEFACTORYASSEMBLY_ELEMENT_NAME)];
                 if (String.IsNullOrEmpty(value))
                 {
                     value = GetElementValue(GetXElement(CONFIG_ELEMENT_NAME, INSTANCEFACTORYASSEMBLY_ELEMENT_NAME), String.Empty);
@@ -60,7 +60,7 @@ namespace Vrh.ApplicationContainer
         {
             get
             {
-                string value = ConfigurationManager.AppSettings[GetApplicationConfigName(INSTANCEFACTORYTYPE_ELEMENT_NAME)];
+                string value = ConfigurationManager.AppSettings[ApplicationContainer.GetApplicationConfigName(INSTANCEFACTORYTYPE_ELEMENT_NAME)];
                 if (String.IsNullOrEmpty(value))
                 {
                     value = GetElementValue(GetXElement(CONFIG_ELEMENT_NAME, INSTANCEFACTORYTYPE_ELEMENT_NAME), String.Empty);
@@ -76,7 +76,7 @@ namespace Vrh.ApplicationContainer
         {
             get
             {
-                string value = ConfigurationManager.AppSettings[GetApplicationConfigName(INSTANCEFACTORYVERSION_ELEMENT_NAME)];
+                string value = ConfigurationManager.AppSettings[ApplicationContainer.GetApplicationConfigName(INSTANCEFACTORYVERSION_ELEMENT_NAME)];
                 if (String.IsNullOrEmpty(value))
                 {
                     value = GetElementValue(GetXElement(CONFIG_ELEMENT_NAME, INSTANCEFACTORYVERSION_ELEMENT_NAME), String.Empty);
@@ -92,7 +92,7 @@ namespace Vrh.ApplicationContainer
         {
             get
             {
-                string strValue = ConfigurationManager.AppSettings[GetApplicationConfigName(MESSAGESTACKSIZE_ELEMENT_NAME)];
+                string strValue = ConfigurationManager.AppSettings[ApplicationContainer.GetApplicationConfigName(MESSAGESTACKSIZE_ELEMENT_NAME)];
                 if (!String.IsNullOrEmpty(strValue))
                 {
                     int intValue = GetValue<int>(strValue, -1);
@@ -104,17 +104,6 @@ namespace Vrh.ApplicationContainer
                 return GetElementValue<ushort>(GetXElement(CONFIG_ELEMENT_NAME, MESSAGESTACKSIZE_ELEMENT_NAME), 50);
             }
         }
-
-        /// <summary>
-        /// Visszadja a modul prfixxel kiegészített beállítás nevet
-        /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        private string GetApplicationConfigName(string key)
-        {
-            return String.Format("{0}:{1}", ApplicationContainer.MODULEPREFIX, key);
-        }
-
         #endregion
 
         #region Defination of namming rules in XML

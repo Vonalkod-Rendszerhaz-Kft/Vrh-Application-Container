@@ -38,7 +38,7 @@ namespace Vrh.ApplicationContainer
 
             _startupTimeStamp = DateTime.UtcNow;
             _wcfServiceInstance.ApplicationContainerReference = this;
-            string configFile = ConfigurationManager.AppSettings[_configFileSettingKey];
+            string configFile = ConfigurationManager.AppSettings[GetApplicationConfigName(CONFIGURATIONFILE_ELEMENT_NAME)];
             if (String.IsNullOrEmpty(configFile))
             {
                 configFile = @"ApplicationContainer.Config.xml";
@@ -1151,14 +1151,6 @@ namespace Vrh.ApplicationContainer
 
         private ApplicationContainerService _wcfServiceInstance = new ApplicationContainerService();
 
-        private string _configFileSettingKey
-        {
-            get
-            {
-                return String.Format("{0}:{1}", MODULEPREFIX, "ConfigurationFile");
-            }
-        }
-
         private Object _instanceLocker = new Object();
 
         private DateTime _startupTimeStamp;
@@ -1179,6 +1171,12 @@ namespace Vrh.ApplicationContainer
         /// Modul azonosító
         /// </summary>
         internal const string MODULEPREFIX = "Vrh.ApplicationContainer";
+        internal const string CONFIGURATIONFILE_ELEMENT_NAME = "ConfigurationFile";
+        public static string GetApplicationConfigName(string key)
+        {
+            return String.Format("{0}:{1}", ApplicationContainer.MODULEPREFIX, key);
+        }
+
 
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls

@@ -1,5 +1,5 @@
 ﻿# Vrh.Logger
-Ez a leírás a komponens **v1.4.0** kiadásáig bezáróan naprakész.
+Ez a leírás a komponens **v1.4.0** kiadásáig bezáróan naprakész. (1.5.0 nincs benne)
 Igényelt minimális framework verzió: **4.0**
 Teljes funkcionalitás és hatékonyság kihasználásához szükséges legalacsonyabb framework verzió: **4.5**
 ### A komponens arra szolgál, hogy egységes és egyszerű megvalósítása legyen a Logolásnak.
@@ -517,6 +517,15 @@ Az alábbi szabályok és elvek elvárások a Pluginnal szemben:
 <hr></hr>
 
 # Version History:
+## V1.5.2 (2018.12.11)
+### Patch:
+1. Service név lekérdezésében hiba javítása
+## V1.5.1 (2018.12.11)
+### Patch:
+1. CallSignature osztály láthatósága .public
+## V1.5.0 (2018.12.11)
+### Compatibility API changes:
+1. CallSignature osztály bevezetése.
 ## V1.4.0 (2017.12.06)
 ### Compatibility API changes:
 1. Logger class funkciója áttéve a VrhLogger-class alá. Ott csak annak a public (API) funkcionalitása maradt, oly módon, hogy áthív a VrhLogger-be. (Hogy ne legyen incompatibility a change.)
