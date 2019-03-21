@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.Entity;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,9 +7,6 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Net.Sockets;
 using System.Net;
-using VRH.Common;
-using Vrh.ApplicationContainer;
-using IVConnector.Plugin.InterventionService;
 using System.ServiceModel;
 using System.ServiceModel.Configuration;
 using System.Configuration;
@@ -20,9 +18,13 @@ using System.Reflection;
 using System.Globalization;
 using System.IO.IsolatedStorage;
 using System.IO;
+
+using VRH.Common;
+using Vrh.ApplicationContainer;
 using Vrh.LinqXMLProcessor.Base;
 using Vrh.Logger;
 using System.Messaging;
+using IVConnector.Plugin.InterventionService;
 
 namespace IVConnector.Plugin
 {
@@ -714,7 +716,7 @@ namespace IVConnector.Plugin
                         /// biztosan csak exception-nel lehet megoldani, hogy nincs a fordítótáblában a külső kódhoz fordítás????
                         resultId = interventionService.DoIntervention(intervention, _configuration.UserGuid, null);
                     }
-                    catch
+                    catch (Exception ex)
                     {
                         /// másrészt ilyen felismert hiba esetekben nem throw exception-nel kellene megoldani a hiba naplózást, mert semmi értelme a 
                         /// teljes exception stack beírásának, elég lenne a VrhLogger.Log használata, majd valami return visszatérő kód előállítása, 
@@ -722,7 +724,8 @@ namespace IVConnector.Plugin
                         result = $"Processing failed! Unknown Assembly line external identifyer in received message (or some other error in requesting IdTranslation)!";
                         logData.Add("Assembly line external id", assemblyLineId);
                         logData.Add("Received message", Vrh.Logger.LogHelper.HexControlChars(message));
-                        _pluginReference.LogThis(result, logData, null, Vrh.Logger.LogLevel.Information, this.GetType());
+
+                        _pluginReference.LogThis(result, logData, ex, Vrh.Logger.LogLevel.Information, this.GetType());
                         return result;
                         /// throw new Exception($"Unknown Assembly line external identifyer (or some other error in requesting IdTranslation): {assemblyLineId}! Processed message {Vrh.Logger.LogHelper.HexControlChars(message)}");
                     }

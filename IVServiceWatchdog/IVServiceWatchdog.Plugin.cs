@@ -2,15 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Vrh.ApplicationContainer;
-using Vrh.Logger;
 using System.Timers;
-using Vrh.LinqXMLProcessor.Base;
-using IVServiceWatchdog.InterventionService;
 using System.Diagnostics;
 using System.ServiceProcess;
 using System.IO;
 using StackExchange.Redis;
+
+using Vrh.LinqXMLProcessor.Base;
+using Vrh.ApplicationContainer;
+using Vrh.Logger;
+
+using IVServiceWatchdog.InterventionService;
 
 namespace IVServiceWatchdog
 {
