@@ -3,4 +3,4 @@
   
 <Plugin Assembly="Plugin.ProjectTemplate.dll" Type="Plugin.ProjectTemplate.Plugin.ProjectTemplatePlugin" Version="1.0.0" Singletone="false" AutoStart="true" PluginDirectory="">
     <Instance Id="instance1" Name="" />
-  </Plugin></Plugins>
+  <Instance Id="instance1" Name="Plugin.ProjectTemplatePlugin instance 1" /></Plugin></Plugins>
