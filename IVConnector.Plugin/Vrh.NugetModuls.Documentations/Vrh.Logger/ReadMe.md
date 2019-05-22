@@ -517,6 +517,11 @@ Az alábbi szabályok és elvek elvárások a Pluginnal szemben:
 <hr></hr>
 
 # Version History:
+## V1.5.5 (2019.05.22)
+### Patch:
+- A VRH.Common 2.2.0 változatának beállítása az Application.Container összhang miatt.
+- A Vrh.LinqXMLProcessor.Base 1.2.3 változatának beállítása az Application.Container összhang miatt.
+
 ## V1.5.2 (2018.12.11)
 ### Patch:
 1. Service név lekérdezésében hiba javítása

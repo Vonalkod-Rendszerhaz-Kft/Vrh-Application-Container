@@ -1,32 +1,32 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Plugins.Config>
   <Plugins StackSize="50">
-<!--    
+    
 	  <Plugin Description="Scheduler Monitor" 
             Assembly="iSchedulerMonitor.dll" 
 			      Type="iSchedulerMonitor.MonitorPlugin" 
-            Version="1.0.0-alpha" Singletone="false" AutoStart ="true" 
-            PluginDirectory="iSchedulerMonitor">
--->            
+            Version="1.0.0-alpha" 
+            Singletone="false" 
+            AutoStart ="true" 
+            PluginDirectory="iSchedulerMonitor"
+            PluginConfig="" Factory="">
       <!-- ANTI: Ha nem azonos gépen fut a WebServer és a plugin, akkor az 
                InstanceConfig a plugint futtató gépen az xml helye; InstanceData a távoli gépen az xml helye. 
                Ha azonos gépen fut, akkor az InstanceData nem kötelező. 
       -->
-<!--    
-      <Instance	Id="Monitor1"
-			  	Name="SchedulerMonitor_for_LearALM"
-  				Description="Időzített feladatok figyelése a LearALM-ben."
-	  			InstanceConfig="d:\Google Drive\!Dev\VRH\lear-dtm\Source\WebApplication\App_Data\iScheduler\iScheduler.xml"
-		  		InstanceData="~/App_Data/iScheduler/iScheduler.xml">
+      <Instance	Id="Monitor1" Inuse="APP"
+                Name="SchedulerMonitor_for_LearALM"
+                Description="Időzített feladatok figyelése a LearALM-ben."
+                InstanceConfig="d:\!Dev\VRH\iScheduler\Vrh.iScheduler\App_Data\iScheduler\iScheduler.xml"
+                InstanceData="~/App_Data/iScheduler/iScheduler.xml">
       </Instance>
--->      
       <!--VRH-->
-      <!--Instance	Id="Monitor1"
+      <!--<Instance	Id="Monitor1"
 					Name="SchedulerMonitor_for_LearALM"
 					Description="Időzített feladatok figyelése a LearALM-ben."
-					InstanceConfig="c:\ALM\wwwroot\App_Data\iScheduler\iScheduler.xml"/-->
-    
-    <!--</Plugin>-->  
+					InstanceConfig="c:\ALM\wwwroot\App_Data\iScheduler\iScheduler.xml"/>
+      -->
+    </Plugin>  
 
 
     <!--<Plugin Description="IV Connevctor plugin"
@@ -47,7 +47,8 @@
             InstanceConfig="\IVConnector\IVConnector.Config.xml/IVConnectorConfig/Configuration_T1,\IVConnector\IVConnector.Config.xml/IVConnectorConfig/MessageDefinitions"/>
     </Plugin>-->
 
-  <Plugin Description="IV Service Watchdog plugin"
+    <!--
+    <Plugin Description="IV Service Watchdog plugin"
               Assembly="IVServiceWatchdog.dll"
               Type ="IVServiceWatchdog.IVServiceWatchdogPlugin"
               Version="1.0.0"
@@ -61,7 +62,8 @@
             Description="Check ALM intervention service, and restart them, if need"
             InstanceConfig="\IVServiceWatchdog\IVServiceWatchdog.Config.xml"/>
     </Plugin>
-<!--
+    -->
+    <!--
     <Plugin Description="Windows Service Starter plugin"
               Assembly="Service.Starter.dll"
               Type ="Service.Starter.ServiceStarterPlugin"
@@ -75,6 +77,6 @@
             Description="Check all Windows service in ALM and start them, if not run"
             InstanceConfig="\ServiceStarter\ServiceStarter.Config.xml"/>
     </Plugin>
--->        
+    -->        
   </Plugins>
 </Plugins.Config>

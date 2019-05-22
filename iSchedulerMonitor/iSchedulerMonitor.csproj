@@ -32,8 +32,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Antlr3.Runtime, Version=3.4.1.9004, Culture=neutral, PublicKeyToken=eb42632606e9261f, processorArchitecture=MSIL">
-      <HintPath>..\packages\Antlr.3.4.1.9004\lib\Antlr3.Runtime.dll</HintPath>
+    <Reference Include="Antlr3.Runtime, Version=3.5.0.2, Culture=neutral, PublicKeyToken=eb42632606e9261f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Antlr.3.5.0.2\lib\Antlr3.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
@@ -44,36 +44,56 @@
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.ReportViewer.Common, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Report.Viewer.11.0.0.0\lib\net\Microsoft.ReportViewer.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.ProcessingObjectModel, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Report.Viewer.11.0.0.0\lib\net\Microsoft.ReportViewer.ProcessingObjectModel.DLL</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.WebForms, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Report.Viewer.11.0.0.0\lib\net\Microsoft.ReportViewer.WebForms.DLL</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="PagedList, Version=1.17.0.0, Culture=neutral, PublicKeyToken=abbb863e9397c5e1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>ExternalReferences\PagedList.dll</HintPath>
+    </Reference>
+    <Reference Include="PagedList.Mvc">
+      <HintPath>ExternalReferences\PagedList.Mvc.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.Helpers.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.Helpers.dll</HintPath>
     </Reference>
-    <Reference Include="System.Web.Mvc, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.3\lib\net45\System.Web.Mvc.dll</HintPath>
+    <Reference Include="System.Web.Mvc, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.7\lib\net45\System.Web.Mvc.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.Optimization, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.Web.Optimization.1.1.3\lib\net40\System.Web.Optimization.dll</HintPath>
     </Reference>
+    <Reference Include="System.Web.Providers">
+      <HintPath>ExternalReferences\System.Web.Providers.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.Razor.3.2.3\lib\net45\System.Web.Razor.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.Razor.3.2.7\lib\net45\System.Web.Razor.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.WebPages.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -86,26 +106,43 @@
     </Reference>
     <Reference Include="VRH.ConnectionStringStore, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\VRH.ConnectionStringStore.1.3.0\lib\net45\VRH.ConnectionStringStore.dll</HintPath>
-      <Private>True</Private>
     </Reference>
-    <Reference Include="Vrh.iScheduler.Lib, Version=1.4.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.iScheduler.1.4.0\lib\net45\Vrh.iScheduler.Lib.dll</HintPath>
+    <Reference Include="Vrh.Interfaces, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.Interfaces.1.0.0\lib\net45\Vrh.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Vrh.iScheduler.Lib, Version=1.5.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.iScheduler.1.5.1\lib\net45\Vrh.iScheduler.Lib.dll</HintPath>
+    </Reference>
+    <Reference Include="Vrh.iScheduler.Report.Lib, Version=1.5.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.iScheduler.Report.1.5.1\lib\net45\Vrh.iScheduler.Report.Lib.dll</HintPath>
     </Reference>
     <Reference Include="Vrh.LinqXMLProcessor.Base, Version=1.2.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Vrh.LinqXMLProcessor.Base.1.2.3\lib\net40\Vrh.LinqXMLProcessor.Base.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="VRH.Log4Pro.MultiLanguageManager, Version=2.1.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\VRH.Log4Pro.MultiLanguageManager.2.1.4\lib\net45\VRH.Log4Pro.MultiLanguageManager.dll</HintPath>
+    <Reference Include="VRH.Log4Pro.MultiLanguageManager, Version=2.1.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\VRH.Log4Pro.MultiLanguageManager.2.1.5\lib\net45\VRH.Log4Pro.MultiLanguageManager.dll</HintPath>
     </Reference>
-    <Reference Include="Vrh.Logger, Version=1.5.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.Logger.1.5.3\lib\net45\Vrh.Logger.dll</HintPath>
+    <Reference Include="Vrh.Logger, Version=1.5.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.Logger.1.5.5\lib\net45\Vrh.Logger.dll</HintPath>
     </Reference>
     <Reference Include="VRH.Mockable.TimeProvider, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\VRH.Mockable.TimeProvider.1.0.0\lib\net45\VRH.Mockable.TimeProvider.dll</HintPath>
     </Reference>
-    <Reference Include="Vrh.Web.Common.Lib, Version=1.5.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.Web.Common.Lib.1.5.0\lib\net45\Vrh.Web.Common.Lib.dll</HintPath>
+    <Reference Include="Vrh.OneMessage, Version=1.1.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.OneMessage.1.1.4\lib\net45\Vrh.OneMessage.dll</HintPath>
+    </Reference>
+    <Reference Include="Vrh.OneReport.Lib, Version=1.4.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.OneReport.1.4.1\lib\net45\Vrh.OneReport.Lib.dll</HintPath>
+    </Reference>
+    <Reference Include="Vrh.Web.Common.Lib, Version=1.11.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.Web.Common.Lib.1.11.1\lib\net45\Vrh.Web.Common.Lib.dll</HintPath>
+    </Reference>
+    <Reference Include="Vrh.Web.Membership.DataTier">
+      <HintPath>ExternalReferences\Vrh.Web.Membership.DataTier.dll</HintPath>
+    </Reference>
+    <Reference Include="Vrh.Web.Membership.Lib">
+      <HintPath>ExternalReferences\Vrh.Web.Membership.Lib.dll</HintPath>
     </Reference>
     <Reference Include="WebGrease, Version=1.5.2.14234, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\WebGrease.1.5.2\lib\WebGrease.dll</HintPath>
@@ -125,6 +162,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Areas\iSchedulerReport\Views\iSchedulerReport\Error.cshtml" />
+    <None Include="Areas\iSchedulerReport\Views\iSchedulerReport\Manager.cshtml" />
+    <None Include="Areas\iSchedulerReport\Views\Shared\_PackageEditor.cshtml" />
+    <None Include="Areas\iSchedulerReport\Views\_ViewStart.cshtml" />
     <None Include="Areas\iScheduler\Views\iScheduler\Editor.cshtml" />
     <None Include="Areas\iScheduler\Views\iScheduler\EditorSingle.cshtml" />
     <None Include="Areas\iScheduler\Views\iScheduler\EditorWeekly.cshtml" />
@@ -132,15 +173,27 @@
     <None Include="Areas\iScheduler\Views\iScheduler\Manager.cshtml" />
     <None Include="Areas\iScheduler\Views\iScheduler\ManagerCalendar.cshtml" />
     <None Include="Areas\iScheduler\Views\_ViewStart.cshtml" />
+    <None Include="Areas\OneReport\Views\OneReport\Display.cshtml" />
+    <None Include="Areas\OneReport\Views\OneReport\Error.cshtml" />
+    <None Include="Areas\OneReport\Views\_ViewStart.cshtml" />
     <None Include="packages.config" />
     <None Include="Vrh.NugetModuls.Documentations\VRH.Common\ReadMe.md" />
+    <None Include="Vrh.NugetModuls.Documentations\Vrh.Interfaces\ReadMe.md" />
+    <None Include="Vrh.NugetModuls.Documentations\Vrh.iScheduler.Report\ReadMe.md" />
     <None Include="Vrh.NugetModuls.Documentations\Vrh.iScheduler\ReadMe.md" />
     <None Include="Vrh.NugetModuls.Documentations\Vrh.LinqXMLProcessor.Base\ReadMe.md" />
     <None Include="Vrh.NugetModuls.Documentations\Vrh.Log4Pro.MultilanguageManager\ReadMe.md" />
     <None Include="Vrh.NugetModuls.Documentations\Vrh.Logger\ReadMe.md" />
+    <None Include="Vrh.NugetModuls.Documentations\Vrh.OneMessage\ReadMe.md" />
     <None Include="Vrh.NugetModuls.Documentations\Vrh.Web.Common.Lib\ReadMe.md" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Data\OneMessages\OneMessage.xml" />
+    <Content Include="Areas\iSchedulerReport\Contents\Editor.css" />
+    <Content Include="Areas\iSchedulerReport\Contents\glyphicon.spin.css" />
+    <Content Include="Areas\iSchedulerReport\Contents\Manager.css" />
+    <Content Include="Areas\iSchedulerReport\Scripts\Editor.js" />
+    <Content Include="Areas\iSchedulerReport\Scripts\Manager.js" />
     <Content Include="Areas\iScheduler\Content\bootstrap-toggle.css" />
     <Content Include="Areas\iScheduler\Content\Editor.css" />
     <Content Include="Areas\iScheduler\Content\Editor.min.css" />
@@ -176,6 +229,7 @@
     <Content Include="Areas\iScheduler\Scripts\FullCalendar\lib\jquery.validate.min.js" />
     <Content Include="Areas\iScheduler\Scripts\FullCalendar\lib\moment.min.js" />
     <Content Include="Areas\iScheduler\Scripts\FullCalendar\locale-all.js" />
+    <Content Include="Areas\OneReport\ReportViewerWebForm.aspx" />
     <Content Include="iSchedulerMonitor.Config.xml" />
     <None Include="LogConfig.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -183,21 +237,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if not exist "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)\iSchedulerMonitor" mkdir "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)\iSchedulerMonitor"
-xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\iSchedulerMonitor.Config.xml" "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)\iSchedulerMonitor"
-xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\iSchedulerMonitor.dll" "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)\iSchedulerMonitor"
-EntityFramework.Extended
-xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\EntityFramework.dll" "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)"
-xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\EntityFramework.Extended.dll" "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)"
-xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\System.Web.Mvc.dll" "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)"
-xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\System.Web.Razor.dll" "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)"
-xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\System.Web.WebPages.dll" "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)"
-xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\System.Web.WebPages.Razor.dll" "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)"
-xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\VRH.ConnectionStringStore.dll" "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)"
-xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\VRH.Log4Pro.MultiLanguageManager.dll" "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)"
-xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\VRH.Mockable.TimeProvider.dll" "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)"
-xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\Vrh.Web.Common.Lib.dll" "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)"
-xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\Vrh.iScheduler.Lib.dll" "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)"
+    <PostBuildEvent>CALL "$(ProjectDir)\ProjectToHost.bat"  "$(SolutionDir)" "$(ConfigurationName)" "$(ProjectName)"
+
 </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

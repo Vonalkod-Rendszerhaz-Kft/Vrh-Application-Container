@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<connectionStrings>
+  <connectionString ConfigEditRef="defaultConnectionString" name="defaultConnectionString">
+    <Element name="Data Source">(local)\SQLEXPRESS</Element>
+    <Element name="Initial Catalog">LearALM</Element>
+    <Element name="Integrated Security">SSPI</Element>
+    <Element name="multipleactiveresultsets">True</Element>
+  </connectionString>
+  <connectionString name="MvcMembership_ModelContainer">
+    <Element name="metadata">res://*/MvcMembership_Model.csdl|res://*/MvcMembership_Model.ssdl|res://*/MvcMembership_Model.msl</Element>
+    <Element name="provider">System.Data.SqlClient</Element>
+    <Element name="provider connection string">#INCLUDE#defaultConnectionString</Element>
+  </connectionString>
+</connectionStrings>

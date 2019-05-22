@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<OneMessageParameters>
+
+  <strings>
+    <string name="valami">valami</string>
+  </strings>
+
+  <connectionstrings>
+    <connectionstring name="yoursmtpname">HOST=yourhost;PORT=465;USER=yourusername;PSW=yourpassword;SSL=true;</connectionstring>
+    <connectionstring name="gmail">HOST=smtp.gmail.com;PORT=587;USER=yourname@gmail.com;PSW=yourpassword;SSL=true;</connectionstring>
+  </connectionstrings>
+
+  <DeliveryDefinitions>
+    <deliverydefinition name="dd1">
+      <emailserverconnection>yoursmtpname</emailserverconnection>
+      <sendas>yourname@yourhost.com</sendas>
+      <sendcopyto></sendcopyto>
+    </deliverydefinition>
+    <deliverydefinition name="dd2">
+      <emailserverconnection>gmail</emailserverconnection>
+      <sendas>yourname@gmail.com</sendas>
+      <sendcopyto></sendcopyto>
+    </deliverydefinition>
+  </DeliveryDefinitions>
+
+  <OneMessageDefinitions>
+
+    <OneMessage id="mess0" delivery="dd1" parameterseparator="|">
+      <parameters>
+        <param name="date">2017.03.31.</param>
+        <param name="első">Első paraméter</param>
+        <param name="másod">Második paraméter</param>
+        <param name="többcím">,lschwirg@vonalkod.hu</param>
+      </parameters>
+      <sendto>gitta@wisoft.hu,anti@wisoft.hu,antalwitt@gmail.com</sendto>
+      <subject>Ez egy teszt üzenet a Lear OneMessage szolgáltatástól. |date|</subject>
+      <messagebody>
+        Tisztelt Címzett!
+
+        Elnézést a zavarásért! A Lear program |OneM| szolgáltatásának tesztje következtében került ez az üzenet a fiókjába.
+
+        Nyugodtan ki lehet törölni! És a továbbiakat is, amelyek ezzel a tárggyal érkeznek.
+
+        Köszönettel, Wittmann Antal
+
+        Paraméter behelyettesítések:
+        |első|
+        |másod|
+      </messagebody>
+      <attachments folder="d:\Anti\Downloads\VRH\Lear\" deleteaftersend="true">
+        <attachment file="Test1.txt"/>
+        <attachment file="Test2.txt"/>
+      </attachments>
+    </OneMessage>
+
+    <OneMessage id="mess1" delivery="dd1" parameterseparator="*">
+      <parameters>
+        <param name="p1">kukutyin</param>
+      </parameters>
+      <sendto parameterseparator="|">antalwitt@gmail.com,anti@wisoft.hu</sendto>
+      <subject parameterseparator="|">Ez a levél tárgya. |p1|</subject>
+      <messagebody parameterseparator="|">
+        Tisztelt Kereskedelmi Hivatal!
+
+        Kéréssel fordulok Önökhöz.
+
+        Üdvözlettel, Wittmann Antal
+      </messagebody>
+      <attachments parameterseparator="|" deleteaftersend="true" folder="">
+        <attachment folder="" file=""></attachment>
+      </attachments>
+    </OneMessage>
+
+  </OneMessageDefinitions>
+
+</OneMessageParameters>
+

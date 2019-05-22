@@ -17,9 +17,13 @@ hasznos függvényekkel, osztályokkal és rendszeresen előforduló szerkezetek
   > * [VariableCollection](###VariableCollection) Behelyettesítendő változók összegyűjtése és a behelyettesítés végrehajtása. 
   > * [XmlCondition osztály](###XmlCondition-osztaly) A ```<Condition>``` elem feldogozását segítő osztály. 
   > * [XmlVariable osztály](###XmlVariable-osztaly) Az ```<XmlVar>``` vagy bármely Name, LCID attribútummal és értékkel rendelkező elem feldogozását segítő osztály. 
+  > * [XmlConnection osztály](###XmlConnection-osztaly) XmlParser kapcsolati string feldogozása és kifejtése.
   > * [XmlParser osztály](###XmlParser-osztaly) Az ```<XmlParser>``` elem feldogozását elvégző osztály. 
  
-* **BaseController**: MVC-s kontroller alaposztály, hasznos és nélkülözhetetlen szolgáltatásokkal.
+* **[BaseController osztály](##BaseControlle-osztaly)**: MVC-s kontroller alaposztály, hasznos és nélkülözhetetlen szolgáltatásokkal.
+
+ > * [ParameterSeparating metódus](###ParameterSeparating-metodus): MVC-s akciók Request.QueryString-jének szétválasztása a kért és egyéb paraméterekre.
+
 * **CookieWebClient**: MVC-s WebClient osztály kiterjesztése, mely a Cookie-kat is kezeli.
  
 
@@ -80,18 +84,19 @@ ERR_REQUIREDATTRIBUTE|"Value of the '{0}' attribute is null or empty in the '{1}
 ERR_PARSETOTYPE|"The '{0}' string is not {1} type! Place='{2}'"
 
 
-### VariableCollection
-Egy System.Collections.Specialized.NameValuCollection alapú osztály, mely kiterjesztésre került abból a célból, 
-hogy alkalmas legyen Név és Érték kulcspárok tárolására, és azok behelyettesítésére
-egy megadott cél szövegben. 
+### VariableDictionary
+Egy ```System.Collections.Generic.Dictionary<string,string>``` alapú osztály, 
+mely kiterjesztésre került abból a célból, hogy alkalmas legyen Név és Érték kulcspárok 
+tárolására, és azok behelyettesítésére egy megadott cél szövegben. 
 Az osztály példányosításakor szükséges megadni egy érvényes nyelvi kódot (LCID).
 A példányosításkor egyből létrejönnek a rendszer változók is a ...BACK változók
 kivételével, azok ugyanis behelyettesítéskor értékelődnek ki. A [rendszerváltozók](####A-rendszervaltozok) nevei
-a SystemVariableNames statikus osztályban érhetőek el. A behelyettesítéskor a változókat
+a ```SystemVariableNames``` statikus osztályban érhetőek el. A behelyettesítéskor a változókat
 az osztály NameSeparator tulajdonság közé illesztve keresi. A NameSeparator tulajdonság 
 alapértelmezett értéke "@@", de átállítható, ha a környezetben más használatos. 
 
-> A táblázatokban csak a NameValueCollection osztályt kiterjesztő elemeket mutatjuk be.
+> A táblázatokban csak a ```System.Collections.Generic.Dictionary<string,string>```
+osztályt kiterjesztő elemeket mutatjuk be.
 
 Tulajdonságok|Leírás
 :----|:----
@@ -107,12 +112,14 @@ keletkezik.
 
 Metódusok|Leírás
 :----|:----
-void Add((NameValueCollection collection)|Név-érték párok hozzáadása egy létező NameValueCollection-ból.
-void Add(string name, string value)|Egy darab név-érték pár hozzáadása a gyűjteményhez.
-void Set(string name, string value)|Megadott nevű változó értékének módosítása.
-bool ContainsVariable(string name)|Igaz értékkel jelzi, ha a név már szerepel a gyűjteményben.
-void ResetSystemVariables()|Rendszerváltozók értékének beállítása.
-string Substitution(string text)|A szövegbe behelyettesíti a gyűjteményben található változók értékét.
+```void Add(string name, string value)```|Egy darab név-érték pár hozzáadása a gyűjteményhez.
+```void Add((NameValueCollection collection)```|Név-érték párok hozzáadása egy létező ```NameValueCollection```-ból.
+```void Add((Dictionary<string,string> dictionary)```|Név-érték párok hozzáadása egy létező ```Dictionary<string,string>```-ból.
+```void Set(string name, string value)```|Megadott nevű változó értékének módosítása.
+```bool ContainsVariable(string name)```|Igaz értékkel jelzi, ha a név már szerepel a gyűjteményben.
+```void ResetSystemVariables()```|Rendszerváltozók értékének beállítása.
+```string Substitution(string text)```|A szövegbe behelyettesíti a gyűjteményben található változók értékét.
+```bool IsValidName(string name)```|Változónév ellenőrzés. A névnek meg kell felelnie az "[a-zA-Z_]\w*" reguláris kifejezésnek.
 
 #### A rendszerváltozók
 A rendszerváltozók neve egy statikus SystemVariableNames nevű osztályban érhetőek el.
@@ -140,32 +147,32 @@ MONTHSBACK|@MONTHSBACK#@|Valahány(#) hónappal korábbi nap.
 #### Osztály használatára egy minta
 ```javascript
 /// <summary>
-/// Minta a VariableCollection osztály használatára.
+/// Minta a VariableDictionary osztály használatára.
 /// </summary>
-private static void VariableCollectionTest()
+private static void VariableDictionaryTest()
 {
     try
     {
         // Az osztály példányosítása. Nyelvi kód paraméter kötelező.
-        VariableCollection vc = new VariableCollection("hu-HU", User.Identity.Name);
-        Show(vc);
+        VariableDictionary vd = new VariableDictionary("hu-HU", User.Identity.Name);
+        Show(vd);
 
         System.Threading.Thread.Sleep(1000);
 
-        vc.ResetSystemVariables();  //rendszerváltozók újra beállítása
-        Show(vc);
+        vd.ResetSystemVariables();  //rendszerváltozók újra beállítása
+        Show(vd);
 
-        vc.Add("VLTZ", "vltz értéke");  //egy változó hozzáadása
-        vc.Set("TODAY", "ma");          //egy változó módosítása
-        vc.Remove("NOW");               //egy változó törlése
-        Show(vc);
+        vd.Add("VLTZ", "vltz értéke");  //egy változó hozzáadása
+        vd["TODAY"] = "ma";             //egy változó módosítása
+        vd.Remove("NOW");               //egy változó törlése
+        Show(vd);
 
         string text = String.Concat(
             "aaaaa@YESTERDAY@bbbbbbb@TODAY@cccccccc",
             "@LASTMONTHLASTDAY@ddddddddddd\neee@DAYSBACK3@ff",
             "ff@WEEKSBACK4@gggg@MONTHSBACK10@hhhh"
         );
-        string result = vc.Substitution(text);  //szövegben lévő hivatkozások behelyettesítése
+        string result = vd.Substitution(text);  //szövegben lévő hivatkozások behelyettesítése
         Console.WriteLine();
         Console.WriteLine($"text= {result}");
     }
@@ -175,11 +182,11 @@ private static void VariableCollectionTest()
     }
 }
 
-private static void Show(VariableCollection vc)
+private static void Show(VariableDictionary vd)
 {
     Console.WriteLine();
-    foreach (string s in vc.AllKeys)
-        Console.WriteLine($"Name: {s,-25}Value: {vc[s]}");
+    foreach (KeyValuePair<string,string> s in vd)
+        Console.WriteLine($"Name: {s.Key,-25}Value: {s.Value}");
 }
 ```
 
@@ -268,6 +275,28 @@ CONNECTIONSTRING|"ConnectionString"|XML tagokban lehetséges 'ConnectionString' 
 NAME|"Name"|XML tagokban lehetséges 'Name' attribútum eléréséhez hasznos állandó.
 LCID|"LCID"|XML tagokban lehetséges 'LCID' attribútum eléréséhez hasznos állandó.
 
+### XmlConnection osztály
+Az XmlPaser példányosításához egy kapcsolati sztring szükséges, amelyet ez az osztály ellenőriz és
+kifejt. Az alábbi táblázat "Tulajdonság" oszlopában zárójelben az látható, hogy az adott összetevőnek
+milyen néven kell szerepelnie a kapcsolati stringben.
+
+Tulajdonság|Típus|Leírás
+:----|:----|:----
+Root (root)|```string```|A gyökér XML fájl az elérési útvonalával együtt, tartalmazhat relatív útvonalat is.
+ConfigurationName (config)|```string```|A konfiguráció neve, amit keresünk a gyökér XmlParser fájlban.
+File (file)|```string```|Ha ez van megadva a connection stringben, akkor itt van a komponens xml paraméter fájlja.
+Element (element)|```string```|Ha ez van megadva a connection stringben, akkor a komponens xml paraméter fájljában ezen elem alatt található a struktúra.
+
+#### Kapcsolati sztring felépítése:
+A minimum igény, hogy a 'config' vagy a 'file' tagnak szerepelnie kell.
+A config az erősebb, ha mindkettő szerepel. Pár minta:
+* "root=D:\SandBox\XmlParser\XmlParser.xml;config=FileManager" vagy
+* "root=D:\SandBox\XmlParser\XmlParser.xml;file=D:\aaa\bbb\FileManager.xml;element=RootAlattiElemNév"
+Ha 'root' nem szerepel, akkor a gyökér fájl alapértelmezése: "~/App_Data/XmlParser/XmlParser.xml".
+A felhasználó komponensek fogadhatnak üres kapcsolati stringet, ha számukra van érvényes alapértelmezett
+konfiguráció név. Például a FileManager meghívható kapcsolati sztring nélkül, akkor a FilManager a 
+következő sztringet generálja: "config:FileManager", és ezzel inicializálja az XmlParser-t.
+
 ### XmlParser osztály
 Az 'XmlParser' XML elem feldolgozását elvégző absztrakt osztály. A VRH paraméterező XML
 állományainak egységes szerkezetű eleme, mely definiálja az állomány részére a változókat, és kapcsolatokat. 
@@ -341,13 +370,13 @@ Az osztály egy absztrakt osztály, felhasználása a következő módon lehets�
 ```javascript
 public class MyXmlProcessor : XmlParser
 {
-    public MyXmlProcessor() : base(fileName, configName, lcid)
+    public MyXmlProcessor() : base(xmlConnectionString, appPath, lcid, otherVars)
 }
 ```
-* **fileName** Az XmlParser.xml állomány helye a fizikai elérési útvonalával együtt
-* **configName** Annak a konfigurációnak a neve, amelyet elő kell készíteni a MyXmlProcessor számára.
-* **lcid** A nyelvi környezetet meghatárázó nyelvi kód. Ha üres, akkor az XmlParser.xml-ben megadott 
-nyelv kód lesz alkalmazva.
+* **xmlConnectionString** Az XmlParser kapcsolati sztringje. Lásd: [XmlConnection osztály](###XmlConnection-osztaly)
+* **appPath** A felhasználó alkalmazásban érvényes alkalmazás mappa. (A '~' jel értéke.)
+* **lcid** A nyelvi környezetet meghatárázó nyelvi kód. Ha üres, akkor az XmlParser.xml-ben megadott nyelv kód lesz alkalmazva.
+* **otherVars** Egy szótár, mely név érték párokat tartalmaznak, melyek bekerülnek az XmlVars-ok közé. 
 
 Tulajdonság|Típus|Leírás
 :----|:----|:----
@@ -390,54 +419,205 @@ NAMESEPARATOR|"NameSeparator"|XML tagokban lehetséges 'NameSeparator' attribút
 FILE|"File"|XML tagokban lehetséges 'File' attribútum eléréséhez hasznos állandó.
 ELEMENT|"Element"|XML tagokban lehetséges 'Element' attribútum eléréséhez hasznos állandó.
 
+
+
+
+## BaseController osztály
+MVC-s alkalmázokhoz használható kontroller alaposztály, hasznos és 
+nélkülözhetetlen szolgáltatásokkal. Főbb szolgáltatások:
+- Dispose megvalósítása
+- DataTable-hez kapcsolódó hasznos szolgáltatások
+- ThrEx: Egy nyelvi fordítóval kiegészített ApplicationException-t dobó metódus.
+- Mlmgt: MultiLanguageManager.GetTranslation meghívása a ForcedLanguageCode nyelvi kóddal.
+
+
+### ParameterSeparating metódus
+Az MVC-s akciók Request.QueryString-jének szétválasztása a kért és egyéb paraméterekre.
+Az akciókban létrejövő QueryString-et két részre osztja. Egy RequestedParameters és egy 
+OtherParameters szótárra. Hogy mi kerüljön a RequestedParameters szótárba azt egy statikus
+osztályban érdmes beállítani, melynek segítségével aztán hivatkozhatunk a szótár elemeire.
+
+#### A kért (felhasználandó) paramétereket tartalmazó osztály
+Az alábbi minta a Vrh.Web.FileManager Index akciójának lehetséges paraméterei:
+```javascript
+/// <summary>
+/// Az akciók által átvehető url paraméterek nevei.
+/// </summary>
+public static class QParams
+{
+    /// <summary>
+    /// XmlParser kapcsolati sztring (connection string).
+    /// </summary>
+    public const string Xml = "xml";
+
+    /// <summary>
+    /// A FileManager definíció azonosítója, amely alapján a keresés és megjelenítés megtörténik.
+    /// </summary>
+    public const string Id = "id";
+
+    /// <summary>
+    /// A hívó által kért nyelv kódja, ha üres, akkor a releváns nyelvi kód lesz.
+    /// </summary>
+    public const string LCID = "lcid";
+
+    /// <summary>
+    /// A definícióban megadott gyökér mappa alatti mappa útvonal.
+    /// </summary>
+    public const string Folder = "folder";
+
+    /// <summary>
+    /// A definícióban megadott gyökér mappa alatti mappa útvonal.
+    /// </summary>
+    public const string File = "filename";
+}
+```
+#### Felhasználási minta
+A ```base.ParameterSeparating``` metódus létrehozza és feltölti a
+```base.RequestedParameters``` szótárat, melynek pont annyi eleme van,
+ahány mezője a ```QParams``` statikus osztálynak, és a szótárban a kulcsok 
+megegyeznek az osztály tulajdonságainak értékével. A szótárban az értékek az 
+ugyanolyan nevű URL paraméterekben érkezett értéket kapják.
+```javascript
+public ActionResult Index()
+{
+    base.ParameterSeparating(typeof(QParams));
+
+    if (String.IsNullOrWhiteSpace(base.RequestedParameters[QParams.LCID]))
+    {   // A ForcedLanguageCode a BaseController konstruktorában megkapja a MultiLanguageManager.RelevantLanguageCode-ot
+        base.RequestedParameters[QParams.LCID] = base.ForcedLanguageCode;
+    }
+    else
+    {
+        base.ForcedLanguageCode = base.RequestedParameters[QParams.LCID];
+    }
+    if (String.IsNullOrWhiteSpace(base.RequestedParameters[QParams.Folder]))
+    {
+        base.RequestedParameters[QParams.Folder] = WebCommon.SIGN_BACKSLASH;
+    }
+    return View(ACTION_INDEX, model);
+}
+```
+
+Amennyiben nem az alapértelmezett ```Request.QueryString``` ```NameValueCollection```-t
+kell feldolgozni, akkor létezik olyan túlterhelése a metódusnak, amelyben megadható a 
+feldolgozandó ```NameValueCollection```. Példaként egy POST metódust van itt,
+melyben a ```Request.Form``` kollekciót kéne feldolgozni:
+```javascript
+[HttpPost]
+public ActionResult SetValami()
+{
+    base.ParameterSeparating(Request.Form,typeof(QParams));
+}
+```
+
+
 ***
-# Version History:
-## V1.5.0 (2018.04.13)
-### Compatible API changes:
-1. CookieApplicationSettings osztály létrehozása.
-2. A WebCommon static osztály létrehozása, a VRH web alkalmazásokban alapvetően vagy sokszor használt tulajdonságok és metódusok eléréséhez.
-3. ViewModes enum létrehozása (Desktop, Mobile, Touch) értékekkel.
+## Version History:
 
-## V1.4.3 (2018.03.21)
-### Patches:
-1. VariableCollection.Substitution nem dob hibát, ha null értékű sztringet kap a behelyettesítéshez. Null-t add vissza ilyenkor.
+#### 1.11.1 (2019.05.22) Patches:
+- Frissítés a Microsoft.AspNet.Mvc 5.2.7 változatára.
+- Frissítés a Newtonsoft.Json 12.0.1 változatára.
 
-## V1.4.2 (2018.03.19)
-### Patches:
-1. XmlParser újra abstract. 
+#### 1.11.0 (2018.08.13) Compatible API changes - debug:
+- ```CookieApplicationSettings``` osztály kiegészült a "WelcomeUrl" tulajdonsággal, 
+hogy a Layout be tudja állítani a logo, és login/logout link értékét.
 
-## V1.4.1 (2018.03.07)
-### Compatible API changes:
-1. XmlParser az érték nélküli változókat is létrehozza üres string értékkel. 
-2. Rendszerváltozó nevű XmlVar esetén hiba keletkezik.
-3. Dokumentácó bővítése, javítása. 
+#### 1.10.1 (2018.08.10) Patches - debug:
+- Az XmlParser hibakezelésén kellet javítani. Hibát dob, ha a konfigurációban megadott elem
+nem létezik.
 
-## V1.4.0 (2018.03.03)
-### Compatible API changes:
-1. XmlLinqBase, XmlCondition, XmlVariable és XmlParser osztály létrehozása, az XML feldolgozás egységesítéséhez.
-2. Dokumentácó bővítése, javítása. 
+#### 1.10.0 (2018.08.10) Compatible API changes - debug:
+- ```CookieApplicationSettings``` osztály kiegészült a "ConfigurationName" és a 
+"ReferenceName" tulajdonságokkal, hogy ez is megőrződjön az alkalmazás cookie-ban.
 
-## V1.3.2 (2018.01.19)
-### Patches:
-1. UrlElement osztályban javítás és módosítás (konstruktor).
+#### 1.9.2 (2018.08.08) Patches - debug:
+- Az ```UrlElement.GetUrl()``` ```StringBuilder```-t használ, és a paraméterek nevében
+vagy értékében előforduló "?&=" jeleket a szabványos URL encode értékre cseréli.
+- A ```ParameterSeparating``` metódus kapott egy túlterhelést (overload),
+amelyben megadható a feldolgozandó ```NameValueCollection```.
 
-## V1.3.1 (2017.12.19)
-### Patches:
-1. Dokumentáció bővítése, pontosítása.
-2. Új név került be a rendszerváltozók közé, a "USERNAME".
+#### 1.9.1 (2018.08.01) Patches - debug:
+- A WebCommon.RealPath metódust kellet pontosítani.
 
-## V1.3.0 (2017.12.08)
-### Compatibility API changes::
-1. VariableCollection osztály létrehozása, az XML feldolgozáskor alkalmazott változók behelyettesítésére, és egységben tartására.
-1. SystemVariableNames statikus osztály létrehozása a rendszerváltozók egységes kezelése céljából.
-2. Dokumentációk bővítése és pontosítása.
+#### 1.9.0 (2018.07.27) Compatible API changes - debug:
+- ```VariableDictionary``` osztály bevezetése. A ```VariableCollection``` a 2.0-ás
+változattól már nem lesz használható.
+- ```ParameterQuery``` osztály megszűnt. A szolgáltatások a ```BaseController``` osztály
+```ParameterSeparating``` metódusába vándoroltak.
+- 'USERNAME' rendszerváltozó automatikusan hozzáadódik az ```OtherParameters```szótárhoz.
 
-## V1.2.3 (2017.11.30)
-### Patches:
-1. Dokumentáció bővítése, pontosítása.
-2. BaseController.ErrorMessageBuilder már magától levágja az utolsó soremelést.
+#### 1.8.3 (2018.07.26) Patches - debug:
+- URL paraméterek azonnal hozzáadódnak az XmlVars gyűjteményhez, és ezeknek az értékét nem
+módosíthatja, ha van ilyen változó az xml paraméterfájlokban.
 
-## V1.2.2 (2017.11.07)
-### Patches:
-1. A Vrh.Common.Serialization.Structures Lib kimozgatása az iScheduler alól ebbe az önálló solutionbe, és átnevezése Vrh.Web.Common.Lib-re
-2. Nuget csomaggá alakítás
+#### 1.8.2 (2018.07.25) Patches - debug:
+- XmlParser és BaseController osztályokban történtek javítások.
+- A VariableCollection csak olyan változókat tartalmazhat, amelyek neve
+megfelel a "[a-zA-Z_]\w*" reguláris kifejezésnek.
+- XmlLinqBase az IDisposable osztályból származtatva
+
+#### 1.8.1 (2018.07.24) Patches - debug:
+- XmlConnection konstruktorában történt javítás. Alapértelmezett fájl és 
+konfigurációnév megadással kapcsolatban.
+
+#### 1.8.0 (2018.07.16) Compatible API changes - debug:
+- ParameterQuery osztály bevezetése. A .NET-es akciók Request.QueryString-jének szétválasztása
+a kért és egyéb paraméterekre. 
+- XmlConnection osztály bevezetése. XmlParser connection string feldolgozásához.
+- XmlParser új konstruktorokkal bővült, melyek alkalmasak az XmlConnection,
+ParameterQuery osztályok és az XmlParser connection string fogadására a példányosításkor. 
+
+#### 1.7.1 (2018.06.30) Patches - debug:
+- A CookieApplicationSettings osztályban a Set metódusban a ProductName és CopyRight
+UrlEncode után kerül mentésre, és visszaolvasáskor UrlDecode történik. (A cookie nem
+tud letárolni UNICODE-ot.)
+
+#### 1.7.0 (2018.05.30) Compatible API changes - debug:
+- Elkészült egy újabb XmlParser konstruktor, mely nem konfigurációs nevet vár, hanem
+egy létező xml fájl nevét. Ez a konstruktor feldolgozza a gyökér XmlParser változóit,
+de nem foglalkozik annak Configuration elemével.
+
+#### 1.6.0 (2018.05.11) Compatible API changes:
+- ValidationExtension static osztály hozzáadása (a régi DataTables.dll-ből átemelve)
+
+#### 1.5.0 (2018.04.13) Compatible API changes:
+- CookieApplicationSettings osztály létrehozása.
+- A WebCommon static osztály létrehozása, a VRH web alkalmazásokban alapvetően 
+vagy sokszor használt tulajdonságok és metódusok eléréséhez.
+- ViewModes enum létrehozása (Desktop, Mobile, Touch) értékekkel.
+
+#### 1.4.3 (2018.03.21) Patches:
+- VariableCollection.Substitution nem dob hibát, ha null értékű sztringet kap a behelyettesítéshez. Null-t add vissza ilyenkor.
+
+#### 1.4.2 (2018.03.19) Patches:
+- XmlParser újra abstract. 
+
+#### 1.4.1 (2018.03.07) Compatible API changes:
+- XmlParser az érték nélküli változókat is létrehozza üres string értékkel. 
+- Rendszerváltozó nevű XmlVar esetén hiba keletkezik.
+- Dokumentácó bővítése, javítása. 
+
+#### 1.4.0 (2018.03.03) Compatible API changes:
+- XmlLinqBase, XmlCondition, XmlVariable és XmlParser osztály létrehozása, az XML
+feldolgozás egységesítéséhez.
+- Dokumentácó bővítése, javítása. 
+
+#### 1.3.2 (2018.01.19) Patches:
+- UrlElement osztályban javítás és módosítás (konstruktor).
+
+#### 1.3.1 (2017.12.19) Patches:
+- Dokumentáció bővítése, pontosítása.
+- Új név került be a rendszerváltozók közé, a "USERNAME".
+
+#### 1.3.0 (2017.12.08) Compatibility API changes::
+- VariableCollection osztály létrehozása, az XML feldolgozáskor alkalmazott változók behelyettesítésére, és egységben tartására.
+- SystemVariableNames statikus osztály létrehozása a rendszerváltozók egységes kezelése céljából.
+- Dokumentációk bővítése és pontosítása.
+
+#### 1.2.3 (2017.11.30) Patches:
+- Dokumentáció bővítése, pontosítása.
+- BaseController.ErrorMessageBuilder már magától levágja az utolsó soremelést.
+
+#### 1.2.2 (2017.11.07) Patches:
+- A Vrh.Common.Serialization.Structures Lib kimozgatása az iScheduler alól ebbe az önálló solutionbe, és átnevezése Vrh.Web.Common.Lib-re
+- Nuget csomaggá alakítás

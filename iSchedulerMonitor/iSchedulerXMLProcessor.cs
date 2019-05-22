@@ -150,8 +150,12 @@
         {
             try
             {
-                _xmlNameSpace = string.Empty;
-                _xmlFileDefinition = "@" + localPath;
+                base._xmlNameSpace = string.Empty;
+                base._xmlFileDefinition = "@" + localPath;
+                base._throwException = true;
+                XElement rootXE = base.GetRootElement();    // csak azért, hogy kiderüljenek az XML hibák!
+                base._throwException = false;
+                //rootXE = base.GetRootElement();    // csak azért, hogy kiderüljenek az XML hibák!
 
                 LCID = "en-US";    //fix érték, mert nincs honnan megtudni a beállítást!
                 CheckIntervalMinimum = 60; // 1 perc

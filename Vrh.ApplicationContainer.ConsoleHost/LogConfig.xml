@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Vrh.Logger>
-  <LogLevel>Warning</LogLevel>
+  <LogLevel>Verbose</LogLevel> <!-- Lehetséges értékek: Verbose, Warning -->>
   <EnableConsoleLogging>True</EnableConsoleLogging>
   <EnableDebuggerLogging>True</EnableDebuggerLogging>
   <EnableFileLogging LogDirectory="Log" LogFile="Vrh.Logger.TxtLog.log">True</EnableFileLogging>

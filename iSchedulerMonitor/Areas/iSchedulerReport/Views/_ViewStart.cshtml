@@ -1,0 +1,18 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@Styles.Render("~/Content/DataTables/css/jquery.dataTables.css"
+             , "~/Content/DataTables/css/dataTables.tableTools.css"
+             , "~/Content/smalot-datetimepicker/bootstrap-datetimepicker.min.css"
+             , "~/Content/smalot-datetimepicker/bootstrap-datetimepicker.min.css"
+              )
+@Styles.Render("~/DataTables/Content/DataTables.css")
+@Styles.Render("~/Content/VRHDataTables.css")
+
+@Scripts.Render("~/Scripts/DataTables/jquery.dataTables.js"
+              , "~/Scripts/DataTables/dataTables.tableTools.js"
+              , "~/Scripts/smalot-datetimepicker/bootstrap-datetimepicker.min.js"
+               )
+
+@Scripts.Render("~/DataTables/Scripts/DataTables.js")

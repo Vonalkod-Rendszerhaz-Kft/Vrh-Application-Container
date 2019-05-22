@@ -63,8 +63,8 @@ namespace iSchedulerMonitor
 
             _pluginReference = pluginReference;
             m_xmlp = new iSchedulerXMLProcessor(localPath, remotePath);
-            m_timer = new Timer(m_xmlp.CheckInterval * 1000); // !!! Ez itt a jó sor !!!
-                                                              //m_timer = new Timer(5000); // !!! Ez meg itt a debug !!!
+            //m_timer = new Timer(m_xmlp.CheckInterval * 1000); // !!! Ez itt a jó sor !!!
+                                                              m_timer = new Timer(20000); // !!! Ez meg itt a debug !!!
             m_timer.Elapsed += OnExamination;
 
             var logData = new Dictionary<string, string>
@@ -151,10 +151,10 @@ namespace iSchedulerMonitor
                             int ScheduledJobCounter = 0;
                             while (rdr.Read())
                             {
-                                ScheduledJobCounter += 1;
+                                ScheduledJobCounter++;
                                 int id = rdr.GetInt32(ixID);
                                 DateTime jobstartedat = DateTime.Now;
-                                logData.Add("Scheduled job Id", id.ToString());
+                                logData.Add($"{ScheduledJobCounter}. scheduled job Id", id.ToString());
                                 _pluginReference.LogThis($"Scheduled job execution started (job index in cycle: #{ScheduledJobCounter.ToString()})!", logData, null, LogLevel.Verbose, this.GetType());
                                 se.Run(id);
                                 DateTime jobfinishedat = DateTime.Now;

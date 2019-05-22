@@ -1,0 +1,30 @@
+if not exist "$(SolutionDir)Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)\iSchedulerMonitor" mkdir "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)\iSchedulerMonitor"
+xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\iSchedulerMonitor.Config.xml" "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)\iSchedulerMonitor"
+
+xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\iSchedulerMonitor.dll" "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)\iSchedulerMonitor"
+
+REM Microsoft.Report.Viewer
+xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\Microsoft.ReportViewer.Common.dll" "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)"
+xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\Microsoft.ReportViewer.ProcessingObjectModel.DLL" "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)"
+xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\Microsoft.ReportViewer.WebForms.DLL" "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)"
+
+REM Egyéb rendszer összetevők
+xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\Antlr3.Runtime.dll" "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)"
+xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\System.Web.Optimization.dll" "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)"
+xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\System.Web.Providers.dll" "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)"
+xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\WebGrease.dll" "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)"
+
+REM VRH-s alapcsomagok
+xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\Vrh.Interfaces.dll" "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)"
+xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\VRH.Log4Pro.MultiLanguageManager.dll" "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)"
+xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\VRH.Mockable.TimeProvider.dll" "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)"
+xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\Vrh.Web.Common.Lib.dll" "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)"
+
+REM Üzleti logikát hordozó csomagok
+xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\Vrh.iScheduler.Lib.dll" "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)"
+xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\Vrh.iScheduler.Report.Lib.dll" "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)"
+xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\Vrh.OneMessage.dll" "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)"
+xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\Vrh.OneReport.Lib.dll" "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)"
+xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\Vrh.Web.Membership.DataTier.dll" "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)"
+xcopy /Y /R "$(SolutionDir)iSchedulerMonitor\bin\$(ConfigurationName)\Vrh.Web.Membership.Lib.dll" "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)"
+

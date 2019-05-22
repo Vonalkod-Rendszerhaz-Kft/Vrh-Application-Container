@@ -1,0 +1,34 @@
+﻿@using Vrh.OneReport.Lib.ReportViewerForMvc
+@using Vrh.OneReport.Lib.Areas.OneReport.ViewModels
+@using Vrh.OneReport.Lib.Areas.OneReport.Models
+
+@model DisplayViewModel
+
+@{
+    var title = string.IsNullOrEmpty(Model.DisplayName) ? string.Format("Report ({0})", Model.ReportId) : string.Format("{0} ({1})", Model.DisplayName, Model.ReportId);
+    ViewBag.Title = title;
+}
+
+<style>
+    #report-panel {
+        position: absolute;
+        top: 5px;
+        left: 5px;
+/*       margin: 5px;
+        width: 90%;
+        height: 80%;
+*/    }
+</style>
+
+<div id="report-panel" class="panel panel-primary">
+    <div class="panel-heading">@title</div>
+    <div class="panel-body">
+        @Html.ReportViewer(ViewBag.ReportViewer as Microsoft.Reporting.WebForms.ReportViewer, ViewBag.ReportModel as ReportXMLModel)
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#lear-alm-fixed-top").css("display", "none");
+    });
+</script>

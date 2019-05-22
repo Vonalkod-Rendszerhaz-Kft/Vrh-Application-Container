@@ -1,0 +1,75 @@
+﻿@model Exception
+
+@helper GetException(Exception ex)
+{
+if (ex is ApplicationException)
+{
+        <div class="row">
+            <div class="col-md-12" style="margin-top:5px;margin-bottom:5px;font-size:larger;font-weight:bold;">@ex.Message</div>
+        </div>
+}
+else
+{
+        <div class="row">
+            <div class="col-md-2">Message:</div>
+            <div class="col-md-10">@ex.Message</div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">Source:</div>
+            <div class="col-md-10">@ex.Source</div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">HResult:</div>
+            <div class="col-md-10">@ex.HResult</div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">Stack Trace:</div>
+            <div class="col-md-10">@ex.StackTrace</div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">Target Site:</div>
+            <div class="col-md-10">@ex.TargetSite</div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">Help Link:</div>
+            <div class="col-md-10">@ex.HelpLink</div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">Data:</div>
+            <div class="col-md-10">@ex.Data</div>
+        </div>
+    if (ex.InnerException != null)
+    {
+            <div class="row">
+                <div class="col-md-2">Inner Exception:</div>
+                <div class="col-md-10">
+                    @GetException(ex.InnerException)
+                </div>
+            </div>
+    }
+}@*if (ex is ApplicationException) END*@
+}@*GetException(Exception ex) helper END*@
+
+<div class="panel panel-primary">
+    <div class="panel-heading" style="font-weight:bold;font-size:larger;padding-top:3px;padding-bottom:3px;">
+        @Html.Raw(ViewBag.Title)
+    </div>
+    <div class="panel-body">
+        @GetException(Model)
+    </div>
+    <div class="panel-footer" style="text-align:right;">
+        <button class="btn btn-default" onclick="javascript:bootboxAction_LastDialog.modal('hide');">OK</button>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        console.log('Error.cshtml: event ready');
+        $('.bootbox-close-button').css('margin-top', '4px').css('margin-right', '10px');
+
+        var $bb = $('#@(ViewBag.BootboxId)');
+        $bb.find('.modal-body').css('padding','0px');
+        $bb.find('.panel-primary').css('margin','0px');
+        $bb.find('.panel-body').css('padding-left','10px').css('padding-right','10px');
+    });
+</script>

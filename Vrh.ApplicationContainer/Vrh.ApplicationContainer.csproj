@@ -75,8 +75,8 @@
       <HintPath>..\packages\Vrh.LinqXMLProcessor.Base.1.2.3\lib\net40\Vrh.LinqXMLProcessor.Base.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Vrh.Logger, Version=1.5.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.Logger.1.5.3\lib\net45\Vrh.Logger.dll</HintPath>
+    <Reference Include="Vrh.Logger, Version=1.5.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.Logger.1.5.5\lib\net45\Vrh.Logger.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -114,15 +114,15 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="ApplicationContainer.Config.xml" />
-    <None Include="_CreateNewNuGetPackage\DoNotModify\NuGet.exe" />
     <None Include="LogConfig.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="_CreateNewNuGetPackage\DoNotModify\NuGet.exe" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /Y /R "$(SolutionDir)Vrh.ApplicationContainer\ApplicationContainer.Config.xml" "$(SolutionDir)\Vrh.ApplicationContainert.ConsoleHost\bin\$(ConfigurationName)"
+    <PostBuildEvent>xcopy /Y /R "$(SolutionDir)Vrh.ApplicationContainer\ApplicationContainer.Config.xml" "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)"
 
 
 REM Create a NuGet package for this project and place the .nupkg file in the project's output directory.
