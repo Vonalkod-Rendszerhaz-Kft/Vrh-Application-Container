@@ -63,8 +63,8 @@ namespace iSchedulerMonitor
 
             _pluginReference = pluginReference;
             m_xmlp = new iSchedulerXMLProcessor(localPath, remotePath);
-            //m_timer = new Timer(m_xmlp.CheckInterval * 1000); // !!! Ez itt a jó sor !!!
-                                                              m_timer = new Timer(20000); // !!! Ez meg itt a debug !!!
+            m_timer = new Timer(m_xmlp.CheckInterval * 1000); // !!! Ez itt a jó sor !!!
+                                                              // m_timer = new Timer(20000); // !!! Ez meg itt a debug !!!
             m_timer.Elapsed += OnExamination;
 
             var logData = new Dictionary<string, string>
