@@ -29,6 +29,9 @@ elemeken keresztűl lehet elérni. Példa egy URL-re: *[application]/iSchedulerR
 
 ## Version History:
 
+#### 1.5.2 (2019.05.27) Patches - debug:
+- Frissítés a Vrh.OneReport 1.4.2 változatára.
+
 #### 1.5.1 (2019.05.22) Patches - debug:
 - Frissítés a Newtonsoft.Json 12.0.1 változatára.
 - Frissítés a Vrh.OneMessage 1.1.4 változatára.

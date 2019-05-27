@@ -110,11 +110,11 @@
     <Reference Include="Vrh.Interfaces, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Vrh.Interfaces.1.0.0\lib\net45\Vrh.Interfaces.dll</HintPath>
     </Reference>
-    <Reference Include="Vrh.iScheduler.Lib, Version=1.5.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.iScheduler.1.5.1\lib\net45\Vrh.iScheduler.Lib.dll</HintPath>
+    <Reference Include="Vrh.iScheduler.Lib, Version=1.5.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.iScheduler.1.5.2\lib\net45\Vrh.iScheduler.Lib.dll</HintPath>
     </Reference>
-    <Reference Include="Vrh.iScheduler.Report.Lib, Version=1.5.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.iScheduler.Report.1.5.1\lib\net45\Vrh.iScheduler.Report.Lib.dll</HintPath>
+    <Reference Include="Vrh.iScheduler.Report.Lib, Version=1.5.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.iScheduler.Report.1.5.2\lib\net45\Vrh.iScheduler.Report.Lib.dll</HintPath>
     </Reference>
     <Reference Include="Vrh.LinqXMLProcessor.Base, Version=1.2.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Vrh.LinqXMLProcessor.Base.1.2.3\lib\net40\Vrh.LinqXMLProcessor.Base.dll</HintPath>
@@ -132,8 +132,8 @@
     <Reference Include="Vrh.OneMessage, Version=1.1.4.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Vrh.OneMessage.1.1.4\lib\net45\Vrh.OneMessage.dll</HintPath>
     </Reference>
-    <Reference Include="Vrh.OneReport.Lib, Version=1.4.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.OneReport.1.4.1\lib\net45\Vrh.OneReport.Lib.dll</HintPath>
+    <Reference Include="Vrh.OneReport.Lib, Version=1.4.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.OneReport.1.4.2\lib\net45\Vrh.OneReport.Lib.dll</HintPath>
     </Reference>
     <Reference Include="Vrh.Web.Common.Lib, Version=1.11.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Vrh.Web.Common.Lib.1.11.1\lib\net45\Vrh.Web.Common.Lib.dll</HintPath>

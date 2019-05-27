@@ -1,0 +1,53 @@
+<menugroups>
+	<menupage roles="*" authenticationRequired="true">
+		<title WordCode="ScheduleReport.MenuPageTitle">Ütemezett riportok</title>
+		<GenerateWordcode Prefix="MvcMenu">True</GenerateWordcode>    
+	</menupage>
+	
+	<menugroup id="reportpackages" roles="*" initialstate="closed" label="Riport csomagok" labelWordCode="ReportPackages">
+		<menuitem roles="*" authenticationRequired="true">
+			<text WordCode="ReportPackageManager">Riport csomag kezelő</text>
+			<area>iSchedulerReport</area><controller>iSchedulerReport</controller><action>Manager</action>
+			<inputparameter name="xmlfile">~\App_Data\iScheduler\iSchedulerReport.xml</inputparameter>
+			<inputparameter name="GroupId">GRP1</inputparameter>
+		</menuitem>
+		<menuitem roles="*" authenticationRequired="true" dialog="true" dialogsize="1000px">
+			<text WordCode="ScheduledReportEditor">Ütemezés szerkesztő</text>
+			<area>iSchedulerReport</area><controller>iSchedulerReport</controller><action>Editor</action>
+			<inputparameter name="xmlfile">~\App_Data\iScheduler\iSchedulerReport.xml</inputparameter>
+			<inputparameter name="groupId">GRP1</inputparameter>
+		</menuitem>
+		<menuitem roles="*" authenticationRequired="true" dialog="true" dialogsize="50%">
+			<text WordCode="ReportPackageTestRun">Riport csomag teszt futtatása</text>
+			<area>WebForm</area><controller>WebForm</controller><action>Execute</action>
+			<inputparameter name="fileName">~\App_Data\iScheduler\iSchedulerWebforms.xml</inputparameter>
+			<inputparameter name="formName">ExecuteTest</inputparameter>
+			<inputparameter name="viewmode">dialog</inputparameter>
+		</menuitem>
+		<!--
+		-->
+	</menugroup>
+	<menugroup id="schedules" roles="*" initialstate="closed" label="Ütemezések" labelWordCode="Schedules">
+		<menuitem roles="*" authenticationRequired="true">
+			<text WordCode="ScheduleManager">Ütemezés kezelő</text>
+			<area>iScheduler</area><controller>iScheduler</controller><action>Manager</action>
+			<inputparameter name="xmlfile">~\App_Data\iScheduler\iScheduler.xml</inputparameter>
+			<inputparameter name="GroupId">GRP1</inputparameter>
+		</menuitem>
+		<menuitem roles="*" authenticationRequired="true" dialog="true" dialogsize="500px">
+			<text WordCode="ScheduleEditorCreateNew">Ütemezés szerkesztő</text>
+			<area>iScheduler</area><controller>iScheduler</controller><action>Editor</action>
+			<inputparameter name="xmlfile">~\App_Data\iScheduler\iScheduler.xml</inputparameter>
+			<inputparameter name="groupId">GRP1</inputparameter>
+		</menuitem>
+		<!--
+		-->
+		<menuitem roles="*" authenticationRequired="true" dialog="true" dialogsize="900px">
+			<text WordCode="ScheduleTestRun">Ütemezés teszt futtatása</text>
+			<area>WebForm</area><controller>WebForm</controller><action>Execute</action>
+			<inputparameter name="fileName">~\App_Data\iScheduler\iSchedulerWebforms.xml</inputparameter>
+			<inputparameter name="formName">ScheduleExecuteTest</inputparameter>
+			<inputparameter name="viewmode">dialog</inputparameter>
+		</menuitem>
+	</menugroup>
+</menugroups>

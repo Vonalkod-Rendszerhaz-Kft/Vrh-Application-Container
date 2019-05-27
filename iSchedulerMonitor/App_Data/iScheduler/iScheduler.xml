@@ -1,0 +1,174 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<iScheduler>
+  <strings>
+    <!-- <string name="AAA">~/App_Data/iScheduler/iScheduler.xml</string> -->
+    <string name="ALMserverIP">192.168.77.29</string>
+    
+    <!-- !!! Ami LinqXMLProcessorBaseClass osztályt használ, ott kötelező a "\" jel a mappa elválasztásnál !!! -->
+    <string name="repxml">d:\!Dev\VRH\lear-dtm\Source\WebApplication\App_Data\iScheduler\iSchedulerReport.xml</string>
+    <string name="repdll">d:\!Dev\VRH\lear-dtm\Source\WebApplication\bin\Vrh.iScheduler.Report.Lib.dll</string>
+  </strings>
+  <connectionstrings>
+    <connectionstring name="anticstr">data source=(local)\SQLEXPRESS;initial catalog=LearALM;integrated security=True;MultipleActiveResultSets=True;App=EntityFramework;</connectionstring>
+    <connectionstring name="vrhcstr">data source=192.168.77.29\SQLExpress;initial catalog=LearALM;user id=sa;password=Vrh@54321;MultipleActiveResultSets=True;App=EntityFramework;</connectionstring>
+    <connectionstring name="vrhcstr2">Data Source=GOD-20-2211\SQLExpress;Initial Catalog=LearALM;multipleactiveresultsets=True;Integrated Security=SSPI;</connectionstring>
+  </connectionstrings>
+  <ObjectType>iSchedulerReport</ObjectType>
+  <!-- <ObjectAccessMode>WebAppController</ObjectAccessMode> -->
+  <ObjectAccessMode>Plugin</ObjectAccessMode>
+  <GroupId>GRP1</GroupId>
+  <DatabaseConnectionString>anticstr</DatabaseConnectionString>
+  <WordCodePrefix>iSchedulerXml.</WordCodePrefix>
+  <LCID>en-US</LCID>
+  
+  <!-- Az Url-ekben a következő beépített változókat lehet használni (betűérzékeny):
+       - @OBJECTTYPE@ : xmlben megadott ObjectTpye
+       - @GROUPID@    : xmlben megadott vagy paraméterrel felülírt érték.
+       - @OBJECTID@   : az ObjectEditor és Exececute akcióknál használható, az éppen szerkesztett azonosító kerül bele.
+       - @OBJECTLIST@ : csak a CheckObjects akciónál használható, és az ellenőrzendő objektumazonosítók vesszővel elválasztott listája lesz benne.
+       - @OPERATION@  : csak az Execute akciónál használható, és az elvégzendő művelet neve kerül bele.
+       - @TIMESTAMP@  : csak az Execute akciónál használható, és az ütemezett objektumnál szereplő OperationTime mező értéke kerül bele.
+       - @PATH@       : csak a ScheduleExecute akciónál használható, és e fájl neve kerül bele az elérési útjával együtt.
+       - @ID@         : csak a ScheduleExecute akciónál használható, és az ütemezés egyedi azonosítója kerül bele.
+  -->
+  <ControllerActions>
+    <CheckObjects>
+      <area>iSchedulerReport</area>
+      <controller>iSchedulerReport</controller>
+      <action>Check</action>
+      <inputparameter name="xmlfile">@repxml@</inputparameter>
+      <inputparameter name="List">@OBJECTLIST@</inputparameter>
+      <inputparameter name="GroupId">@GROUPID@</inputparameter>
+    </CheckObjects>
+    <ListObjects>
+      <area>iSchedulerReport</area>
+      <controller>iSchedulerReport</controller>
+      <action>List</action>
+      <inputparameter name="xmlfile">@repxml@</inputparameter>
+      <inputparameter name="GroupId">@GROUPID@</inputparameter>
+    </ListObjects>
+    <ListOperations>
+      <area>iSchedulerReport</area>
+      <controller>iSchedulerReport</controller>
+      <action>ListOperations</action>
+      <inputparameter name="xmlfile">@repxml@</inputparameter>
+    </ListOperations>
+    <ObjectManager>
+      <area>iSchedulerReport</area>
+      <controller>iSchedulerReport</controller>
+      <action>Manager</action>
+      <inputparameter name="xmlfile">@repxml@</inputparameter>
+      <inputparameter name="GroupId">@GROUPID@</inputparameter>
+    </ObjectManager>
+    <ObjectEditor>
+      <area>iSchedulerReport</area>
+      <controller>iSchedulerReport</controller>
+      <action>Editor</action>
+      <inputparameter name="xmlfile">@repxml@</inputparameter>
+      <inputparameter name="GroupId">@GROUPID@</inputparameter>
+      <inputparameter name="ObjectId">@OBJECTID@</inputparameter>
+    </ObjectEditor>
+    <Execute>
+      <area>iSchedulerReport</area>
+      <controller>iSchedulerReport</controller>
+      <action>@OPERATION@</action>
+      <inputparameter name="xmlfile">@repxml@</inputparameter>
+      <inputparameter name="GroupId">@GROUPID@</inputparameter>
+      <inputparameter name="ObjectId">@OBJECTID@</inputparameter>
+      <inputparameter name="TimeStamp">@TIMESTAMP@</inputparameter>
+    </Execute>
+    <!--
+    <Execute>
+		<area>OneScripter</area><controller>Scripter</controller><action>RunScriptJson</action>
+		<inputparameter name="xmlpath">~/App_Data/OneScripter/ServiceScriptsScripters.xml</inputparameter>
+		<inputparameter name="name">BackupSystem</inputparameter>
+    </Execute>
+	-->
+  </ControllerActions>
+
+  <Plugin>
+    <AssemblyPath>@repdll@</AssemblyPath>
+    <ObjectXml>@repxml@</ObjectXml>
+  </Plugin>
+
+  <Manager>
+    <Options DefaultViewMode="list" />
+    <Buttons>
+      <!--
+			1. Type="sys" lehetséges nevei: ConsistencyCheck, GoToListView, GoToMonthView, NewSchedule.
+			2. Type="sys" Name="ConsistencyCheck" esetén egy bootstrap váltógomb (togglebutton) jön létre!
+			   A Style a bekapcsolt állapot stílusát jelenti, kikapcsolt állapotban szürkeháttér fekete betűkkel.
+			   A WordCode kiegészítésare kerül az .On és a .Off kiegészítővel, mely be és a ki kapcsolt esetben
+			   szükséges szöveget jelenti. Most így készült el, de lehetséges egy általánosabb megoldás is.
+			<Button Type="sys" Name="ObjectManager" Row="1" Col="1" Style="color:white;background-color:black;" WordCode="Manager.Button.ObjectManager"/>
+			-->
+      <Button Type="sys" Name="GoToMonthView" Row="1" Col="9" Style="color:black;background-color:orange;" WordCode="Manager.Button.GoToMonthView" />
+      <Button Type="sys" Name="GoToListView" Row="1" Col="8" Style="color:black;background-color:orange;" WordCode="Manager.Button.GoToListView" />
+      <Button Type="sys" Name="ConsistencyCheck" Row="1" Col="7" Style="color:white;background-color:red;" WordCode="Manager.Button.ConsistencyCheck" />
+      <Button Type="sys" Name="NewSchedule" Row="1" Col="6" Style="color:white;background-color:limegreen;" WordCode="Manager.Button.NewSchedule" />
+      <Button Type="url" Name="Button0" Row="2" Col="9" Style="color:white;background-color:blue;" WordCode="Manager.Button.ObjectManager">
+        <url>
+          <area>iSchedulerReport</area>
+          <controller>iSchedulerReport</controller>
+          <action>Manager</action>
+          <inputparameter name="xmlfile">@repxml@</inputparameter>
+          <inputparameter name="GroupId">@GROUPID@</inputparameter>
+        </url>
+      </Button>
+      <Button Type="url" Name="Button1" Row="2" Col="8" Style="color:white;background-color:black;" WordCode="Manager.Button.TestExecute">
+        <url>
+          <area>MvcMenu</area>
+          <controller>WebForm</controller>
+          <action>WebForm</action>
+          <inputparameter name="fileName">~\App_Data\iScheduler\iSchedulerWebforms.xml</inputparameter>
+          <inputparameter name="formName">ScheduleExecuteTest</inputparameter>
+        </url>
+      </Button>
+      <Button Type="url" Name="Button3" Row="2" Col="7" Style="color:white;background-color:black;" WordCode="Manager.Button.TestExecuteReportPackage">
+        <url>
+          <area>MvcMenu</area>
+          <controller>WebForm</controller>
+          <action>WebForm</action>
+          <inputparameter name="fileName">~\App_Data\iScheduler\iSchedulerWebforms.xml</inputparameter>
+          <inputparameter name="formName">ExecuteTest</inputparameter>
+        </url>
+      </Button>
+      <Button Type="url" Name="Button2" Row="2" Col="6" Style="color:black;background-color:yellow;" WordCode="Manager.Button.GoToSavedReports">
+        <url>
+          <area>FileDownloader</area>
+          <controller>Home</controller>
+          <action>Index</action>
+          <inputparameter name="id">ScheduledReports</inputparameter>
+          <inputparameter name="xml">c:\ALM\wwwroot\App_Data\iScheduler\MvcDownloaders.xml</inputparameter>
+        </url>
+      </Button>
+    </Buttons>
+  </Manager>
+  <MonitorService>
+    <ExecuteUrl>
+      <!--ANTI <protocol>http</protocol><hostname>localhost:50083</hostname> -->
+      <!-- VRH <protocol>http</protocol><hostname>@ALMserverIP@</hostname><appname>LearALM</appname> -->
+      <protocol>http</protocol>
+      <hostname>localhost:50083</hostname>
+      <area>iScheduler</area>
+      <controller>iScheduler</controller>
+      <action>ScheduleExecute</action>
+      <inputparameter name="path">@PATH@</inputparameter>
+      <inputparameter name="scheduleid">@ID@</inputparameter>
+    </ExecuteUrl>
+    <LoginUrl>
+      <!--ANTI <protocol>http</protocol><hostname>localhost:59148</hostname> -->
+      <!-- VRH <protocol>http</protocol><hostname>@ALMserverIP@</hostname><appname>LearALM</appname> -->
+      <protocol>http</protocol>
+      <hostname>localhost:59148</hostname>
+      <area>UserAdministration</area>
+      <controller>Account</controller>
+      <action>Login</action>
+    </LoginUrl>
+    <LoginCredentials username="Developer" password="Dev123" />
+    <!-- Minimum: 60 sec (1perc), maximum: 86400 sec (1nap) -->
+    <CheckInterval>30</CheckInterval>
+    <!-- Alapértelmezés: 60 sec (1perc), minimum: 10 sec, maximum: 3600 sec (1óra) -->
+    <ResponseTimeout>300</ResponseTimeout>
+  </MonitorService>
+</iScheduler>

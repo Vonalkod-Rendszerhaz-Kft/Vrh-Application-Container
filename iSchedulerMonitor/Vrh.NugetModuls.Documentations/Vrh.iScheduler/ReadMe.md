@@ -60,6 +60,10 @@ ScheduleSeriesId|Ha az ütemezés egy ütemezés sorozat része, akkor annak azo
 ****
 
 # Version History:
+#### 1.5.2 (2019.05.27) Patches:
+- Frissítés a Vrh.OneReport 1.4.2 változatára.
+- Frissítés a Vrh.iScheduler.Report 1.5.2 változatára.
+
 #### 1.5.1 (2019.05.22) Patches:
 - VRH.ConnectionStringStore 1.3.0 változat visszaállítása, hogy szinkronban legyen az Application.Container-rel.
 - Frissítés a Newtonsoft.Json 12.0.1 változatára.

@@ -10,13 +10,18 @@ SET configurationName=%~2
 SET projectName=%~3
 ECHO %me%: %projectName% project: Copy components ...
 SET binDir=%solutionDir%%projectName%\bin\%configurationName%\
-SET hostDir=%solutionDir%\Vrh.ApplicationContainer.ConsoleHost\bin\%configurationName%\
+SET hostDir=%solutionDir%Vrh.ApplicationContainer.ConsoleHost\bin\%configurationName%\
 SET targetDir=%hostDir%%projectName%
+SET oneReportDir=%hostDir%%projectName%\OneReport
+SET iSchedulerDir=%hostDir%%projectName%\iScheduler
 SET switch=/Y /R
 
 if not exist "%targetDir%" mkdir "%targetDir%"
+if not exist "%oneReportDir%" mkdir "%oneReportDir%"
+if not exist "%iSchedulerDir%" mkdir "%iSchedulerDir%"
 xcopy %switch% "%solutionDir%%projectName%\iSchedulerMonitor.Config.xml" "%targetDir%"
-xcopy %switch% "%binDir%%projectName%.dll" "%targetDir%"
+xcopy %switch% "%solutionDir%%projectName%\App_Data\OneReport\*.*" "%oneReportDir%"
+xcopy %switch% "%solutionDir%%projectName%\App_Data\iScheduler\*.*" "%iSchedulerDir%"
 
 REM Microsoft.Report.Viewer
 xcopy %switch% "%binDir%Microsoft.ReportViewer.Common.dll" "%hostDir%"

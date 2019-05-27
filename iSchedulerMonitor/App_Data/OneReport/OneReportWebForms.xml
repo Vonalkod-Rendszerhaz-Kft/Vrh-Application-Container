@@ -1,0 +1,1939 @@
+<WebFormXML VariableNameSeparator="#">
+	<!-- Ebben a fájlban használható renszer (FIX) változók (!e neveket be használd változónévnek!):
+		LCID:				a program futására vonatkozóan meghatározott nyelvkód
+		TODAY:				a futáskori dátum yyyyMMdd formátumban
+		YESTERDAY:			a tegnapi nap dátuma yyyyMMdd formátumban
+		NOW:				a futáskori időbélyeg yyyyMMddHHmmss formátumban
+		THISWEEKMONDAY:		a futáskor aktuális hét hétfőjének dátuma yyyyMMdd formátumban
+		THISWEEKFRIDAY:		a futáskor aktuális hét péntekének dátuma yyyyMMdd formátumban
+		THISMONTH1STDAY:	a futáskor aktuális hónap első napjának dátuma yyyyMMdd formátumban
+		THISMONTHLASTDAY:	a futáskor aktuális hónap utolsó napjának dátuma yyyyMMdd formátumban
+		LASTWEEKMONDAY:		a futáskor aktuális hét hétfőjének dátuma yyyyMMdd formátumban
+		LASTWEEKFRIDAY:		a futáskor aktuális hét péntekének dátuma yyyyMMdd formátumban
+		LASTMONTH1STDAY:	a futáskor aktuális hónap első napjának dátuma yyyyMMdd formátumban
+		LASTMONTHLASTDAY:	a futáskor aktuális hónap utolsó napjának dátuma yyyyMMdd formátumban
+		DAYSBACK#:				a futáskori napnál # nappal korábbi nap.
+		WEEKSBACK#:				a futáskori napnál #*7 nappal korábbi nap.
+		MONTHSBACK#:			a futáskori napnál # hónappal korábbi nap. Napsorszám marad, ha értelmes.
+	-->
+	<DefaultLCID>en-US</DefaultLCID>
+	<strings>
+		<string name="Dirpath_Uploads">~/App_Data/Uploads</string>
+		<string name="Path_OneReportXml">~/App_Data/OneReport/OneReports.xml</string>
+		<string name="Dirpath_OneReport">~/App_Data/OneReport</string>
+		<string name="Dirpath_ExportDataReports">C:/ALMBackups/ExportDataReports</string>
+		<string name="Dirpath_SavedReports">C:/ALMBackups/SavedReports</string>
+		<string name="STYLE_BUTTON_BLACK">color:black;</string>
+		<string name="STYLE_BUTTON_BLACKONYELLOW">background-image:none;background-color:yellow;color:black;</string>
+		<string name="STYLE_BUTTON_WHITEONBLUE">background-image:none;background-color:blue;color:white;</string>
+		<string name="SITENAME">xxxxVRH/ALM Etalon 150</string>
+	</strings>
+	<connectionstrings>
+		<connectionstring name="anticstr">Data Source=(local)\SQLEXPRESS;Initial Catalog=LearALM;Integrated Security=SSPI;MultipleActiveResultSets=True;App=EntityFramework;</connectionstring>
+		<connectionstring name="defaultConnectionString">data source=.\SQLExpress;initial catalog=LearALM;user id=sa;password=Vrh@54321;MultipleActiveResultSets=True;App=EntityFramework;</connectionstring>
+	</connectionstrings>
+	<ExternalParameters>
+		<ExternalParameter name="actionid">DFE</ExternalParameter>
+	</ExternalParameters>
+	<CommonElementsDefaults>
+		<Defaults>
+			<FormDesign Layout="~/Views/Shared/_Layout.cshtml" LayoutMobile="~/Areas/Mobile/Views/Shared/_Layout.cshtml" Style="width:100%;"/>
+			<Parameters NameSeparator="@@"/>
+			<Inputs Type="Text" Required="false" ReadOnly="false" UploadFolder="#Dirpath_Uploads#"/>
+			<SQLList ID="Id" Display="Name" ConnectionString="anticstr"/>
+		</Defaults>
+		<Defaults LCID="hu-HU">
+			<FormTexts ReturnMessageOKHeader="A riport végrehajtása befejeződött!" ReturnMessageNOKHeader="Hibás paraméterek!" RequiredMissing="A {0} mező kitöltése kötelező!"/>
+		</Defaults>
+		<Defaults LCID="en-US">
+			<FormTexts ReturnMessageOKHeader="Report execution finished!" ReturnMessageNOKHeader="Erroneous parameters!" RequiredMissing="Input field {0} is mandatory!"/>
+		</Defaults>
+	</CommonElementsDefaults>
+	<CommonElementsInputs>
+		<CommonInputs>
+			<Input Scope="ref" Row="1" Col="1" Name="SHIFTSYSTEMNAME" Type="SQLList" Required="false" DefaultValue="-1"> 
+				<SQLList ID="IID" Display="DDISPLAY" Type="single" Quote="">
+				  <Command>SELECT TOP 100 Name AS IID, Name AS DDISPLAY FROM dbo.WorkShifts WHERE Name like @filter</Command>
+				</SQLList>
+			</Input>
+			<Input Scope="ref" Row="1" Col="2" Name="SHIFTNAME" Type="SQLList" Required="false">
+				<SQLList ID="IID" Display="DDISPLAY" Filter1="SHIFTSYSTEMNAME" Type="single" Quote="">
+				<!--
+				<SQLList ID="IID" Display="DDISPLAY" Filter1="SHIFTSYSTEMNAME" Multiselect="'">
+				ha Multiselect nem üres, akkor több elemet lehet kiválasztani a listából; a lista
+				elemei a Multiselect-ben megadott keretek közé kerülnek; ha tehát a lista elemei
+				L1,L2,L3, Multiselect="'", akkor az Input névhez a 'L1','L2','L3' kerül hozzárendelésre.
+				-->
+					<Command>
+					SELECT TOP 100 WorkShiftIntervals.Name AS IID, WorkShiftIntervals.Name + ' (' + WorkShifts.Name + ')' AS DDISPLAY
+					FROM WorkShiftIntervals INNER JOIN WorkShifts ON WorkShiftIntervals.WorkShiftId = WorkShifts.[Id]
+					WHERE (WorkShiftIntervals.Name + ' (' + WorkShifts.Name + ')' like @filter)
+					AND (WorkShifts.Name = @filter1 OR @filter1 = '-1')
+					</Command>
+				</SQLList>
+			</Input>
+			<Input Scope="ref" Row="2" Col="1" Name="STARTFrom" Type="DateTime">
+				<DateTime Format="SQL-CONVERT120D"/>
+			</Input>
+			<Input Scope="ref" Row="2" Col="2" Name="STARTTo" Type="DateTime">
+				<DateTime Format="SQL-CONVERT120D"/>
+			</Input>
+			<Input Scope="ref" Row="3" Col="1" Name="AssemblyLineId" Type="SQLList">
+				<SQLList ID="IID" Display="DDISPLAY" Filter1="SHIFTSYSTEMNAME">
+					<Command>
+			SELECT TOP 100 IID, DDISPLAY FROM SelectList_ProductionLines WHERE DDISPLAY LIKE @filter AND ((DDISPLAY LIKE '%'+@filter1+'%') OR (@filter1 = '-1') OR (@filter1 = ''))
+					</Command>
+				</SQLList>
+			</Input>
+			<Input Scope="ref" Row="3" Col="1" Name="AssemblyLineGroup" Type="SQLList">
+				<SQLList Type="singleListOnly" ID="IID" Display="DDISPLAY">
+					<Command>
+						select [QuotedKeylist] AS IID, [Word]+' ('+[Keylist]+')' AS DDISPLAY from [dbo].[QueryView_ProductionLineLists] order by [Word]
+					</Command>
+				</SQLList>
+			</Input>
+			<Input Scope="ref" Row="3" Col="2" Name="AssemblyLineIdFromGroup" Type="SQLList">
+				<SQLList ID="IID" Display="DDISPLAY" Type="MultiListOnly" Quote="'" Filter1="AssemblyLineGroup">
+					<Command>
+						SELECT TOP 100 IID, DDISPLAY FROM SelectList_ProductionLines
+						WHERE DDISPLAY LIKE @filter
+						AND (@filter1 LIKE '%'''+IID+'''%' OR (@filter1 = '-1') OR (@filter1 = ''))
+					</Command>
+				</SQLList>
+			</Input>
+			<Input Scope="ref" Row="4" Col="2" Name="DTR" Type="SQLList">
+				<SQLList ID="IID" Display="DDISPLAY">
+					<Command>
+					SELECT IID,DDISPLAY FROM [dbo].[SelectList_DownTimeReasons] WHERE (DDISPLAY LIKE @filter)
+					</Command>
+				</SQLList>
+			</Input>
+			<Input Scope="ref" Row="3" Col="2" Name="WORKPLACENAME" Type="SQLList">
+				<SQLList ID="IID" Display="DDISPLAY" Filter1="AssemblyLineId">
+					<Command>
+			SELECT TOP 100 IID, DDISPLAY
+			FROM SelectList_WorkPlaces
+			WHERE DDISPLAY LIKE @filter
+			AND (DDISPLAY LIKE '%'+@filter1+'%' AND (NOT @filter1 = '-1') AND (NOT @filter1 = ''))
+					</Command>
+				</SQLList>
+			</Input>
+			<Input Scope="ref" Row="3" Col="3" Name="WORKPLACENUM"/>
+			<Input Scope="ref" Row="3" Col="4" Name="WORKPLACEx" Type="DATList">
+				<DATList Type="singleListOnly" Filter1="AssemblyLineId">
+					<url>
+						<area></area><controller>Home</controller><action>AndonWorkStations</action>
+						<inputparameter name="filter">@filter1</inputparameter>
+						<inputparameter name="query"></inputparameter>
+					</url>
+				</DATList>
+			</Input>
+			<Input Scope="ref" Row="3" Col="1" Name="Team" Type="SQLList" Required="false">
+				<SQLList ID="IID" Display="DDISPLAY" Type="single" Quote="">
+					<Command>
+					SELECT IID, DDISPLAY FROM [LearALM].[dbo].[SelectList_WorkerTeams]
+					</Command>
+				</SQLList>
+			</Input>
+			<Input Scope="ref" Row="3" Col="2" Name="TeamIdList" Type="SQLList" Required="false">
+				<SQLList ID="IID" Display="DDISPLAY" Type="MultiListOnly" Quote="'">
+					<Command>
+					SELECT IID, DDISPLAY FROM [LearALM].[dbo].[SelectList_WorkerTeams]
+					</Command>
+				</SQLList>
+			</Input>
+			<Input Scope="ref" Row="1" Col="2" Name="GPN" Type="SQLList" Required="false">
+				<SQLList ID="IID" Display="DDISPLAY" Type="single" Quote="">
+					<Command>
+					SELECT IID, DDISPLAY FROM [LearALM].[dbo].[SelectList_Products]
+					</Command>
+				</SQLList>
+			</Input>
+			<Input Scope="ref" Row="4" Col="2" Name="OPERATION" Type="EnumList" Required="true" DefaultValue="1">
+				<EnumList Type="single">
+					<EnumItem ID="0" Display="Started"/>
+					<EnumItem ID="1" Display="Produced"/>
+					<EnumItem ID="2" Display="Packed"/>
+					<EnumItem ID="3" Display="Package closed"/>
+				</EnumList>
+			</Input>
+		</CommonInputs>
+		<CommonInputs LCID="hu-HU">
+			<Input Scope="ref" Row="4" Col="1" Name="PERIODETYPE" Type="SQLList">
+				<SQLList ID="IID" Display="DDISPLAY">
+					<Command>
+					SELECT DISTINCT 
+					[DTMPeriods].[PeriodeType] AS IID, 
+					dbo.PeriodTypeName([DTMPeriods].[PeriodeType], 'hu_HU') AS DDISPLAY
+					FROM [dbo].[DTMPeriods]
+					</Command>
+				</SQLList>
+			</Input>
+			<Input Scope="ref" Row="4" Col="2" Name="REQUESTCODE" Type="SQLList">
+				<SQLList ID="IID" Display="DDISPLAY">
+					<Command>
+					SELECT AndonRequestCodes.[Code] AS IID
+						  ,AndonRequestCodes.[Description]
+						  ,AndonRequestCodes.[Active]
+						  ,i18nWords.WordDescription
+						  ,i18nTranslations.Text +' (' + AndonRequestCodes.[Code] + ')' AS DDISPLAY
+					FROM dbo.AndonRequestCodes 
+						INNER JOIN dbo.i18nWords ON AndonRequestCodes.[Description] = i18nWords.WordCode 
+						INNER JOIN dbo.i18nTranslations ON i18nWords.[WordCode] = i18nTranslations.Word_WordCode
+					WHERE (AndonRequestCodes.Active = 1) AND (i18nTranslations.Language_LanguageCode = 'hu-HU')
+					</Command>
+				</SQLList>
+			</Input>
+			<Input Scope="ref" Row="4" Col="3" Name="CLEARCODE" Type="SQLList">
+				<SQLList ID="IID" Display="DDISPLAY">
+					<Command>
+					SELECT AndonHelpCodes.[Code] AS IID
+						  ,AndonHelpCodes.[Description]
+						  ,AndonHelpCodes.[Active]
+						  ,i18nWords.WordDescription
+						  ,i18nTranslations.Text +' (' + AndonHelpCodes.[Code] + ')' AS DDISPLAY
+					FROM dbo.AndonHelpCodes 
+						INNER JOIN dbo.i18nWords ON AndonHelpCodes.[Description] = i18nWords.WordCode 
+						INNER JOIN dbo.i18nTranslations ON i18nWords.[WordCode] = i18nTranslations.Word_WordCode
+					WHERE (AndonHelpCodes.Active = 1) AND (i18nTranslations.Language_LanguageCode = 'hu-HU')
+					</Command>
+				</SQLList>
+			</Input>
+			<Input Scope="ref" Row="4" Col="1" Name="REQUESTACTIVE" Type="EnumList"> 
+				<EnumList>
+					<EnumItem ID="0" Display="Passzív"/>
+					<EnumItem ID="1" Display="Aktív"/>
+				</EnumList>
+			</Input>
+			<Input Scope="ref" Row="8" Col="1" Name="reportid" Label="Riport" Type="DATList" Required="true">
+				<DATList Type="singleListOnly">
+					<url>
+						<area>OneReport</area><controller>OneReport</controller><action>List</action>
+						<fragment></fragment>
+						<inputparameter name="xmlfile">~/App_Data/OneReport/OneReports.xml</inputparameter>
+						<inputparameter name="listmode">C</inputparameter>
+					</url>
+				</DATList>
+			</Input>
+			<Input Scope="ref" Row="8" Col="3" Name="presetid" Label="Paraméter összeállítás" Type="DATList">
+				<DATList Type="singleListOnly" Filter1="reportid" Filter2="reportver">
+					<url>
+						<area>OneReport</area><controller>OneReport</controller><action>List</action>
+						<fragment></fragment>
+						<inputparameter name="xmlfile">~/App_Data/OneReport/OneReports.xml</inputparameter>
+						<inputparameter name="reportid">@filter1@filter2</inputparameter>
+						<inputparameter name="listmode">D</inputparameter>
+					</url>
+				</DATList>
+			</Input>
+		</CommonInputs>
+		<CommonInputs LCID="en-US">
+			<Input Scope="ref" Row="4" Col="1" Name="PERIODETYPE" Type="SQLList">
+				<SQLList ID="IID" Display="DDISPLAY">
+					<Command>
+					SELECT DISTINCT 
+					[DTMPeriods].[PeriodeType] AS IID, 
+					dbo.PeriodTypeName([DTMPeriods].[PeriodeType], 'en_US') AS DDISPLAY
+					FROM [dbo].[DTMPeriods]
+					</Command>
+				</SQLList>
+			</Input>
+			<Input Scope="ref" Row="4" Col="2" Name="REQUESTCODE" Type="SQLList">
+				<SQLList ID="IID" Display="DDISPLAY">
+					<Command>
+					SELECT AndonRequestCodes.[Code] AS IID
+						  ,AndonRequestCodes.[Description]
+						  ,AndonRequestCodes.[Active]
+						  ,i18nWords.WordDescription
+						  ,i18nTranslations.Text +' (' + AndonRequestCodes.[Code] + ')' AS DDISPLAY
+					FROM dbo.AndonRequestCodes 
+						INNER JOIN dbo.i18nWords ON AndonRequestCodes.[Description] = i18nWords.WordCode 
+						INNER JOIN dbo.i18nTranslations ON i18nWords.[WordCode] = i18nTranslations.Word_WordCode
+					WHERE (AndonRequestCodes.Active = 1) AND (i18nTranslations.Language_LanguageCode = 'en-US')
+					</Command>
+				</SQLList>
+			</Input>
+			<Input Scope="ref" Row="4" Col="3" Name="CLEARCODE" Type="SQLList">
+				<SQLList ID="IID" Display="DDISPLAY">
+					<Command>
+					SELECT AndonHelpCodes.[Code] AS IID
+						  ,AndonHelpCodes.[Description]
+						  ,AndonHelpCodes.[Active]
+						  ,i18nWords.WordDescription
+						  ,i18nTranslations.Text +' (' + AndonHelpCodes.[Code] + ')' AS DDISPLAY
+					FROM dbo.AndonHelpCodes 
+						INNER JOIN dbo.i18nWords ON AndonHelpCodes.[Description] = i18nWords.WordCode 
+						INNER JOIN dbo.i18nTranslations ON i18nWords.[WordCode] = i18nTranslations.Word_WordCode
+					WHERE (AndonHelpCodes.Active = 1) AND (i18nTranslations.Language_LanguageCode = 'en-US')
+					</Command>
+				</SQLList>
+			</Input>
+			<Input Scope="ref" Row="4" Col="1" Name="REQUESTACTIVE" Type="EnumList"> 
+				<EnumList>
+					<EnumItem ID="0" Display="Passive"/>
+					<EnumItem ID="1" Display="Active"/>
+				</EnumList>
+			</Input>
+			<Input Scope="ref" Row="8" Col="1" Name="reportid" Label="Report" Type="DATList" Required="true">
+				<DATList Type="singleListOnly">
+					<url>
+						<area>OneReport</area><controller>OneReport</controller><action>List</action>
+						<fragment></fragment>
+						<inputparameter name="xmlfile">~/App_Data/OneReport/OneReports.xml</inputparameter>
+						<inputparameter name="listmode">C</inputparameter>
+					</url>
+				</DATList>
+			</Input>
+			<Input Scope="ref" Row="8" Col="3" Name="presetid" Label="Parameter preset" Type="DATList">
+				<DATList Type="singleListOnly" Filter1="reportid" Filter2="reportver">
+					<url>
+						<area>OneReport</area><controller>OneReport</controller><action>List</action>
+						<fragment></fragment>
+						<inputparameter name="xmlfile">~/App_Data/OneReport/OneReports.xml</inputparameter>
+						<inputparameter name="reportid">@filter1@filter2</inputparameter>
+						<inputparameter name="listmode">D</inputparameter>
+					</url>
+				</DATList>
+			</Input>
+		</CommonInputs>
+	</CommonElementsInputs>
+	<CommonElementsParameters>
+		<CommonParameters>
+			<Parameter Scope="ref" PassTo="url" Name="xmlfile"><Value>~/App_Data/OneReport/OneReports.xml</Value></Parameter>
+			<Parameter Scope="ref" PassTo="url" Name="report"><Value>@reportid@@reportver@</Value></Parameter>
+			<Parameter Scope="ref" PassTo="url" Name="preset"><Value>@presetid@</Value>
+				<Conditions>
+					<Condition ValueType="UrlParSegment" Type="equal" Test="@presetid@" With="-1"><Value></Value></Condition>
+					<Condition ValueType="UrlParSegment" Type="equal" Test="X@presetid@X" With="XX"><Value></Value></Condition>
+				</Conditions>  
+			</Parameter>
+			<Parameter Scope="ref" PassTo="url" Name="SHIFTSYSTEMNAME"><Value>@SHIFTSYSTEMNAME@</Value>
+				<Conditions>
+					<Condition ValueType="UrlParSegment" Type="equal" Test="@SHIFTSYSTEMNAME@" With="-1"><Value></Value></Condition>
+					<Condition ValueType="UrlParSegment" Type="equal" Test="X@SHIFTSYSTEMNAME@X" With="XX"><Value></Value></Condition>
+				</Conditions>  
+			</Parameter>
+			<Parameter Scope="ref" PassTo="url" Name="SHIFTNAME"><Value>@SHIFTNAME@</Value>
+				<Conditions>
+					<Condition ValueType="UrlParSegment" Type="equal" Test="@SHIFTNAME@" With="-1"><Value></Value></Condition>
+					<Condition ValueType="UrlParSegment" Type="equal" Test="X@SHIFTNAME@X" With="XX"><Value></Value></Condition>
+				</Conditions>  
+			</Parameter>
+			<Parameter Scope="ref" PassTo="url" Name="STARTFrom"><Value>@STARTFrom@</Value>
+				<Conditions>
+					<Condition ValueType="UrlParSegment" Type="equal" Test="@STARTFrom@" With="-1"><Value></Value></Condition>
+					<Condition ValueType="UrlParSegment" Type="equal" Test="X@STARTFrom@X" With="XX"><Value></Value></Condition>
+				</Conditions>  
+			</Parameter>
+			<Parameter Scope="ref" PassTo="url" Name="STARTTo"><Value>@STARTTo@</Value>
+				<Conditions>
+					<Condition ValueType="UrlParSegment" Type="equal" Test="@STARTTo@" With="-1"><Value></Value></Condition>
+					<Condition ValueType="UrlParSegment" Type="equal" Test="X@STARTTo@X" With="XX"><Value></Value></Condition>
+				</Conditions>  
+			</Parameter>
+			<Parameter Scope="ref" PassTo="url" Name="AssemblyLineId"><Value>@AssemblyLineId@</Value>
+				<Conditions>
+					<Condition ValueType="UrlParSegment" Type="equal" Test="@AssemblyLineId@" With="-1"><Value></Value></Condition>
+					<Condition ValueType="UrlParSegment" Type="equal" Test="X@AssemblyLineId@X" With="XX"><Value></Value></Condition>
+				</Conditions>  
+			</Parameter>
+			<Parameter Scope="ref" PassTo="url" Name="AssemblyLineGroup">
+				<Conditions>
+					<Condition ValueType="UrlParSegment" Type="equal" Test="@AssemblyLineIdFromGroup@" With="-1"><Value>AssemblyLineId=@AssemblyLineGroup@</Value></Condition>
+					<Condition ValueType="UrlParSegment" Type="equal" Test="X@AssemblyLineIdFromGroup@X" With="XX"><Value>AssemblyLineId=@AssemblyLineGroup@</Value></Condition>
+					<Condition ValueType="UrlParSegment" Type="equal" Test="@AssemblyLineGroup@" With="-1"><Value>AssemblyLineId=@AssemblyLineIdFromGroup@</Value></Condition>
+					<Condition ValueType="UrlParSegment" Type="equal" Test="X@AssemblyLineGroup@X" With="XX"><Value>AssemblyLineId=@AssemblyLineIdFromGroup@</Value></Condition>
+					<Condition ValueType="UrlParSegment" Type="else"><Value>AssemblyLineId=@AssemblyLineIdFromGroup@</Value></Condition>
+				</Conditions>
+			</Parameter>
+			<Parameter Scope="ref" PassTo="url" Name="Team"><Value>@Team@</Value>
+				<Conditions>
+					<Condition ValueType="UrlParSegment" Type="equal" Test="@Team@" With="-1"><Value></Value></Condition>
+					<Condition ValueType="UrlParSegment" Type="equal" Test="X@Team@X" With="XX"><Value></Value></Condition>
+				</Conditions>  
+			</Parameter>
+			<Parameter Scope="ref" PassTo="url" Name="TeamIdList"><Value>@TeamIdList@</Value>
+				<Conditions>
+					<Condition ValueType="UrlParSegment" Type="equal" Test="@TeamIdList@" With="-1"><Value></Value></Condition>
+					<Condition ValueType="UrlParSegment" Type="equal" Test="X@TeamIdList@X" With="XX"><Value></Value></Condition>
+				</Conditions>  
+			</Parameter>
+			<Parameter Scope="ref" PassTo="url" Name="GPN"><Value>@GPN@</Value>
+				<Conditions>
+					<Condition ValueType="UrlParSegment" Type="equal" Test="@GPN@" With="-1"><Value></Value></Condition>
+					<Condition ValueType="UrlParSegment" Type="equal" Test="X@GPN@X" With="XX"><Value></Value></Condition>
+				</Conditions>  
+			</Parameter>
+			<Parameter Scope="ref" PassTo="url" Name="PERIODETYPE"><Value>@PERIODETYPE@</Value>
+				<Conditions>
+					<Condition ValueType="UrlParSegment" Type="equal" Test="@PERIODETYPE@" With="-1"><Value></Value></Condition>
+					<Condition ValueType="UrlParSegment" Type="equal" Test="X@PERIODETYPE@X" With="XX"><Value></Value></Condition>
+				</Conditions>  
+			</Parameter>
+			<Parameter Scope="ref" PassTo="url" Name="DTR"><Value>@DTR@</Value>
+				<Conditions>
+					<Condition ValueType="UrlParSegment" Type="equal" Test="@DTR@" With="-1"><Value></Value></Condition>
+					<Condition ValueType="UrlParSegment" Type="equal" Test="X@DTR@X" With="XX"><Value></Value></Condition>
+				</Conditions>  
+			</Parameter>
+			<Parameter Scope="ref" PassTo="url" Name="REQUESTACTIVE"><Value>@REQUESTACTIVE@</Value>
+				<Conditions>
+					<Condition ValueType="UrlParSegment" Type="equal" Test="@REQUESTACTIVE@" With="-1"><Value></Value></Condition>
+					<Condition ValueType="UrlParSegment" Type="equal" Test="X@REQUESTACTIVE@X" With="XX"><Value></Value></Condition>
+				</Conditions>  
+			</Parameter>
+			<Parameter Scope="ref" PassTo="url" Name="WORKPLACE"><Value>@WORKPLACENAME@</Value>
+				<Conditions>
+					<Condition Type="equal" Test="@WORKPLACENAME@" With="-1"><Value>@WORKPLACENUM@</Value></Condition>
+					<Condition Type="equal" Test="X@WORKPLACENAME@X" With="XX"><Value>@WORKPLACENUM@</Value></Condition>
+				</Conditions>  
+			</Parameter>
+			<Parameter Scope="ref" PassTo="url" Name="REQUESTCODE"><Value>@REQUESTCODE@</Value>
+				<Conditions>
+					<Condition ValueType="UrlParSegment" Type="equal" Test="@REQUESTCODE@" With="-1"><Value></Value></Condition>
+					<Condition ValueType="UrlParSegment" Type="equal" Test="X@REQUESTCODE@X" With="XX"><Value></Value></Condition>
+				</Conditions>  
+			</Parameter>
+			<Parameter Scope="ref" PassTo="url" Name="CLEARCODE"><Value>@CLEARCODE@</Value>
+				<Conditions>
+					<Condition ValueType="UrlParSegment" Type="equal" Test="@CLEARCODE@" With="-1"><Value></Value></Condition>
+					<Condition ValueType="UrlParSegment" Type="equal" Test="X@CLEARCODE@X" With="XX"><Value></Value></Condition>
+				</Conditions>  
+			</Parameter>
+			<Parameter Scope="ref" PassTo="url" Name="OPERATION"><Value>@OPERATION@</Value>
+				<Conditions>
+					<Condition ValueType="UrlParSegment" Type="equal" Test="@OPERATION@" With="-1"><Value>1</Value></Condition>
+					<Condition ValueType="UrlParSegment" Type="equal" Test="X@OPERATION@X" With="XX"><Value>1</Value></Condition>
+				</Conditions>  
+			</Parameter>
+			<Parameter Scope="all" PassTo="url" Name="UNFOLDALL"><Value>false</Value></Parameter>
+			<Parameter Scope="all" PassTo="url" Name="SITENAME"><Value>#SITENAME#</Value></Parameter>
+		</CommonParameters>
+	</CommonElementsParameters>
+	<CommonElementsExecuteConditions>
+		<CommonExecuteConditions>
+			<ExecuteCondition Scope="ref" Name="ReportId" Type="notequal" Test="x@reportid@" With="x"/>
+		</CommonExecuteConditions>
+	</CommonElementsExecuteConditions>
+	<CommonElementsActions>
+		<CommonActions LCID="hu-HU">
+			<Action Scope="ref" Name="Display" ReturnMode="WebPageToNewTab" ButtonLabel="Riport futtatása" ButtonStyle="#STYLE_BUTTON_BLACK#">
+				<url><area>OneReport</area><controller>OneReport</controller><action>Display</action></url>
+			</Action>
+			<Action Scope="ref" Name="File" ReturnMode="ReturnInfoJSON" ButtonLabel="Formázott riport mentése PDF-be" ButtonStyle="#STYLE_BUTTON_BLACKONYELLOW#">
+				<url>
+					<area>OneReport</area><controller>OneReport</controller><action>File</action>
+					<inputparameter name="format">XLS</inputparameter>
+					<inputparameter name="file">#Dirpath_SavedReports#/SavedReport_#USERNAME#_#NOW#.xlsx</inputparameter>
+				</url>
+			</Action>
+			<Action Scope="ref" Name="Export" ReturnMode="ReturnInfoJSON" ButtonLabel="Riport adatok mentése" ButtonStyle="#STYLE_BUTTON_WHITEONBLUE#">
+				<url>
+					<area>OneReport</area><controller>OneReport</controller><action>Export</action>
+					<inputparameter name="format">XML</inputparameter>
+					<inputparameter name="file">#Dirpath_ExportDataReports#/ExportData_#USERNAME#_#NOW#.xml</inputparameter>
+				</url>
+			</Action>
+		</CommonActions>
+		<CommonActions LCID="en-US">
+			<Action Scope="ref" Name="Display" ReturnMode="WebPageToNewTab" ButtonLabel="Run report" ButtonStyle="#STYLE_BUTTON_BLACK#">
+				<url><area>OneReport</area><controller>OneReport</controller><action>Display</action></url>
+			</Action>
+			<Action Scope="ref" Name="File" ReturnMode="ReturnInfoJSON" ButtonLabel="Save formatted report to PDF" ButtonStyle="#STYLE_BUTTON_BLACKONYELLOW#">
+				<url>
+					<area>OneReport</area><controller>OneReport</controller><action>File</action>
+					<inputparameter name="format">PDF</inputparameter>
+					<inputparameter name="file">#Dirpath_SavedReports#/SavedReport_#USERNAME#_#NOW#.pdf</inputparameter>
+				</url>
+			</Action>
+			<Action Scope="ref" Name="Export" ReturnMode="ReturnInfoJSON" ButtonLabel="Export raw data" ButtonStyle="#STYLE_BUTTON_WHITEONBLUE#">
+				<url>
+					<area>OneReport</area><controller>OneReport</controller><action>Export</action>
+					<inputparameter name="format">XML</inputparameter>
+					<inputparameter name="file">#Dirpath_ExportDataReports#/ExportData_#USERNAME#_#NOW#.xml</inputparameter>
+				</url>
+			</Action>
+		</CommonActions>
+	</CommonElementsActions>
+	<WebForms>
+		<WebForm Name="Downtime0" LCID="hu-HU" Title="Minden riport (paraméter összeállításokkal)">
+			<Help>Minden állásidő riport (paraméter összeállításokkal)</Help>
+			<Inputs><Input Name="reportid"/>
+				<Input Name="reportver" Row="0" Col="0" Label="Riport verzió" DefaultValue=""/>
+				<Input Name="presetid"/>
+			</Inputs>
+			<ActionConditions>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|D"><Action Name="Display"/>
+					<Parameters>
+						<Parameter Name="xmlfile"/>			
+						<Parameter Name="report"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+					<ExecuteConditions>
+						<ExecuteCondition Name="ReportId" ErrMsg="Report id kötelező!"/>
+					</ExecuteConditions>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|F"><Action Name="File" />
+					<Parameters>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="report"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+					<ExecuteConditions>
+						<ExecuteCondition Name="ReportId" ErrMsg="Report id kötelező!"/>
+					</ExecuteConditions>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|E"><Action Name="Export"/>
+					<Parameters>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="report"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+					<ExecuteConditions>
+						<ExecuteCondition Name="ReportId" ErrMsg="Report id kötelező!"/>
+					</ExecuteConditions>
+				</ActionCondition>
+			</ActionConditions>
+		</WebForm>
+		<WebForm Name="Downtime0" LCID="en-US" Title="All reports (with parameter presets)">
+			<Help>All downtime reports (with parameter presets)</Help>
+			<Inputs><Input Name="reportid"/>
+				<Input Name="reportver" Row="0" Col="0" Label="Riport verzió" DefaultValue=""/>
+				<Input Name="presetid"/>
+			</Inputs>
+			<ActionConditions>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|D"><Action Name="Display"/>
+					<Parameters>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="report"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+					<ExecuteConditions>
+						<ExecuteCondition Name="ReportId" ErrMsg="Report id kötelező!"/>
+					</ExecuteConditions>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|F"><Action Name="File" />
+					<Parameters>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="report"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+					<ExecuteConditions>
+						<ExecuteCondition Name="ReportId" ErrMsg="Report id kötelező!"/>
+					</ExecuteConditions>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|E"><Action Name="Export"/>
+					<Parameters>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="report"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+					<ExecuteConditions>
+						<ExecuteCondition Name="ReportId" ErrMsg="Report id kötelező!"/>
+					</ExecuteConditions>
+				</ActionCondition>
+			</ActionConditions>
+		</WebForm>
+		<WebForm Name="Downtime1" LCID="hu-HU" Title="Állásidő riport (műszakra összesített)">
+			<Help>Állásidő riport (műszakra összesített)</Help>
+			<Inputs><Input Name="reportid" ReadOnly="true" DefaultValue="Downtime1" Type="Text"/>
+				<Input Name="reportver" Row="0" Col="0" Label="Riport verzió" DefaultValue=""/>
+				<Input Name="SHIFTSYSTEMNAME" Label="Műszakrend"/>
+				<Input Name="SHIFTNAME" Label="Műszak"/>
+				<Input Name="STARTFrom" Label="Műszak kezdete (tól)"/>
+				<Input Name="STARTTo" Label="Műszak kezdete (ig - a dátumot nem beleértve)"/>
+				<Input Name="presetid"/>
+			</Inputs>
+			<ActionConditions>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|D"><Action Name="Display"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|F"><Action Name="File" />
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|E"><Action Name="Export"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+			</ActionConditions>
+		</WebForm>
+		<WebForm Name="Downtime1" LCID="en-US" Title="Downtime report (totalled for shift)" >
+			<Help>Downtime report (totalled for shift)</Help>
+			<Inputs><Input Name="reportid" ReadOnly="true" DefaultValue="Downtime1" Type="Text"/>
+				<Input Name="reportver" Row="0" Col="0" Label="Riport verzió" DefaultValue=""/>
+				<Input Name="SHIFTSYSTEMNAME" Label="Shiftsystem"/>
+				<Input Name="SHIFTNAME" Label="Shift"/>
+				<Input Name="STARTFrom" Label="Shift date (from)"/>
+				<Input Name="STARTTo" Label="Shift date (to - given date not included)"/>
+				<Input Name="presetid"/>
+			</Inputs>
+			<ActionConditions>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|D"><Action Name="Display"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|F"><Action Name="File"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|E"><Action Name="Export"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+			</ActionConditions>
+		</WebForm>
+		<WebForm Name="Downtime2" LCID="hu-HU" Title="Állásidő riport (műszakra/gépekre összesített)">
+			<Help>Állásidő riport (műszakra/gépekre összesített).</Help>
+			<Inputs><Input Name="reportid" ReadOnly="true" DefaultValue="Downtime2" Type="Text"/>
+				<Input Name="reportver" Row="0" Col="0" Label="Riport verzió" DefaultValue=""/>
+				<Input Name="SHIFTSYSTEMNAME" Label="Műszakrend"/>
+				<Input Name="SHIFTNAME" Label="Műszak"/>
+				<!--<Input Name="AssemblyLineId" Label="Assembly line"/>-->
+				<Input Name="AssemblyLineGroup" Label="AssemblyLine Group"/>
+				<Input Name="AssemblyLineIdFromGroup" Label="AssemblyLine"/>
+				<Input Name="STARTFrom" Label="Műszak kezdete (tól)"/>
+				<Input Name="STARTTo" Label="Műszak kezdete (ig - a dátumot nem beleértve)"/>
+				<Input Name="presetid"/>
+			</Inputs>
+			<ActionConditions>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|D"><Action Name="Display"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|F"><Action Name="File" />
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|E"><Action Name="Export"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+			</ActionConditions>
+		</WebForm>
+		<WebForm Name="Downtime2" LCID="en-US" Title="Downtime report (totalled for shift/assembly lines)">
+			<Help>Downtime report (totalled for shift/assembly lines).</Help>
+			<Inputs><Input Name="reportid" ReadOnly="true" DefaultValue="Downtime2" Type="Text"/>
+				<Input Name="reportver" Row="0" Col="0" Label="Riport verzió" DefaultValue=""/>
+				<Input Name="presetid"/>
+				<Input Name="SHIFTSYSTEMNAME" Label="Shiftsystem"/>
+				<Input Name="SHIFTNAME" Label="Shift"/>
+				<Input Name="STARTFrom" Label="Shift date (from)"/>
+				<Input Name="STARTTo" Label="Shift date (to - given date not included)"/>
+				<!--<Input Name="AssemblyLineId" Label="Assembly line"/>-->
+				<Input Name="AssemblyLineGroup" Label="AssemblyLine Group"/>
+				<Input Name="AssemblyLineIdFromGroup" Label="AssemblyLine"/>
+			</Inputs>
+			<ActionConditions>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|D"><Action Name="Display"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|F"><Action Name="File" />
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|E"><Action Name="Export"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+			</ActionConditions>
+		</WebForm>
+		<WebForm Name="Downtime3" LCID="hu-HU" Title="Állásidő riport (műszakra/gépekre/állásidő okra összesített)">
+			<Help>Állásidő riport (műszakra/gépekre/állásidő okra összesített).</Help>
+			<Inputs><Input Name="reportid" ReadOnly="true" DefaultValue="Downtime3" Type="Text"/>
+				<Input Name="reportver" Row="0" Col="0" Label="Riport verzió" DefaultValue=""/>
+				<Input Name="presetid"/>
+				<Input Name="SHIFTSYSTEMNAME" Label="Műszakrend"/>
+				<Input Name="SHIFTNAME" Label="Műszak"/>
+				<Input Name="STARTFrom" Label="Műszak kezdete (tól)"/>
+				<Input Name="STARTTo" Label="Műszak kezdete (ig - a dátumot nem beleértve)"/>
+				<!--<Input Name="AssemblyLineId" Label="Assembly line"/>-->
+				<Input Name="AssemblyLineGroup" Label="AssemblyLine Group"/>
+				<Input Name="AssemblyLineIdFromGroup" Label="AssemblyLine"/>
+			</Inputs>
+			<ActionConditions>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|D"><Action Name="Display"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|F"><Action Name="File" />
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|E"><Action Name="Export"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+			</ActionConditions>
+		</WebForm>
+		<WebForm Name="Downtime3" LCID="en-US" Title="Downtime report (totalled for shift/assembly lines/DTR codes)">
+			<Help>Downtime report (totalled for shift/assembly lines/DTR codes).</Help>
+			<Inputs><Input Name="reportid" ReadOnly="true" DefaultValue="Downtime3" Type="Text"/>
+				<Input Name="reportver" Row="0" Col="0" Label="Riport verzió" DefaultValue=""/>
+				<Input Name="presetid"/>
+				<Input Name="SHIFTSYSTEMNAME" Label="Shiftsystem"/>
+				<Input Name="SHIFTNAME" Label="Shift"/>
+				<Input Name="STARTFrom" Label="Shift date (from)"/>
+				<Input Name="STARTTo" Label="Shift date (to - given date not included)"/>
+				<!--<Input Name="AssemblyLineId" Label="Assembly line"/>-->
+				<Input Name="AssemblyLineGroup" Label="AssemblyLine Group"/>
+				<Input Name="AssemblyLineIdFromGroup" Label="AssemblyLine"/>
+			</Inputs>
+			<ActionConditions>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|D"><Action Name="Display"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|F"><Action Name="File" />
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|E"><Action Name="Export"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+			</ActionConditions>
+		</WebForm>
+		<WebForm Name="Downtime3T" LCID="hu-HU" Title="Állásidő riport (műszakra/teamre/állásidő okra összesített)">
+			<Help>Állásidő riport (műszakra/teamre/állásidő okra összesített).</Help>
+			<Inputs><Input Name="reportid" ReadOnly="true" DefaultValue="Downtime3T" Type="Text"/>
+				<Input Name="reportver" Row="0" Col="0" Label="Riport verzió" DefaultValue=""/>
+				<Input Name="presetid"/>
+				<Input Name="SHIFTSYSTEMNAME" Label="Műszakrend"/>
+				<Input Name="SHIFTNAME" Label="Műszak"/>
+				<Input Name="STARTFrom" Label="Műszak kezdete (tól)"/>
+				<Input Name="STARTTo" Label="Műszak kezdete (ig - a dátumot nem beleértve)"/>
+				<Input Name="TeamIdList" Label="Csapat"/>
+			</Inputs>
+			<ActionConditions>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|D"><Action Name="Display"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="TeamIdList"/>
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|F"><Action Name="File" />
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="TeamIdList"/>
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|E"><Action Name="Export"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="TeamIdList"/>
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+			</ActionConditions>
+		</WebForm>
+		<WebForm Name="Downtime3T" LCID="en-US" Title="Downtime report (totalled for shift/team/DTR codes)">
+			<Help>Downtime report (totalled for shift/team/DTR codes).</Help>
+			<Inputs><Input Name="reportid" ReadOnly="true" DefaultValue="Downtime3T" Type="Text"/>
+				<Input Name="reportver" Row="0" Col="0" Label="Riport verzió" DefaultValue=""/>
+				<Input Name="presetid"/>
+				<Input Name="SHIFTSYSTEMNAME" Label="Shiftsystem"/>
+				<Input Name="SHIFTNAME" Label="Shift"/>
+				<Input Name="STARTFrom" Label="Shift date (from)"/>
+				<Input Name="STARTTo" Label="Shift date (to - given date not included)"/>
+				<Input Name="TeamIdList" Label="Team"/>
+			</Inputs>
+			<ActionConditions>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|D"><Action Name="Display"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="TeamIdList"/>
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|F"><Action Name="File" />
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="TeamIdList"/>
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|E"><Action Name="Export"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="TeamIdList"/>
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+			</ActionConditions>
+		</WebForm>
+		<WebForm Name="Downtime4" LCID="hu-HU" Title="Műszak-idő felhasználás riport">
+			<Help>Műszak-idő felhasználás riport.</Help>
+			<Inputs><Input Name="reportid" ReadOnly="true" DefaultValue="Downtime4" Type="Text"/>
+				<Input Name="reportver" Row="0" Col="0" Label="Riport verzió" DefaultValue=""/>
+				<Input Name="presetid"/>
+				<Input Name="SHIFTSYSTEMNAME" Label="Műszakrend"/>
+				<Input Name="SHIFTNAME" Label="Műszak"/>
+				<Input Name="STARTFrom" Label="Műszak kezdete (tól)"/>
+				<Input Name="STARTTo" Label="Műszak kezdete (ig - a dátumot nem beleértve)"/>
+				<!--<Input Name="AssemblyLineId" Label="Assembly line"/>-->
+				<Input Name="AssemblyLineGroup" Label="AssemblyLine Group"/>
+				<Input Name="AssemblyLineIdFromGroup" Label="AssemblyLine"/>
+			</Inputs>
+			<ActionConditions>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|D"><Action Name="Display"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|F"><Action Name="File" />
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|E"><Action Name="Export"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+			</ActionConditions>
+		</WebForm>
+		<WebForm Name="Downtime4" LCID="en-US" Title="Shift time utilization report">
+			<Help>Shift time utilization report.</Help>
+			<Inputs><Input Name="reportid" ReadOnly="true" DefaultValue="Downtime4" Type="Text"/>
+				<Input Name="reportver" Row="0" Col="0" Label="Riport verzió" DefaultValue=""/>
+				<Input Name="presetid"/>
+				<Input Name="SHIFTSYSTEMNAME" Label="Shiftsystem"/>
+				<Input Name="SHIFTNAME" Label="Shift"/>
+				<Input Name="STARTFrom" Label="Shift date (from)"/>
+				<Input Name="STARTTo" Label="Shift date (to - given date not included)"/>
+				<!--<Input Name="AssemblyLineId" Label="Assembly line"/>-->
+				<Input Name="AssemblyLineGroup" Label="AssemblyLine Group"/>
+				<Input Name="AssemblyLineIdFromGroup" Label="AssemblyLine"/>
+			</Inputs>
+			<ActionConditions>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|D"><Action Name="Display"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|F"><Action Name="File" />
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|E"><Action Name="Export"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+			</ActionConditions>
+		</WebForm>
+		<WebForm Name="Downtime5" LCID="hu-HU" Title="Tételes műszak-idő felhasználás riport">
+			<Help>Tételes periódus riport.</Help>
+			<Inputs><Input Name="reportid" ReadOnly="true" DefaultValue="Downtime5" Type="Text"/>
+				<Input Name="reportver" Row="0" Col="0" Label="Riport verzió" DefaultValue=""/>
+				<Input Name="presetid"/>
+				<Input Name="SHIFTSYSTEMNAME" Label="Műszakrend"/>
+				<Input Name="SHIFTNAME" Label="Műszak"/>
+				<Input Name="STARTFrom" Label="Műszak kezdete (tól)"/>
+				<Input Name="STARTTo" Label="Műszak kezdete (ig - a dátumot nem beleértve)"/>
+				<!--<Input Name="AssemblyLineId" Label="Assembly line"/>-->
+				<Input Name="AssemblyLineGroup" Label="AssemblyLine Group"/>
+				<Input Name="AssemblyLineIdFromGroup" Label="AssemblyLine"/>
+				<Input Name="PERIODETYPE" Label="Periódus típusa"/>
+				<Input Name="DTR" Label="Állásidő kód"/>
+			</Inputs>
+			<ActionConditions>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|D"><Action Name="Display"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="PERIODETYPE"/>
+						<Parameter Name="DTR"/>
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|F"><Action Name="File" />
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="PERIODETYPE"/>
+						<Parameter Name="DTR"/>
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|E"><Action Name="Export"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="PERIODETYPE"/>
+						<Parameter Name="DTR"/>
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+			</ActionConditions>
+		</WebForm>
+		<WebForm Name="Downtime5" LCID="en-US" Title="Detailed shift time utilization report">
+			<Help>Detailed periods report.</Help>
+			<Inputs><Input Name="reportid" ReadOnly="true" DefaultValue="Downtime5" Type="Text"/>
+				<Input Name="reportver" Row="0" Col="0" Label="Riport verzió" DefaultValue=""/>
+				<Input Name="presetid"/>
+				<Input Name="SHIFTSYSTEMNAME" Label="Shiftsystem"/>
+				<Input Name="SHIFTNAME" Label="Shift"/>
+				<Input Name="STARTFrom" Label="Shift date (from)"/>
+				<Input Name="STARTTo" Label="Shift date (to - given date not included)"/>
+				<!--<Input Name="AssemblyLineId" Label="Assembly line"/>-->
+				<Input Name="AssemblyLineGroup" Label="AssemblyLine Group"/>
+				<Input Name="AssemblyLineIdFromGroup" Label="AssemblyLine"/>
+				<Input Name="PERIODETYPE" Label="Periode type"/>
+				<Input Name="DTR" Label="DTR code"/>
+			</Inputs>
+			<ActionConditions>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|D"><Action Name="Display"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="PERIODETYPE"/>
+						<Parameter Name="DTR"/>
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|F"><Action Name="File" />
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="PERIODETYPE"/>
+						<Parameter Name="DTR"/>
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|E"><Action Name="Export"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="PERIODETYPE"/>
+						<Parameter Name="DTR"/>
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+			</ActionConditions>
+		</WebForm>
+		<WebForm Name="AndonLog" LCID="hu-HU" Title="Andon napló bejegyzések">
+			<Help>Andon napló bejegyzések.</Help>
+			<Inputs>
+				<Input Name="reportid" ReadOnly="true" DefaultValue="AndonLog" Type="Text"/>
+				<Input Name="reportver" Row="0" Col="0" Label="Riport verzió" DefaultValue=""/>
+				<Input Name="presetid"/>
+				<Input Name="SHIFTSYSTEMNAME" Label="Műszakrend"/>
+				<Input Name="SHIFTNAME" Label="Műszak"/>
+				<Input Name="STARTFrom" Label="Műszak kezdete (tól)"/>
+				<Input Name="STARTTo" Label="Műszak kezdete (ig - a dátumot nem beleértve)"/>
+				<Input Name="AssemblyLineId" Label="Szerelősor"/>
+				<Input Name="REQUESTACTIVE" Label="Aktív/Passzív"/>
+				<Input Name="WORKPLACENAME" Label="Munkahely neve..."/>
+				<Input Name="WORKPLACENUM" Label="...VAGY száma"/>
+				<Input Name="REQUESTCODE" Label="Andon kérés kód"/>
+				<Input Name="CLEARCODE" Label="Andon törlés kód"/>
+			</Inputs>
+			<ActionConditions>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|D"><Action Name="Display"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="AssemblyLineId"/>
+						<Parameter Name="REQUESTACTIVE"/>
+						<Parameter Name="WORKPLACE"/>
+						<Parameter Name="REQUESTCODE"/>
+						<Parameter Name="CLEARCODE"/>
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|F"><Action Name="File" />
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="AssemblyLineId"/>
+						<Parameter Name="REQUESTACTIVE"/>
+						<Parameter Name="WORKPLACE"/>
+						<Parameter Name="REQUESTCODE"/>
+						<Parameter Name="CLEARCODE"/>
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|E"><Action Name="Export"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="AssemblyLineId"/>
+						<Parameter Name="REQUESTACTIVE"/>
+						<Parameter Name="WORKPLACE"/>
+						<Parameter Name="REQUESTCODE"/>
+						<Parameter Name="CLEARCODE"/>
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+			</ActionConditions>
+		</WebForm>
+		<WebForm Name="AndonLog" LCID="en-US" Title="Andon log records">
+			<Help>Andon log records.</Help>
+			<Inputs>
+				<Input Name="reportid" ReadOnly="true" DefaultValue="AndonLog" Type="Text"/>
+				<Input Name="reportver" Row="0" Col="0" Label="Riport verzió" DefaultValue=""/>
+				<Input Name="presetid"/>
+				<Input Name="SHIFTSYSTEMNAME" Label="Shiftsystem"/>
+				<Input Name="SHIFTNAME" Label="Shift"/>
+				<Input Name="STARTFrom" Label="Shift date (from)"/>
+				<Input Name="STARTTo" Label="Shift date (to - given date not included)"/>
+				<Input Name="AssemblyLineId" Label="Assembly line"/>
+				<Input Name="REQUESTACTIVE" Label="Active/Passive"/>
+				<Input Name="WORKPLACENAME" Label="Workplace name..."/>
+				<Input Name="WORKPLACENUM" Label="...OR number"/>
+				<Input Name="REQUESTCODE" Label="Andon request code"/>
+				<Input Name="CLEARCODE" Label="Andon clear code"/>
+			</Inputs>
+			<ActionConditions>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|D"><Action Name="Display"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="AssemblyLineId"/>
+						<Parameter Name="REQUESTACTIVE"/>
+						<Parameter Name="WORKPLACE"/>
+						<Parameter Name="REQUESTCODE"/>
+						<Parameter Name="CLEARCODE"/>
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|F"><Action Name="File" />
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="AssemblyLineId"/>
+						<Parameter Name="REQUESTACTIVE"/>
+						<Parameter Name="WORKPLACE"/>
+						<Parameter Name="REQUESTCODE"/>
+						<Parameter Name="CLEARCODE"/>
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|E"><Action Name="Export"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="AssemblyLineId"/>
+						<Parameter Name="REQUESTACTIVE"/>
+						<Parameter Name="WORKPLACE"/>
+						<Parameter Name="REQUESTCODE"/>
+						<Parameter Name="CLEARCODE"/>
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+			</ActionConditions>
+		</WebForm>
+		<WebForm Name="Production0" LCID="en-US" Title="Production and efficiency report (detailed)" >
+			<Help>Production report (detailed; grouped by shift hours)</Help>
+			<Inputs><Input Name="reportid" ReadOnly="true" DefaultValue="Production0" Type="Text"/>
+				<Input Name="reportver" Row="8" Col="2" Label="Report version" Type="EnumList" DefaultValue="a">
+					<EnumList Type="singleListOnly">
+						<EnumItem ID="a" Display="a: grouped by date-shift-assembly line-shift hour-GPN"/>
+						<EnumItem ID="b" Display="b: grouped by date-shift-assembly line-GPN"/>
+						<EnumItem ID="c" Display="c: grouped by date-shift-team-GPN (detailed)"/>
+					</EnumList>
+				</Input>
+				<Input Name="SHIFTSYSTEMNAME" Label="Shiftsystem"/>
+				<Input Name="SHIFTNAME" Label="Shift"/>
+				<Input Name="STARTFrom" Label="Shift date (from)"/>
+				<Input Name="STARTTo" Label="Shift date (to - given date not included)"/>
+				<!--<Input Name="AssemblyLineId" Label="Assembly line"/>-->
+				<Input Name="AssemblyLineGroup" Label="AssemblyLine Group"/>
+				<Input Name="AssemblyLineIdFromGroup" Label="AssemblyLine"/>
+				<Input Name="Team" Label="Team"/>
+				<Input Name="GPN" Label="GPN" Row="4" Col="1"/>
+				<Input Name="OPERATION" Label="Operation for metric calculations" Row="5" Col="1"/>
+				<Input Name="presetid"/>
+			</Inputs>
+			<ActionConditions>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|D"><Action Name="Display"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="Team"/>
+						<Parameter Name="GPN"/>
+						<Parameter Name="OPERATION"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|F"><Action Name="File" />
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="Team"/>
+						<Parameter Name="GPN"/>
+						<Parameter Name="OPERATION"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|E"><Action Name="Export"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="Team"/>
+						<Parameter Name="GPN"/>
+						<Parameter Name="OPERATION"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+			</ActionConditions>
+		</WebForm>
+		<WebForm Name="Production0" LCID="hu-HU" Title="Termelés és hatékonyság riport (részletes)">
+			<Help>Production report (részletes, műszak órára csoportosítva)</Help>
+			<Inputs><Input Name="reportid" ReadOnly="true" DefaultValue="Production0" Type="Text"/>
+				<Input Name="reportver" Row="8" Col="2" Label="Riport verzió" Type="EnumList" DefaultValue="a">
+					<EnumList Type="singleListOnly">
+						<EnumItem ID="a" Display="a: dátum-műszak-szerelősor-műszak óra-GPN-re csoportosítva"/>
+						<EnumItem ID="b" Display="b: dátum-műszak-szerelősor-GPN-re csoportosítva"/>
+						<EnumItem ID="c" Display="c: dátum-műszak-csapat-GPN-re csoportosítva (tételes)"/>
+					</EnumList>
+				</Input>
+				<Input Name="SHIFTSYSTEMNAME" Label="Műszakrend"/>
+				<Input Name="SHIFTNAME" Label="Műszak"/>
+				<Input Name="STARTFrom" Label="Műszak kezdete (tól)"/>
+				<Input Name="STARTTo" Label="Műszak kezdete (ig - a dátumot nem beleértve)"/>
+				<!--<Input Name="AssemblyLineId" Label="Assembly line"/>-->
+				<Input Name="AssemblyLineGroup" Label="AssemblyLine Group"/>
+				<Input Name="AssemblyLineIdFromGroup" Label="AssemblyLine"/>
+				<Input Name="Team" Label="Csapat"/>
+				<Input Name="GPN" Label="GPN" Row="4" Col="1"/>
+				<Input Name="OPERATION" Label="Művelet a mutatószámításokhoz" Row="5" Col="1"/>
+				<Input Name="presetid"/>
+			</Inputs>
+			<ActionConditions>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|D"><Action Name="Display"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="Team"/>
+						<Parameter Name="GPN"/>
+						<Parameter Name="OPERATION"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|F"><Action Name="File" />
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="Team"/>
+						<Parameter Name="GPN"/>
+						<Parameter Name="OPERATION"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|E"><Action Name="Export"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="Team"/>
+						<Parameter Name="GPN"/>
+						<Parameter Name="OPERATION"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+			</ActionConditions>
+		</WebForm>
+		<WebForm Name="Production2" LCID="en-US" Title="Production volume reports" >
+			<Help>Production report (#2)</Help>
+			<Inputs><Input Name="reportid" ReadOnly="true" DefaultValue="Production2" Type="Text"/>
+				<Input Name="reportver" Row="8" Col="2" Label="Report version" Type="EnumList" DefaultValue="a">
+					<EnumList Type="singleListOnly">
+						<EnumItem ID="a" Display="a: ordered by assembly line - shift - shift hour - date and team"/>
+						<EnumItem ID="b" Display="b: ordered by team - shift - shift hours - date - assembly line"/>
+						<EnumItem ID="c" Display="c: ordered by date - shift - shift hours - assembly line and team"/>
+						<EnumItem ID="d" Display="d: ordered by date - shift - assembly line and team - shift hours"/>
+						<EnumItem ID="e" Display="e: ordered by date - shift - assembly line and team - GPN"/>
+						<EnumItem ID="f" Display="f: ordered by date - shift - team - GPN"/>
+					</EnumList>
+				</Input>
+				<Input Name="SHIFTSYSTEMNAME" Label="Shiftsystem"/>
+				<Input Name="SHIFTNAME" Label="Shift"/>
+				<Input Name="STARTFrom" Label="Shift date (from)"/>
+				<Input Name="STARTTo" Label="Shift date (to - given date not included)"/>
+				<!--<Input Name="AssemblyLineId" Label="Assembly line"/>-->
+				<Input Name="AssemblyLineGroup" Label="AssemblyLine Group"/>
+				<Input Name="AssemblyLineIdFromGroup" Label="AssemblyLine"/>
+				<Input Name="Team" Label="Team"/>
+				<Input Name="GPN" Label="GPN" Row="4" Col="1"/>
+				<Input Name="OPERATION" Label="Operation for metric calculations" Row="5" Col="1"/>
+				<Input Name="presetid"/>
+			</Inputs>
+			<ActionConditions>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|D"><Action Name="Display"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="Team"/>
+						<Parameter Name="GPN"/>
+						<Parameter Name="OPERATION"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|F"><Action Name="File" />
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="Team"/>
+						<Parameter Name="GPN"/>
+						<Parameter Name="OPERATION"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|E"><Action Name="Export"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="Team"/>
+						<Parameter Name="GPN"/>
+						<Parameter Name="OPERATION"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+			</ActionConditions>
+		</WebForm>
+		<WebForm Name="Production2" LCID="hu-HU" Title="Termelési mennyiségek riportok">
+			<Help>Termelés és hatékonyság riport (#2)</Help>
+			<Inputs><Input Name="reportid" ReadOnly="true" DefaultValue="Production2" Type="Text"/>
+				<Input Name="reportver" Row="8" Col="2" Label="Riport verzió" Type="EnumList" DefaultValue="a">
+					<EnumList Type="singleListOnly">
+						<EnumItem ID="a" Display="a: rendezettség szerelősor - műszak - műszak óra - dátum és csapat szerint"/>
+						<EnumItem ID="b" Display="b: rendezettség csapat - műszak - műszak óra - dátum - szerelősor szerint"/>
+						<EnumItem ID="c" Display="c: rendezettség dátum - műszak - műszak óra - szerelősor és csapat szerint"/>
+						<EnumItem ID="d" Display="d: rendezettség dátum - műszak - szerelősor és csapat - műszak óra szerint"/>
+						<EnumItem ID="e" Display="e: rendezettség dátum - műszak - szerelősor és csapat - GPN szerint"/>
+						<EnumItem ID="f" Display="f: rendezettség dátum - műszak - csapat - GPN szerint"/>
+						<EnumItem ID="g" Display="g: rendezettség műszakrend - műszak - szerelősor és csapat - műszak óra - GPN szerint"/>
+					</EnumList>
+				</Input>
+				<Input Name="SHIFTSYSTEMNAME" Label="Műszakrend"/>
+				<Input Name="SHIFTNAME" Label="Műszak"/>
+				<Input Name="STARTFrom" Label="Műszak kezdete (tól)"/>
+				<Input Name="STARTTo" Label="Műszak kezdete (ig - a dátumot nem beleértve)"/>
+				<!--<Input Name="AssemblyLineId" Label="Assembly line"/>-->
+				<Input Name="AssemblyLineGroup" Label="AssemblyLine Group"/>
+				<Input Name="AssemblyLineIdFromGroup" Label="AssemblyLine"/>
+				<Input Name="Team" Label="Csapat"/>
+				<Input Name="GPN" Label="GPN" Row="4" Col="1"/>
+				<Input Name="OPERATION" Label="Művelet a mutatószámításokhoz" Row="5" Col="1"/>
+				<Input Name="presetid"/>
+			</Inputs>
+			<ActionConditions>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|D"><Action Name="Display"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="Team"/>
+						<Parameter Name="GPN"/>
+						<Parameter Name="OPERATION"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|F"><Action Name="File" />
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="Team"/>
+						<Parameter Name="GPN"/>
+						<Parameter Name="OPERATION"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|E"><Action Name="Export"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="Team"/>
+						<Parameter Name="GPN"/>
+						<Parameter Name="OPERATION"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+			</ActionConditions>
+		</WebForm>
+		<WebForm Name="Production3" LCID="en-US" Title="Production volume and performance metrics reports">
+			<Help>Production volume and performance metrics reports (#3)</Help>
+			<Inputs><Input Name="reportid" ReadOnly="true" DefaultValue="Production3" Type="Text"/>
+				<Input Name="reportver" Row="0" Col="0" Label="Riport verzió" DefaultValue=""/>
+				<Input Name="SHIFTSYSTEMNAME" Label="Shiftsystem"/>
+				<Input Name="SHIFTNAME" Label="Shift"/>
+				<Input Name="STARTFrom" Label="Shift date (from)"/>
+				<Input Name="STARTTo" Label="Shift date (to - given date not included)"/>
+				<!--<Input Name="AssemblyLineId" Label="Assembly line"/>-->
+				<Input Name="AssemblyLineGroup" Label="AssemblyLine Group"/>
+				<Input Name="AssemblyLineIdFromGroup" Label="AssemblyLine"/>
+				<Input Name="Team" Label="Team"/>
+				<Input Name="GPN" Label="GPN" Row="4" Col="1"/>
+				<Input Name="OPERATION" Label="Operation for metric calculations" Row="5" Col="1"/>
+				<Input Name="presetid"/>
+			</Inputs>
+			<ActionConditions>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|D"><Action Name="Display"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="Team"/>
+						<Parameter Name="GPN"/>
+						<Parameter Name="OPERATION"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|F"><Action Name="File" />
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="Team"/>
+						<Parameter Name="GPN"/>
+						<Parameter Name="OPERATION"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|E"><Action Name="Export"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="Team"/>
+						<Parameter Name="GPN"/>
+						<Parameter Name="OPERATION"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+			</ActionConditions>
+		</WebForm>
+		<WebForm Name="Production3" LCID="hu-HU" Title="Termelési mennyiségek és teljesítmény metrikák riportok">
+			<Help>Termelési mennyiségek és teljesítmény metrikák riportok (#3)</Help>
+			<Inputs><Input Name="reportid" ReadOnly="true" DefaultValue="Production3" Type="Text"/>
+				<Input Name="reportver" Row="0" Col="0" Label="Riport verzió" DefaultValue=""/>
+				<Input Name="SHIFTSYSTEMNAME" Label="Műszakrend"/>
+				<Input Name="SHIFTNAME" Label="Műszak"/>
+				<Input Name="STARTFrom" Label="Műszak kezdete (tól)"/>
+				<Input Name="STARTTo" Label="Műszak kezdete (ig - a dátumot nem beleértve)"/>
+				<!--<Input Name="AssemblyLineId" Label="Assembly line"/>-->
+				<Input Name="AssemblyLineGroup" Label="AssemblyLine Group"/>
+				<Input Name="AssemblyLineIdFromGroup" Label="AssemblyLine"/>
+				<Input Name="Team" Label="Csapat"/>
+				<Input Name="GPN" Label="GPN" Row="4" Col="1"/>
+				<Input Name="OPERATION" Label="Művelet a mutatószámításokhoz" Row="5" Col="1"/>
+				<Input Name="presetid"/>
+			</Inputs>
+			<ActionConditions>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|D"><Action Name="Display"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="Team"/>
+						<Parameter Name="GPN"/>
+						<Parameter Name="OPERATION"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|F"><Action Name="File" />
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="Team"/>
+						<Parameter Name="GPN"/>
+						<Parameter Name="OPERATION"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|E"><Action Name="Export"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<!--<Parameter Name="AssemblyLineId"/>-->
+						<Parameter Name="AssemblyLineGroup"/>
+						<Parameter Name="Team"/>
+						<Parameter Name="GPN"/>
+						<Parameter Name="OPERATION"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+			</ActionConditions>
+		</WebForm>
+		<WebForm Name="Harnesses1" LCID="hu-HU" Title="Kábelkorbácsok (#1)">
+			<Help>Kábelkorbács riport (#1)</Help>
+			<Inputs><Input Name="reportid" ReadOnly="true" DefaultValue="Harnesses1" Type="Text"/>
+				<Input Name="reportver" Row="0" Col="0" Label="Riport verzió" DefaultValue=""/>
+				<Input Name="SHIFTSYSTEMNAME" Label="Műszakrend"/>
+				<Input Name="SHIFTNAME" Label="Műszak"/>
+				<Input Name="STARTFrom" Label="Műszak kezdete (tól)"/>
+				<Input Name="STARTTo" Label="Műszak kezdete (ig - a dátumot nem beleértve)"/>
+				<Input Name="presetid"/>
+			</Inputs>
+			<ActionConditions>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|D"><Action Name="Display"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|F"><Action Name="File" />
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|E"><Action Name="Export"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+			</ActionConditions>
+		</WebForm>
+		<WebForm Name="Harnesses1" LCID="en-US" Title="Harnesses (#1)" >
+			<Help>Harness report (#1)</Help>
+			<Inputs><Input Name="reportid" ReadOnly="true" DefaultValue="Harnesses1" Type="Text"/>
+				<Input Name="reportver" Row="0" Col="0" Label="Riport verzió" DefaultValue=""/>
+				<Input Name="SHIFTSYSTEMNAME" Label="Shiftsystem"/>
+				<Input Name="SHIFTNAME" Label="Shift"/>
+				<Input Name="STARTFrom" Label="Shift date (from)"/>
+				<Input Name="STARTTo" Label="Shift date (to - given date not included)"/>
+				<Input Name="presetid"/>
+			</Inputs>
+			<ActionConditions>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|D"><Action Name="Display"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|F"><Action Name="File"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|E"><Action Name="Export"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+			</ActionConditions>
+		</WebForm>
+		<WebForm Name="Harnesses2" LCID="hu-HU" Title="Kábelkorbácsok (#2)">
+			<Help>Kábelkorbács riport (#2)</Help>
+			<Inputs><Input Name="reportid" ReadOnly="true" DefaultValue="Harnesses2" Type="Text"/>
+				<Input Name="reportver" Row="0" Col="0" Label="Riport verzió" DefaultValue=""/>
+				<Input Name="SHIFTSYSTEMNAME" Label="Műszakrend"/>
+				<Input Name="SHIFTNAME" Label="Műszak"/>
+				<Input Name="STARTFrom" Label="Műszak kezdete (tól)"/>
+				<Input Name="STARTTo" Label="Műszak kezdete (ig - a dátumot nem beleértve)"/>
+				<Input Name="presetid"/>
+			</Inputs>
+			<ActionConditions>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|D"><Action Name="Display"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|F"><Action Name="File" />
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|E"><Action Name="Export"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+			</ActionConditions>
+		</WebForm>
+		<WebForm Name="Harnesses2" LCID="en-US" Title="Harnesses (#2)" >
+			<Help>Harness report (#2)</Help>
+			<Inputs><Input Name="reportid" ReadOnly="true" DefaultValue="Harnesses2" Type="Text"/>
+				<Input Name="reportver" Row="0" Col="0" Label="Riport verzió" DefaultValue=""/>
+				<Input Name="SHIFTSYSTEMNAME" Label="Shiftsystem"/>
+				<Input Name="SHIFTNAME" Label="Shift"/>
+				<Input Name="STARTFrom" Label="Shift date (from)"/>
+				<Input Name="STARTTo" Label="Shift date (to - given date not included)"/>
+				<Input Name="presetid"/>
+			</Inputs>
+			<ActionConditions>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|D"><Action Name="Display"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|F"><Action Name="File"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+				<ActionCondition Type="match" Test="#actionid#" With="^$|E"><Action Name="Export"/>
+					<Parameters>
+						<Parameter Name="report"/>
+						<Parameter Name="xmlfile"/>				
+						<Parameter Name="SHIFTSYSTEMNAME"/>
+						<Parameter Name="SHIFTNAME"/>
+						<Parameter Name="STARTFrom"/>
+						<Parameter Name="STARTTo"/>
+						<Parameter Name="preset"/>
+					</Parameters>
+				</ActionCondition>
+			</ActionConditions>
+		</WebForm>
+	</WebForms>
+</WebFormXML>

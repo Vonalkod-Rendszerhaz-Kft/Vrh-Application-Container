@@ -10,16 +10,27 @@
             AutoStart ="true" 
             PluginDirectory="iSchedulerMonitor"
             PluginConfig="" Factory="">
+      
       <!-- ANTI: Ha nem azonos gépen fut a WebServer és a plugin, akkor az 
                InstanceConfig a plugint futtató gépen az xml helye; InstanceData a távoli gépen az xml helye. 
                Ha azonos gépen fut, akkor az InstanceData nem kötelező. 
       -->
-      <Instance	Id="Monitor1" Inuse="APP"
+      <!-- ANTIDELL LEAR ALM-re állítva az Instance -->
+      <!--<Instance	Id="Monitor1" Inuse="APP"
                 Name="SchedulerMonitor_for_LearALM"
                 Description="Időzített feladatok figyelése a LearALM-ben."
                 InstanceConfig="d:\!Dev\VRH\iScheduler\Vrh.iScheduler\App_Data\iScheduler\iScheduler.xml"
                 InstanceData="~/App_Data/iScheduler/iScheduler.xml">
+      </Instance>-->
+
+      <!-- ANTIDELL AppContainer-re állítva az Instance -->
+      <Instance	Id="Monitor1" Inuse="APP"
+                Name="SchedulerMonitor_for_LearALM"
+                Description="Időzített feladatok figyelése a LearALM-ben."
+                InstanceConfig="d:\!Dev\VRH\application.container\Vrh.ApplicationContainer.ConsoleHost\bin\Debug\iSchedulerMonitor\iScheduler\iScheduler.xml"
+                InstanceData="d:\!Dev\VRH\application.container\Vrh.ApplicationContainer.ConsoleHost\bin\Debug\iSchedulerMonitor\iScheduler\iScheduler.xml">
       </Instance>
+
       <!--VRH-->
       <!--<Instance	Id="Monitor1"
 					Name="SchedulerMonitor_for_LearALM"

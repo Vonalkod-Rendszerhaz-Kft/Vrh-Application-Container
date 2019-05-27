@@ -1,0 +1,1948 @@
+<ReportDefinitions>
+	<!-- Ebben a fájlban használható FIX változók (!e neveket be használd változónévnek!):
+		LCID:				a program futására vonatkozóan meghatározott nyelvkód
+		TODAY:				a futáskori dátum yyyyMMdd formátumban
+		YESTERDAY:			a tegnapi nap dátuma yyyyMMdd formátumban
+		NOW:				a futáskori időbélyeg yyyyMMddHHmmss formátumban
+		THISWEEKMONDAY:		a futáskor aktuális hét hétfőjének dátuma yyyyMMdd formátumban
+		THISWEEKFRIDAY:		a futáskor aktuális hét péntekének dátuma yyyyMMdd formátumban
+		THISMONTH1STDAY:	a futáskor aktuális hónap első napjának dátuma yyyyMMdd formátumban
+		THISMONTHLASTDAY:	a futáskor aktuális hónap utolsó napjának dátuma yyyyMMdd formátumban
+		LASTWEEKMONDAY:		a futáskor aktuális hét hétfőjének dátuma yyyyMMdd formátumban
+		LASTWEEKFRIDAY:		a futáskor aktuális hét péntekének dátuma yyyyMMdd formátumban
+		LASTMONTH1STDAY:	a futáskor aktuális hónap első napjának dátuma yyyyMMdd formátumban
+		LASTMONTHLASTDAY:	a futáskor aktuális hónap utolsó napjának dátuma yyyyMMdd formátumban
+	-->
+	<strings>
+		<string Name="REPORTRECORDCOUNTLIMIT">0</string>
+		<string Name="SELECT_Reports_MetricsCycles">
+			SELECT @_RECORDCOUNTLIMIT@ 1 AS NUMOFRECORDS, * FROM [dbo].[Reports_MetricsCycles]
+			WHERE 1=1 @kSHIFTSYSTEMNAME@ @kSHIFTNAME@ @kSTARTFrom@ @kSTARTTo@ @kAssemblyLineId@ @kTeam@ @kGPN@
+		</string>
+		<string Name="SELECT_Reports_MetricsCyclesByHours">
+			SELECT @_RECORDCOUNTLIMIT@ 1 AS NUMOFRECORDS, * FROM [dbo].[Reports_MetricsCyclesByHours]
+			WHERE 1=1 @kSHIFTSYSTEMNAME@ @kSHIFTNAME@ @kSTARTFrom@ @kSTARTTo@ @kAssemblyLineId@ @kTeam@ @kGPN@
+		</string>
+		<string Name="SELECT_Reports_MetricsCyclesByHoursGPN">
+			SELECT @_RECORDCOUNTLIMIT@ 1 AS NUMOFRECORDS, * FROM [dbo].[Reports_MetricsCyclesByHoursGPN]
+			WHERE 1=1 @kSHIFTSYSTEMNAME@ @kSHIFTNAME@ @kSTARTFrom@ @kSTARTTo@ @kAssemblyLineId@ @kTeam@ @kGPN@
+		</string>
+		<string Name="SELECT_Reports_MetricsCyclesByGPN">
+			SELECT @_RECORDCOUNTLIMIT@ 1 AS NUMOFRECORDS, * FROM [dbo].[Reports_MetricsCyclesByGPN]
+			WHERE 1=1 @kSHIFTSYSTEMNAME@ @kSHIFTNAME@ @kSTARTFrom@ @kSTARTTo@ @kAssemblyLineId@ @kTeam@ @kGPN@
+		</string>
+		<string Name="SELECT_Reports_PeriodsByShift">
+<!--
+	INNER JOIN (SELECT P11.SHIFTSYSTEMNAME AS _SHIFTSYSTEMNAME
+						,P11.SHIFTNAME AS _SHIFTNAME
+						,SUM(P11.[LENGTH]) AS SUMSUMTime 
+				FROM Reports_Periods AS P11 
+				GROUP BY P11.SHIFTSYSTEMNAME, P11.SHIFTNAME) AS P1 
+		ON P1._SHIFTSYSTEMNAME = Periods.SHIFTSYSTEMNAME AND P1._SHIFTNAME = Periods.SHIFTNAME @kSTARTFrom@ @kSTARTTo@
+-->
+			SELECT @_RECORDCOUNTLIMIT@
+				Periods.SHIFTSYSTEMNAME,Periods.SHIFTNAME
+				,PeriodeTypeNum,dbo.PeriodTypeName(Periods.PeriodeTypeNum,'@LCID@') AS PeriodeTypeName
+				,Count(*) AS [Count]
+				,SUM(Periods.[LENGTH]) AS SUMTime
+				,(CASE Periods.PeriodeTypeNum WHEN 4 THEN -1 WHEN 3 THEN 1 ELSE 0 END) * SUM(Periods.[LENGTH]) AS SUMTimeDT
+				,P1.SUMSUMTime
+				,SUM([QTYproduced]) AS SUMProdCount
+				,SUM([Cycles]) AS SUMCycles
+			FROM Reports_Periods AS Periods
+			INNER JOIN (SELECT P11.SHIFTSYSTEMNAME AS _SHIFTSYSTEMNAME
+							,P11.SHIFTNAME AS _SHIFTNAME
+							,SUM(P11.[LENGTH]) AS SUMSUMTime 
+						FROM Reports_Periods2 AS P11 
+						WHERE 1=1 @kSHIFTSYSTEMNAME@ @kSHIFTNAME@ @kSTARTFrom@ @kSTARTTo@
+						GROUP BY P11.SHIFTSYSTEMNAME, P11.SHIFTNAME) AS P1 
+				ON P1._SHIFTSYSTEMNAME = Periods.SHIFTSYSTEMNAME AND P1._SHIFTNAME = Periods.SHIFTNAME 
+			WHERE (1=1) AND Periods.SHIFTSYSTEMNAME IS NOT NULL @kSHIFTSYSTEMNAME@ @kSHIFTNAME@ @kSTARTFrom@ @kSTARTTo@
+			GROUP BY Periods.SHIFTSYSTEMNAME, Periods.SHIFTNAME, P1.SUMSUMTime, Periods.PeriodeTypeNum
+		</string>
+		<string Name="SELECT_Reports_PeriodsByShiftAsline">
+<!--
+	INNER JOIN (SELECT P11.SHIFTSYSTEMNAME AS _SHIFTSYSTEMNAME
+						,P11.SHIFTNAME AS _SHIFTNAME
+						,P11.MachineId AS _MachineId
+						,SUM(P11.[LENGTH]) AS SUMSUMTime 
+					FROM Reports_Periods AS P11 
+					GROUP BY P11.SHIFTSYSTEMNAME, P11.SHIFTNAME, P11.MachineId) AS P1 
+				ON P1._SHIFTSYSTEMNAME = Periods.SHIFTSYSTEMNAME AND P1._SHIFTNAME = Periods.SHIFTNAME AND P1._MachineId = Periods.MachineId @kSTARTFrom@ @kSTARTTo@
+-->
+			SELECT @_RECORDCOUNTLIMIT@
+				Periods.SHIFTSYSTEMNAME,Periods.SHIFTNAME
+				,Periods.MachineId,Periods.MachineName
+				,PeriodeTypeNum,dbo.PeriodTypeName(Periods.PeriodeTypeNum,'@LCID@') AS PeriodeTypeName
+				,Count(*) AS [Count]
+				,SUM(Periods.[LENGTH]) AS SUMTime
+				,(CASE Periods.PeriodeTypeNum WHEN 4 THEN -1 WHEN 3 THEN 1 ELSE 0 END) * SUM(Periods.[LENGTH])	AS SUMTimeDT
+				,P1.SUMSUMTime
+				,SUM([QTYproduced]) AS SUMProdCount
+				,SUM([Cycles]) AS SUMCycles
+			FROM Reports_Periods AS Periods
+			INNER JOIN (SELECT P11.SHIFTSYSTEMNAME AS _SHIFTSYSTEMNAME
+							,P11.SHIFTNAME AS _SHIFTNAME
+							,P11.MachineId AS _MachineId
+							,SUM(P11.[LENGTH]) AS SUMSUMTime 
+						FROM Reports_Periods2 AS P11 
+						WHERE 1=1 @kSHIFTSYSTEMNAME@ @kSHIFTNAME@ @kAssemblyLineId@ @kSTARTFrom@ @kSTARTTo@
+						GROUP BY P11.SHIFTSYSTEMNAME, P11.SHIFTNAME, P11.MachineId) AS P1 
+				ON P1._SHIFTSYSTEMNAME = Periods.SHIFTSYSTEMNAME AND P1._SHIFTNAME = Periods.SHIFTNAME AND P1._MachineId = Periods.MachineId
+			WHERE (1=1) AND Periods.SHIFTSYSTEMNAME IS NOT NULL @kSHIFTSYSTEMNAME@ @kSHIFTNAME@ @kAssemblyLineId@ @kSTARTFrom@ @kSTARTTo@
+			GROUP BY Periods.SHIFTSYSTEMNAME, Periods.SHIFTNAME, Periods.MachineId, Periods.MachineName, P1.SUMSUMTime, Periods.PeriodeTypeNum
+		</string>
+		<string Name="SELECT_Reports_PeriodsByShiftAslineDTR">
+<!--
+			INNER JOIN (SELECT P11.SHIFTSYSTEMNAME AS _SHIFTSYSTEMNAME
+								,P11.SHIFTNAME AS _SHIFTNAME
+								,P11.MachineId AS _MachineId
+								,SUM(P11.[LENGTH]) AS SUMSUMTime 
+							FROM Reports_Periods AS P11 
+							GROUP BY P11.SHIFTSYSTEMNAME, P11.SHIFTNAME, P11.MachineId) AS P1
+						ON P1._SHIFTSYSTEMNAME = Periods.SHIFTSYSTEMNAME AND P1._SHIFTNAME = Periods.SHIFTNAME AND P1._MachineId = Periods.MachineId @kSTARTFrom@ @kSTARTTo@
+-->
+			SELECT @_RECORDCOUNTLIMIT@
+				Periods.SHIFTSYSTEMNAME, Periods.SHIFTNAME
+				,Periods.MachineId,Periods.MachineName
+				,Periods.PeriodeTypeNum,dbo.PeriodTypeName(Periods.PeriodeTypeNum,'@LCID@') AS PeriodeTypeName
+				,Periods.DTRidandname
+				,Count(*) AS [Count]
+				,SUM(Periods.[LENGTH]) AS SUMTime
+				,(CASE Periods.PeriodeTypeNum WHEN 4 THEN -1 WHEN 3 THEN 1 ELSE 0 END) * SUM(Periods.[LENGTH]) AS SUMTimeDT
+				,MIN(Periods.[LENGTH]) AS MINTime, MAX(Periods.[LENGTH]) AS MAXTime
+				,P1.SUMSUMTime
+				,SUM([QTYproduced]) AS SUMProdCount
+				,SUM([Cycles]) AS SUMCycles
+			FROM Reports_Periods AS Periods
+			INNER JOIN (SELECT P11.SHIFTSYSTEMNAME AS _SHIFTSYSTEMNAME
+							,P11.SHIFTNAME AS _SHIFTNAME
+							,P11.MachineId AS _MachineId
+							,SUM(P11.[LENGTH]) AS SUMSUMTime 
+						FROM Reports_Periods2 AS P11 
+						WHERE 1=1 @kSHIFTSYSTEMNAME@ @kSHIFTNAME@ @kAssemblyLineId@ @kSTARTFrom@ @kSTARTTo@
+						GROUP BY P11.SHIFTSYSTEMNAME, P11.SHIFTNAME, P11.MachineId) AS P1 
+				ON P1._SHIFTSYSTEMNAME = Periods.SHIFTSYSTEMNAME AND P1._SHIFTNAME = Periods.SHIFTNAME AND P1._MachineId = Periods.MachineId
+			WHERE (1=1) AND Periods.SHIFTSYSTEMNAME IS NOT NULL @kSHIFTSYSTEMNAME@ @kSHIFTNAME@ @kAssemblyLineId@ @kSTARTFrom@ @kSTARTTo@
+			GROUP BY Periods.SHIFTSYSTEMNAME, Periods.SHIFTNAME, Periods.MachineId, Periods.MachineName, P1.SUMSUMTime, Periods.PeriodeTypeNum, Periods.DTRidandname
+		</string>
+		<string Name="SELECT_Reports_PeriodsByShiftTeamDTR">
+			SELECT @_RECORDCOUNTLIMIT@
+				Periods.SHIFTSYSTEMNAME, Periods.SHIFTNAME
+				,Periods.TEAMID,Periods.TEAMNAME,Periods.TEAMINFO
+				,Periods.PeriodeTypeNum,dbo.PeriodTypeName(Periods.PeriodeTypeNum,'@LCID@') AS PeriodeTypeName
+				,Periods.DTRidandname
+				,Count(*) AS [Count]
+				,SUM(Periods.[LENGTH]) AS SUMTime
+				,(CASE Periods.PeriodeTypeNum WHEN 4 THEN -1 WHEN 3 THEN 1 ELSE 0 END) * SUM(Periods.[LENGTH]) AS SUMTimeDT
+				,MIN(Periods.[LENGTH]) AS MINTime, MAX(Periods.[LENGTH]) AS MAXTime
+				,P1.SUMSUMTime
+				,SUM([QTYproduced]) AS SUMProdCount
+				,SUM([Cycles]) AS SUMCycles
+			FROM Reports_Periods AS Periods
+			INNER JOIN (SELECT P11.SHIFTSYSTEMNAME AS _SHIFTSYSTEMNAME
+							,P11.SHIFTNAME AS _SHIFTNAME
+							,P11.TEAMID AS _TEAMID
+							,SUM(P11.[LENGTH]) AS SUMSUMTime 
+						FROM Reports_Periods2T AS P11 
+						WHERE 1=1 @kSHIFTSYSTEMNAME@ @kSHIFTNAME@ @kTeamId@ @kSTARTFrom@ @kSTARTTo@
+						GROUP BY P11.SHIFTSYSTEMNAME, P11.SHIFTNAME, P11.TEAMID) AS P1 
+				ON P1._SHIFTSYSTEMNAME = Periods.SHIFTSYSTEMNAME AND P1._SHIFTNAME = Periods.SHIFTNAME AND P1._TEAMID = Periods.TEAMID
+			WHERE (1=1) AND Periods.SHIFTSYSTEMNAME IS NOT NULL @kSHIFTSYSTEMNAME@ @kSHIFTNAME@ @kTeamId@ @kSTARTFrom@ @kSTARTTo@
+			GROUP BY Periods.SHIFTSYSTEMNAME, Periods.SHIFTNAME, Periods.TEAMID, Periods.TEAMNAME, Periods.TEAMINFO, P1.SUMSUMTime, Periods.PeriodeTypeNum, Periods.DTRidandname
+		</string>
+		<string Name="SELECT_Reports_PeriodsShiftTimeUtilization">
+			SELECT @_RECORDCOUNTLIMIT@ * FROM dbo.Reports_Periods3
+			WHERE (1=1) @kSHIFTSYSTEMNAME@ @kSHIFTNAME@ @kAssemblyLineId@ @kSTARTFrom@ @kSTARTTo@
+		</string>
+		<string Name="SELECT_Reports_PeriodsDetailed">
+			SELECT  @_RECORDCOUNTLIMIT@ * ,Periods.PeriodeTypeNum,dbo.PeriodTypeName(Periods.PeriodeTypeNum,'@LCID@') AS PeriodeTypeName
+			FROM Reports_Periods AS Periods
+			WHERE 1=1 @kSHIFTSYSTEMNAME@ @kSHIFTNAME@ @kAssemblyLineId@ @kSTARTFrom@ @kSTARTTo@	@kPERIODETYPE@ @kDTR@ 
+		</string>
+		<string Name="SELECT_Reports_AndonLog">
+			SELECT  @_RECORDCOUNTLIMIT@ * FROM Reports_AndonLog
+			WHERE 1=1 @kREQUESTACTIVE@ @kSHIFTSYSTEMNAME@ @kSHIFTNAME@ @kSTARTFrom@ @kSTARTTo@ @kAssemblyLineId@ @kWORKPLACE@ @kREQUESTCODE@ @kCLEARCODE@
+		</string>
+	</strings>
+	<connectionstrings>
+		<connectionstring name="defaultConnectionString">data source=(local)\SQLEXPRESS;initial catalog=LearALM;integrated security=True;MultipleActiveResultSets=True;App=EntityFramework;</connectionstring>
+		<!--
+		<connectionstring name="defaultConnectionString">data source=.\SQLExpress;initial catalog=LearALM;user id=sa;password=Vrh@54321;MultipleActiveResultSets=True;App=EntityFramework;</connectionstring>
+		-->
+	</connectionstrings>
+	<general>
+		<defaultLCID>en-US</defaultLCID>
+		<InputRoot></InputRoot> <!-- RDL fájlok helye. Ha üres, akkor abban a mappában keresi, ahol ez a fájl van. -->
+		<defaultoutput format="HTML" action="display" folder="~/App_Data/OneReport" file="test.pdf"/>
+		<WordCodePrefix>OneReportsXml</WordCodePrefix>
+		<ExternalParameterPresetXml></ExternalParameterPresetXml>		
+		<Timeout Sqlquery ="180" AsyncPostBackTimeOut="440" executionTimeout="440"/>
+	</general>
+	<reports>
+		<report id="Downtime1" LCID="hu-HU,en-US" reportfile="Downtime1 - @LCID@.rdl" connectionstring="defaultConnectionString">
+			<Displayname WordCode="Downtime1.DisplayName">Állásidő riport (műszakra összesített)</Displayname>
+			<ExternalParameters>
+				<Parameter Name="SHIFTSYSTEMNAME"><Value></Value></Parameter>
+				<Parameter Name="SHIFTNAME"><Value></Value></Parameter>
+				<Parameter Name="STARTFrom"><Value></Value></Parameter>
+				<Parameter Name="STARTTo"><Value></Value></Parameter>
+				<Parameter Name="UNFOLDALL"><Value>true</Value></Parameter>
+				<Parameter Name="RECORDCOUNTLIMIT"><Value>@REPORTRECORDCOUNTLIMIT@</Value></Parameter>
+				<Parameter Name="SITENAME"><Value></Value></Parameter>
+			</ExternalParameters>
+			<ExternalParameterPresets>
+				<Preset Name="TODAY" Description="Today data up to now">
+					<Parameter Name="STARTFrom"><Value>@TODAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="YESTERDAY" Description="Yesterday data">
+					<Parameter Name="STARTFrom"><Value>@YESTERDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEK" Description="This week data, not including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEK_AND_TODAY" Description="This week data, including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTWEEK" Description="Last week data">
+					<Parameter Name="STARTFrom"><Value>@LASTWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTWEEKFRIDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTMONTH" Description="Last month data">
+					<Parameter Name="STARTFrom"><Value>@LASTMONTH1STDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTMONTHLASTDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+			</ExternalParameterPresets>
+			<InternalParameters>
+				<Parameter Name="kSHIFTSYSTEMNAME"><Value>AND SHIFTSYSTEMNAME = '@SHIFTSYSTEMNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTSYSTEMNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSHIFTNAME"><Value>AND SHIFTNAME = '@SHIFTNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTFrom"><Value>AND ([ShiftStart] &gt;= '@STARTFrom@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTFrom@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTTo"><Value>AND ([ShiftStart] &lt;= '@STARTTo@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTTo@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="_RECORDCOUNTLIMIT"><Value>TOP @RECORDCOUNTLIMIT@</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@RECORDCOUNTLIMIT@" With="0"><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="SQLTEXT"><Value>@SELECT_Reports_PeriodsByShift@</Value></Parameter>
+			</InternalParameters>
+			<reportfile>
+				<param name="SHIFTSYSTEMNAME">@SHIFTSYSTEMNAME@</param>
+				<param name="SHIFTNAME">@SHIFTNAME@</param>
+				<param name="STARTFrom">@STARTFrom@</param>
+				<param name="STARTTo">@STARTTo@</param>
+				<param name="UNFOLDALL">@UNFOLDALL@</param>
+				<param name="SQLTEXT">@SQLTEXT@</param>
+				<param name="SITENAME">@SITENAME@</param>
+			</reportfile>
+			<datasets><dataset name="DataSet1"><datacommand type="SQL"><sql>@SQLTEXT@</sql></datacommand></dataset></datasets>	
+		</report>
+		<report id="Downtime2" LCID="hu-HU,en-US" reportfile="Downtime2 - @LCID@.rdl" connectionstring="defaultConnectionString">
+			<Displayname WordCode="Downtime2.DisplayName">Állásidő riport (műszakra/gépekre összesített)</Displayname>
+			<ExternalParameters>
+				<Parameter Name="SHIFTSYSTEMNAME"><Value></Value></Parameter>
+				<Parameter Name="SHIFTNAME"><Value></Value></Parameter>
+				<Parameter Name="STARTFrom"><Value></Value></Parameter>
+				<Parameter Name="STARTTo"><Value></Value></Parameter>
+				<Parameter Name="AssemblyLineId"><Value></Value></Parameter>
+				<Parameter Name="UNFOLDALL"><Value>true</Value></Parameter>
+				<Parameter Name="RECORDCOUNTLIMIT"><Value>@REPORTRECORDCOUNTLIMIT@</Value></Parameter>
+				<Parameter Name="SITENAME"><Value></Value></Parameter>
+			</ExternalParameters>
+			<ExternalParameterPresets>
+				<Preset Name="TODAY" Description="Today data up to now">
+					<Parameter Name="STARTFrom"><Value>@TODAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="YESTERDAY" Description="Yesterday data">
+					<Parameter Name="STARTFrom"><Value>@YESTERDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEK" Description="This week data, not including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEKANDTODAY" Description="This week data, including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTWEEK" Description="Last week data">
+					<Parameter Name="STARTFrom"><Value>@LASTWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTWEEKFRIDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTMONTH" Description="Last month data">
+					<Parameter Name="STARTFrom"><Value>@LASTMONTH1STDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTMONTHLASTDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+			</ExternalParameterPresets>
+			<InternalParameters>
+				<Parameter Name="kSHIFTSYSTEMNAME"><Value>AND SHIFTSYSTEMNAME = '@SHIFTSYSTEMNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTSYSTEMNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSHIFTNAME"><Value>AND SHIFTNAME = '@SHIFTNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTFrom"><Value>AND ([ShiftStart] &gt;= '@STARTFrom@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTFrom@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTTo"><Value>AND ([ShiftStart] &lt;= '@STARTTo@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTTo@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<!--<Parameter Name="kAssemblyLineId"><Value>AND MachineId = '@AssemblyLineId@'</Value>-->
+				<Parameter Name="kAssemblyLineId"><Value>AND MachineId IN (@AssemblyLineId@)</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@AssemblyLineId@" With=""><Value></Value></Condition>
+					</Conditions>  
+				</Parameter>
+				<Parameter Name="_RECORDCOUNTLIMIT"><Value>TOP @RECORDCOUNTLIMIT@</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@RECORDCOUNTLIMIT@" With="0"><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+			</InternalParameters>
+			<reportfile>
+				<param name="SHIFTSYSTEMNAME">@SHIFTSYSTEMNAME@</param>
+				<param name="SHIFTNAME">@SHIFTNAME@</param>
+				<param name="STARTFrom">@STARTFrom@</param>
+				<param name="STARTTo">@STARTTo@</param>
+				<param name="AssemblyLineId">@AssemblyLineId@</param>
+				<param name="UNFOLDALL">@UNFOLDALL@</param>
+				<param name="SQLTEXT">@SELECT_Reports_PeriodsByShiftAsline@</param>
+				<param name="SITENAME">@SITENAME@</param>
+			</reportfile>
+			<datasets><dataset name="DataSet1"><datacommand type="SQL"><sql>@SELECT_Reports_PeriodsByShiftAsline@</sql></datacommand></dataset></datasets>
+		</report>
+		<report id="Downtime3" LCID="hu-HU,en-US" reportfile="Downtime3 - @LCID@.rdl" connectionstring="defaultConnectionString">
+			<Displayname WordCode="Downtime3.DisplayName">Állásidő riport (műszakra/gépekre/állásidő okra összesített)</Displayname>
+			<ExternalParameters>
+				<Parameter Name="SHIFTSYSTEMNAME"><Value></Value></Parameter>
+				<Parameter Name="SHIFTNAME"><Value></Value></Parameter>
+				<Parameter Name="STARTFrom"><Value></Value></Parameter>
+				<Parameter Name="STARTTo"><Value></Value></Parameter>
+				<Parameter Name="AssemblyLineId"><Value></Value></Parameter>
+				<Parameter Name="UNFOLDALL"><Value>true</Value></Parameter>
+				<Parameter Name="RECORDCOUNTLIMIT"><Value>@REPORTRECORDCOUNTLIMIT@</Value></Parameter>
+				<Parameter Name="SITENAME"><Value></Value></Parameter>
+			</ExternalParameters>
+			<ExternalParameterPresets>
+				<Preset Name="TODAY" Description="Today data up to now">
+					<Parameter Name="STARTFrom"><Value>@TODAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="YESTERDAY" Description="Yesterday data">
+					<Parameter Name="STARTFrom"><Value>@YESTERDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEK" Description="This week data, not including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEKANDTODAY" Description="This week data, including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTWEEK" Description="Last week data">
+					<Parameter Name="STARTFrom"><Value>@LASTWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTWEEKFRIDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTMONTH" Description="Last month data">
+					<Parameter Name="STARTFrom"><Value>@LASTMONTH1STDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTMONTHLASTDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+			</ExternalParameterPresets>
+			<InternalParameters>
+				<Parameter Name="kSHIFTSYSTEMNAME"><Value>AND SHIFTSYSTEMNAME = '@SHIFTSYSTEMNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTSYSTEMNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSHIFTNAME"><Value>AND SHIFTNAME = '@SHIFTNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTFrom"><Value>AND ([ShiftStart] &gt;= '@STARTFrom@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTFrom@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTTo"><Value>AND ([ShiftStart] &lt;= '@STARTTo@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTTo@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<!--<Parameter Name="kAssemblyLineId"><Value>AND MachineId = '@AssemblyLineId@'</Value>-->
+				<Parameter Name="kAssemblyLineId"><Value>AND MachineId IN (@AssemblyLineId@)</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@AssemblyLineId@" With=""><Value></Value></Condition>
+					</Conditions>  
+				</Parameter>
+				<Parameter Name="_RECORDCOUNTLIMIT"><Value>TOP @RECORDCOUNTLIMIT@</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@RECORDCOUNTLIMIT@" With="0"><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+			</InternalParameters>
+			<reportfile>
+				<param name="SHIFTSYSTEMNAME">@SHIFTSYSTEMNAME@</param>
+				<param name="SHIFTNAME">@SHIFTNAME@</param>
+				<param name="STARTFrom">@STARTFrom@</param>
+				<param name="STARTTo">@STARTTo@</param>
+				<param name="AssemblyLineId">@AssemblyLineId@</param>
+				<param name="UNFOLDALL">@UNFOLDALL@</param>
+				<param name="SQLTEXT">@SELECT_Reports_PeriodsByShiftAslineDTR@</param>
+				<param name="SITENAME">@SITENAME@</param>
+			</reportfile>
+			<datasets><dataset name="DataSet1"><datacommand type="SQL"><sql>@SELECT_Reports_PeriodsByShiftAslineDTR@</sql></datacommand></dataset></datasets>
+		</report>
+		<report id="Downtime3T" LCID="hu-HU,en-US" reportfile="Downtime3T - @LCID@.rdl" connectionstring="defaultConnectionString">
+			<Displayname WordCode="Downtime3T.DisplayName">Állásidő riport (műszakra/teamre/állásidő okra összesített)</Displayname>
+			<ExternalParameters>
+				<Parameter Name="SHIFTSYSTEMNAME"><Value></Value></Parameter>
+				<Parameter Name="SHIFTNAME"><Value></Value></Parameter>
+				<Parameter Name="STARTFrom"><Value></Value></Parameter>
+				<Parameter Name="STARTTo"><Value></Value></Parameter>
+				<Parameter Name="TeamIdList"><Value></Value></Parameter>
+				<Parameter Name="UNFOLDALL"><Value>true</Value></Parameter>
+				<Parameter Name="RECORDCOUNTLIMIT"><Value>@REPORTRECORDCOUNTLIMIT@</Value></Parameter>
+				<Parameter Name="SITENAME"><Value></Value></Parameter>
+			</ExternalParameters>
+			<ExternalParameterPresets>
+				<Preset Name="TODAY" Description="Today data up to now">
+					<Parameter Name="STARTFrom"><Value>@TODAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="YESTERDAY" Description="Yesterday data">
+					<Parameter Name="STARTFrom"><Value>@YESTERDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEK" Description="This week data, not including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEKANDTODAY" Description="This week data, including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTWEEK" Description="Last week data">
+					<Parameter Name="STARTFrom"><Value>@LASTWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTWEEKFRIDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTMONTH" Description="Last month data">
+					<Parameter Name="STARTFrom"><Value>@LASTMONTH1STDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTMONTHLASTDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+			</ExternalParameterPresets>
+			<InternalParameters>
+				<Parameter Name="kSHIFTSYSTEMNAME"><Value>AND SHIFTSYSTEMNAME = '@SHIFTSYSTEMNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTSYSTEMNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSHIFTNAME"><Value>AND SHIFTNAME = '@SHIFTNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTFrom"><Value>AND ([ShiftStart] &gt;= '@STARTFrom@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTFrom@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTTo"><Value>AND ([ShiftStart] &lt;= '@STARTTo@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTTo@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kTeamId"><Value>AND TEAMNAME IN (@TeamIdList@)</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@TeamIdList@" With=""><Value></Value></Condition>
+					</Conditions>  
+				</Parameter>
+				<Parameter Name="_RECORDCOUNTLIMIT"><Value>TOP @RECORDCOUNTLIMIT@</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@RECORDCOUNTLIMIT@" With="0"><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+			</InternalParameters>
+			<reportfile>
+				<param name="SHIFTSYSTEMNAME">@SHIFTSYSTEMNAME@</param>
+				<param name="SHIFTNAME">@SHIFTNAME@</param>
+				<param name="STARTFrom">@STARTFrom@</param>
+				<param name="STARTTo">@STARTTo@</param>
+				<param name="TeamIdList">@TeamIdList@</param>
+				<param name="UNFOLDALL">@UNFOLDALL@</param>
+				<param name="SQLTEXT">@SELECT_Reports_PeriodsByShiftTeamDTR@</param>
+				<param name="SITENAME">@SITENAME@</param>
+			</reportfile>
+			<datasets><dataset name="DataSet1"><datacommand type="SQL"><sql>@SELECT_Reports_PeriodsByShiftTeamDTR@</sql></datacommand></dataset></datasets>
+		</report>
+		<report id="Downtime4" LCID="hu-HU,en-US" reportfile="Downtime4 - @LCID@.rdl" connectionstring="defaultConnectionString">
+			<Displayname WordCode="Downtime4.DisplayName">Műszak-idő felhasználás riport</Displayname>
+			<ExternalParameters>
+				<Parameter Name="SHIFTSYSTEMNAME"><Value></Value></Parameter>
+				<Parameter Name="SHIFTNAME"><Value></Value></Parameter>
+				<Parameter Name="STARTFrom"><Value></Value></Parameter>
+				<Parameter Name="STARTTo"><Value></Value></Parameter>
+				<Parameter Name="AssemblyLineId"><Value></Value></Parameter>
+				<Parameter Name="UNFOLDALL"><Value>true</Value></Parameter>
+				<Parameter Name="RECORDCOUNTLIMIT"><Value>@REPORTRECORDCOUNTLIMIT@</Value></Parameter>
+				<Parameter Name="SITENAME"><Value></Value></Parameter>
+			</ExternalParameters>
+			<ExternalParameterPresets>
+				<Preset Name="TODAY" Description="Today data up to now">
+					<Parameter Name="STARTFrom"><Value>@TODAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="YESTERDAY" Description="Yesterday data">
+					<Parameter Name="STARTFrom"><Value>@YESTERDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEK" Description="This week data, not including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEKANDTODAY" Description="This week data, including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTWEEK" Description="Last week data">
+					<Parameter Name="STARTFrom"><Value>@LASTWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTWEEKFRIDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTMONTH" Description="Last month data">
+					<Parameter Name="STARTFrom"><Value>@LASTMONTH1STDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTMONTHLASTDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+			</ExternalParameterPresets>
+			<InternalParameters>
+				<Parameter Name="kSHIFTSYSTEMNAME"><Value>AND SHIFTSYSTEMNAME = '@SHIFTSYSTEMNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTSYSTEMNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSHIFTNAME"><Value>AND SHIFTNAME = '@SHIFTNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTFrom"><Value>AND ([ShiftStart] &gt;= '@STARTFrom@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTFrom@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTTo"><Value>AND ([ShiftStart] &lt;= '@STARTTo@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTTo@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<!--<Parameter Name="kAssemblyLineId"><Value>AND MachineId = '@AssemblyLineId@'</Value>-->
+				<Parameter Name="kAssemblyLineId"><Value>AND MachineId IN (@AssemblyLineId@)</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@AssemblyLineId@" With=""><Value></Value></Condition>
+					</Conditions>  
+				</Parameter>
+				<Parameter Name="_RECORDCOUNTLIMIT"><Value>TOP @RECORDCOUNTLIMIT@</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@RECORDCOUNTLIMIT@" With="0"><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+			</InternalParameters>
+			<reportfile>
+				<param name="SHIFTSYSTEMNAME">@SHIFTSYSTEMNAME@</param>
+				<param name="SHIFTNAME">@SHIFTNAME@</param>
+				<param name="STARTFrom">@STARTFrom@</param>
+				<param name="STARTTo">@STARTTo@</param>
+				<param name="AssemblyLineId">@AssemblyLineId@</param>
+				<param name="UNFOLDALL">@UNFOLDALL@</param>
+				<param name="SQLTEXT">@SELECT_Reports_PeriodsShiftTimeUtilization@</param>
+				<param name="SITENAME">@SITENAME@</param>
+			</reportfile>
+			<datasets><dataset name="DataSet1"><datacommand type="SQL"><sql>@SELECT_Reports_PeriodsShiftTimeUtilization@</sql></datacommand></dataset></datasets>
+		</report>
+		<report id="Downtime5" LCID="hu-HU,en-US" reportfile="Downtime5 - @LCID@.rdl" connectionstring="defaultConnectionString">
+			<Displayname WordCode="Downtime5.DisplayName">Tételes periódus riport</Displayname>
+			<ExternalParameters>
+				<Parameter Name="SHIFTSYSTEMNAME"><Value></Value></Parameter>
+				<Parameter Name="SHIFTNAME"><Value></Value></Parameter>
+				<Parameter Name="STARTFrom"><Value></Value></Parameter>
+				<Parameter Name="STARTTo"><Value></Value></Parameter>
+				<Parameter Name="AssemblyLineId"><Value></Value></Parameter>
+				<Parameter Name="PERIODETYPE"><Value></Value></Parameter>
+				<Parameter Name="DTR"><Value></Value></Parameter>
+				<Parameter Name="UNFOLDALL"><Value>true</Value></Parameter>
+				<Parameter Name="RECORDCOUNTLIMIT"><Value>@REPORTRECORDCOUNTLIMIT@</Value></Parameter>
+				<Parameter Name="SITENAME"><Value></Value></Parameter>
+			</ExternalParameters>
+			<ExternalParameterPresets>
+				<Preset Name="TODAY" Description="Today data up to now">
+					<Parameter Name="STARTFrom"><Value>@TODAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="YESTERDAY" Description="Yesterday data">
+					<Parameter Name="STARTFrom"><Value>@YESTERDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEK" Description="This week data, not including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEKANDTODAY" Description="This week data, including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTWEEK" Description="Last week data">
+					<Parameter Name="STARTFrom"><Value>@LASTWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTWEEKFRIDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTMONTH" Description="Last month data">
+					<Parameter Name="STARTFrom"><Value>@LASTMONTH1STDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTMONTHLASTDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+			</ExternalParameterPresets>
+			<InternalParameters>
+				<Parameter Name="kSHIFTSYSTEMNAME"><Value>AND SHIFTSYSTEMNAME = '@SHIFTSYSTEMNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTSYSTEMNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSHIFTNAME"><Value>AND SHIFTNAME = '@SHIFTNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTFrom"><Value>AND ([ShiftStart] &gt;= '@STARTFrom@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTFrom@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTTo"><Value>AND ([ShiftStart] &lt;= '@STARTTo@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTTo@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<!--<Parameter Name="kAssemblyLineId"><Value>AND MachineId = '@AssemblyLineId@'</Value>-->
+				<Parameter Name="kAssemblyLineId"><Value>AND MachineId IN (@AssemblyLineId@)</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@AssemblyLineId@" With=""><Value></Value></Condition>
+					</Conditions>  
+				</Parameter>
+				<Parameter Name="kDTR"><Value>AND DTR = '@DTR@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@DTR@" With=""><Value></Value></Condition>
+					</Conditions>  
+				</Parameter>
+				<Parameter Name="kPERIODETYPE"><Value>AND PeriodeTypeNum = '@PERIODETYPE@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@PERIODETYPE@" With=""><Value></Value></Condition>
+					</Conditions>  
+				</Parameter>
+				<Parameter Name="_RECORDCOUNTLIMIT"><Value>TOP @RECORDCOUNTLIMIT@</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@RECORDCOUNTLIMIT@" With="0"><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+			</InternalParameters>
+			<reportfile>
+				<param name="SHIFTSYSTEMNAME">@SHIFTSYSTEMNAME@</param>
+				<param name="SHIFTNAME">@SHIFTNAME@</param>
+				<param name="STARTFrom">@STARTFrom@</param>
+				<param name="STARTTo">@STARTTo@</param>
+				<param name="AssemblyLineId">@AssemblyLineId@</param>
+				<param name="PERIODETYPE">@PERIODETYPE@</param>
+				<param name="DTR">@DTR@</param>
+				<param name="UNFOLDALL">@UNFOLDALL@</param>
+				<param name="SQLTEXT">@SELECT_Reports_PeriodsDetailed@</param>
+				<param name="SITENAME">@SITENAME@</param>
+			</reportfile>
+			<datasets><dataset name="DataSet1"><datacommand type="SQL"><sql>@SELECT_Reports_PeriodsDetailed@</sql></datacommand></dataset></datasets>
+		</report>
+		<report id="AndonLog" LCID="hu-HU,en-US" reportfile="AndonLog - @LCID@.rdl" connectionstring="defaultConnectionString">
+			<Displayname WordCode="AndonLog.DisplayName">Andon napló riport</Displayname>
+			<ExternalParameters>
+				<Parameter Name="SHIFTSYSTEMNAME"><Value></Value></Parameter>
+				<Parameter Name="SHIFTNAME"><Value></Value></Parameter>
+				<Parameter Name="STARTFrom"><Value></Value></Parameter>
+				<Parameter Name="STARTTo"><Value></Value></Parameter>
+				<Parameter Name="AssemblyLineId"><Value></Value></Parameter>
+				<Parameter Name="REQUESTACTIVE"><Value></Value></Parameter>
+				<Parameter Name="WORKPLACE"><Value></Value></Parameter>
+				<Parameter Name="REQUESTCODE"><Value></Value></Parameter>
+				<Parameter Name="CLEARCODE"><Value></Value></Parameter>
+				<Parameter Name="UNFOLDALL"><Value>true</Value></Parameter>
+				<Parameter Name="RECORDCOUNTLIMIT"><Value>@REPORTRECORDCOUNTLIMIT@</Value></Parameter>
+				<Parameter Name="SITENAME"><Value></Value></Parameter>
+			</ExternalParameters>
+			<ExternalParameterPresets>
+				<Preset Name="TODAY" Description="Today data up to now">
+					<Parameter Name="STARTFrom"><Value>@TODAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="YESTERDAY" Description="Yesterday data">
+					<Parameter Name="STARTFrom"><Value>@YESTERDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEK" Description="This week data, not including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEKANDTODAY" Description="This week data, including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTWEEK" Description="Last week data">
+					<Parameter Name="STARTFrom"><Value>@LASTWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTWEEKFRIDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTMONTH" Description="Last month data">
+					<Parameter Name="STARTFrom"><Value>@LASTMONTH1STDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTMONTHLASTDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+			</ExternalParameterPresets>
+			<InternalParameters>
+				<Parameter Name="kSHIFTSYSTEMNAME"><Value>AND SHIFTSYSTEMNAME = '@SHIFTSYSTEMNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTSYSTEMNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSHIFTNAME"><Value>AND SHIFTNAME = '@SHIFTNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTFrom"><Value>AND ([ShiftStart] &gt;= '@STARTFrom@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTFrom@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTTo"><Value>AND ([ShiftStart] &lt;= '@STARTTo@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTTo@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kAssemblyLineId"><Value>AND [ProductionLineKey] = '@AssemblyLineId@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@AssemblyLineId@" With=""><Value></Value></Condition>
+					</Conditions>  
+				</Parameter>
+				<Parameter Name="kREQUESTACTIVE"><Value>AND RequestActive = @REQUESTACTIVE@</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@REQUESTACTIVE@" With=""><Value></Value></Condition>
+					</Conditions>  
+				</Parameter>
+				<Parameter Name="kWORKPLACE"><Value>AND WorkStation = '@WORKPLACE@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@WORKPLACE@" With=""><Value></Value></Condition>
+					</Conditions>  
+				</Parameter>
+				<Parameter Name="kREQUESTCODE"><Value>AND RequestCode = '@REQUESTCODE@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@REQUESTCODE@" With=""><Value></Value></Condition>
+					</Conditions>  
+				</Parameter>
+				<Parameter Name="kCLEARCODE"><Value>AND ClearCode = '@CLEARCODE@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@CLEARCODE@" With=""><Value></Value></Condition>
+					</Conditions>  
+				</Parameter>
+				<Parameter Name="_RECORDCOUNTLIMIT"><Value>TOP @RECORDCOUNTLIMIT@</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@RECORDCOUNTLIMIT@" With="0"><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+			</InternalParameters>
+			<reportfile>
+				<param name="SHIFTSYSTEMNAME">@SHIFTSYSTEMNAME@</param>
+				<param name="SHIFTNAME">@SHIFTNAME@</param>
+				<param name="STARTFrom">@STARTFrom@</param>
+				<param name="STARTTo">@STARTTo@</param>
+				<param name="PRODUCTIONLINE">@AssemblyLineId@</param>
+				<param name="REQUESTACTIVE">@REQUESTACTIVE@</param>
+				<param name="WORKPLACE">@WORKPLACE@</param>
+				<param name="REQUESTCODE">@REQUESTCODE@</param>
+				<param name="CLEARCODE">@CLEARCODE@</param>
+				<param name="UNFOLDALL">@UNFOLDALL@</param>
+				<param name="SQLTEXT">@SELECT_Reports_AndonLog@</param>
+				<param name="SITENAME">@SITENAME@</param>
+			</reportfile>
+			<datasets><dataset name="DataSet1"><datacommand type="SQL"><sql>@SELECT_Reports_AndonLog@</sql></datacommand></dataset></datasets>
+		</report>
+		<report id="Production0a" LCID="hu-HU,en-US" reportfile="Production0a - @LCID@.rdl" connectionstring="defaultConnectionString">
+			<Displayname WordCode="Production0a.DisplayName">Termelés és hatékonyság riport (tételes #0a)</Displayname>
+			<ExternalParameters>
+				<Parameter Name="SHIFTSYSTEMNAME"><Value></Value></Parameter>
+				<Parameter Name="SHIFTNAME"><Value></Value></Parameter>
+				<Parameter Name="STARTFrom"><Value></Value></Parameter>
+				<Parameter Name="STARTTo"><Value></Value></Parameter>
+				<Parameter Name="AssemblyLineId"><Value></Value></Parameter>
+				<Parameter Name="Team"><Value></Value></Parameter>
+				<Parameter Name="GPN"><Value></Value></Parameter>
+				<Parameter Name="OPERATION"><Value></Value></Parameter>
+				<Parameter Name="UNFOLDALL"><Value>true</Value></Parameter>
+				<Parameter Name="RECORDCOUNTLIMIT"><Value>@REPORTRECORDCOUNTLIMIT@</Value></Parameter>
+				<Parameter Name="SITENAME"><Value></Value></Parameter>
+			</ExternalParameters>
+			<ExternalParameterPresets>
+				<Preset Name="TODAY" Description="Today data up to now">
+					<Parameter Name="STARTFrom"><Value>@TODAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="YESTERDAY" Description="Yesterday data">
+					<Parameter Name="STARTFrom"><Value>@YESTERDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEK" Description="This week data, not including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEKANDTODAY" Description="This week data, including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTWEEK" Description="Last week data">
+					<Parameter Name="STARTFrom"><Value>@LASTWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTWEEKFRIDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTMONTH" Description="Last month data">
+					<Parameter Name="STARTFrom"><Value>@LASTMONTH1STDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTMONTHLASTDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+			</ExternalParameterPresets>
+			<InternalParameters>
+				<Parameter Name="kSHIFTSYSTEMNAME"><Value>AND SHIFTSYSTEMNAME = '@SHIFTSYSTEMNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTSYSTEMNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSHIFTNAME"><Value>AND SHIFTNAME = '@SHIFTNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTFrom"><Value>AND ([ShiftStart] &gt;= '@STARTFrom@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTFrom@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTTo"><Value>AND ([ShiftStart] &lt;= '@STARTTo@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTTo@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<!--<Parameter Name="kAssemblyLineId"><Value>AND MachineId = '@AssemblyLineId@'</Value>-->
+				<Parameter Name="kAssemblyLineId"><Value>AND MachineId IN (@AssemblyLineId@)</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@AssemblyLineId@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kTeam"><Value>AND TEAMNAME = '@Team@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@Team@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kGPN"><Value>AND GPN = '@GPN@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@GPN@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="_RECORDCOUNTLIMIT"><Value>TOP @RECORDCOUNTLIMIT@</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@RECORDCOUNTLIMIT@" With="0"><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+			</InternalParameters>
+			<reportfile>
+				<param name="SHIFTSYSTEMNAME">@SHIFTSYSTEMNAME@</param>
+				<param name="SHIFTNAME">@SHIFTNAME@</param>
+				<param name="STARTFrom">@STARTFrom@</param>
+				<param name="STARTTo">@STARTTo@</param>
+				<param name="AssemblyLine">@AssemblyLineId@</param>
+				<param name="Team">@Team@</param>
+				<param name="GPN">@GPN@</param>
+				<param name="OPERATION">@OPERATION@</param>
+				<param name="UNFOLDALL">@UNFOLDALL@</param>
+				<param name="RECORDCOUNTLIMIT">@RECORDCOUNTLIMIT@</param>
+				<param name="SQLTEXT">@SELECT_Reports_MetricsCycles@</param>
+				<param name="SITENAME">@SITENAME@</param>
+			</reportfile>
+			<datasets><dataset name="DataSet1"><datacommand type="SQL"><sql>@SELECT_Reports_MetricsCycles@</sql></datacommand></dataset></datasets>
+		</report>
+		<report id="Production0b" LCID="hu-HU,en-US" reportfile="Production0b - @LCID@.rdl" connectionstring="defaultConnectionString">
+			<Displayname WordCode="Production0b.DisplayName">Termelés és hatékonyság riport (tételes #0b)</Displayname>
+			<ExternalParameters>
+				<Parameter Name="SHIFTSYSTEMNAME"><Value></Value></Parameter>
+				<Parameter Name="SHIFTNAME"><Value></Value></Parameter>
+				<Parameter Name="STARTFrom"><Value></Value></Parameter>
+				<Parameter Name="STARTTo"><Value></Value></Parameter>
+				<Parameter Name="AssemblyLineId"><Value></Value></Parameter>
+				<Parameter Name="Team"><Value></Value></Parameter>
+				<Parameter Name="GPN"><Value></Value></Parameter>
+				<Parameter Name="OPERATION"><Value></Value></Parameter>
+				<Parameter Name="UNFOLDALL"><Value>true</Value></Parameter>
+				<Parameter Name="RECORDCOUNTLIMIT"><Value>@REPORTRECORDCOUNTLIMIT@</Value></Parameter>
+				<Parameter Name="SITENAME"><Value></Value></Parameter>
+			</ExternalParameters>
+			<ExternalParameterPresets>
+				<Preset Name="TODAY" Description="Today data up to now">
+					<Parameter Name="STARTFrom"><Value>@TODAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="YESTERDAY" Description="Yesterday data">
+					<Parameter Name="STARTFrom"><Value>@YESTERDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEK" Description="This week data, not including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEKANDTODAY" Description="This week data, including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTWEEK" Description="Last week data">
+					<Parameter Name="STARTFrom"><Value>@LASTWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTWEEKFRIDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTMONTH" Description="Last month data">
+					<Parameter Name="STARTFrom"><Value>@LASTMONTH1STDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTMONTHLASTDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+			</ExternalParameterPresets>
+			<InternalParameters>
+				<Parameter Name="kSHIFTSYSTEMNAME"><Value>AND SHIFTSYSTEMNAME = '@SHIFTSYSTEMNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTSYSTEMNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSHIFTNAME"><Value>AND SHIFTNAME = '@SHIFTNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTFrom"><Value>AND ([ShiftStart] &gt;= '@STARTFrom@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTFrom@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTTo"><Value>AND ([ShiftStart] &lt;= '@STARTTo@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTTo@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<!--<Parameter Name="kAssemblyLineId"><Value>AND MachineId = '@AssemblyLineId@'</Value>-->
+				<Parameter Name="kAssemblyLineId"><Value>AND MachineId IN (@AssemblyLineId@)</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@AssemblyLineId@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kTeam"><Value>AND TEAMNAME = '@Team@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@Team@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kGPN"><Value>AND GPN = '@GPN@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@GPN@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="_RECORDCOUNTLIMIT"><Value>TOP @RECORDCOUNTLIMIT@</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@RECORDCOUNTLIMIT@" With="0"><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+			</InternalParameters>
+			<reportfile>
+				<param name="SHIFTSYSTEMNAME">@SHIFTSYSTEMNAME@</param>
+				<param name="SHIFTNAME">@SHIFTNAME@</param>
+				<param name="STARTFrom">@STARTFrom@</param>
+				<param name="STARTTo">@STARTTo@</param>
+				<param name="AssemblyLine">@AssemblyLineId@</param>
+				<param name="Team">@Team@</param>
+				<param name="GPN">@GPN@</param>
+				<param name="OPERATION">@OPERATION@</param>
+				<param name="UNFOLDALL">@UNFOLDALL@</param>
+				<param name="RECORDCOUNTLIMIT">@RECORDCOUNTLIMIT@</param>
+				<param name="SQLTEXT">@SELECT_Reports_MetricsCycles@</param>
+				<param name="SITENAME">@SITENAME@</param>
+			</reportfile>
+			<datasets><dataset name="DataSet1"><datacommand type="SQL"><sql>@SELECT_Reports_MetricsCycles@</sql></datacommand></dataset></datasets>
+		</report>
+		<report id="Production0c" LCID="hu-HU,en-US" reportfile="Production0c - @LCID@.rdl" connectionstring="defaultConnectionString">
+			<Displayname WordCode="Production0c.DisplayName">Termelés és hatékonyság riport (tételes #0c)</Displayname>
+			<ExternalParameters>
+				<Parameter Name="SHIFTSYSTEMNAME"><Value></Value></Parameter>
+				<Parameter Name="SHIFTNAME"><Value></Value></Parameter>
+				<Parameter Name="STARTFrom"><Value></Value></Parameter>
+				<Parameter Name="STARTTo"><Value></Value></Parameter>
+				<Parameter Name="AssemblyLineId"><Value></Value></Parameter>
+				<Parameter Name="Team"><Value></Value></Parameter>
+				<Parameter Name="GPN"><Value></Value></Parameter>
+				<Parameter Name="OPERATION"><Value></Value></Parameter>
+				<Parameter Name="UNFOLDALL"><Value>true</Value></Parameter>
+				<Parameter Name="RECORDCOUNTLIMIT"><Value>@REPORTRECORDCOUNTLIMIT@</Value></Parameter>
+				<Parameter Name="SITENAME"><Value></Value></Parameter>
+			</ExternalParameters>
+			<ExternalParameterPresets>
+				<Preset Name="TODAY" Description="Today data up to now">
+					<Parameter Name="STARTFrom"><Value>@TODAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="YESTERDAY" Description="Yesterday data">
+					<Parameter Name="STARTFrom"><Value>@YESTERDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEK" Description="This week data, not including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEKANDTODAY" Description="This week data, including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTWEEK" Description="Last week data">
+					<Parameter Name="STARTFrom"><Value>@LASTWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTWEEKFRIDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTMONTH" Description="Last month data">
+					<Parameter Name="STARTFrom"><Value>@LASTMONTH1STDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTMONTHLASTDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+			</ExternalParameterPresets>
+			<InternalParameters>
+				<Parameter Name="kSHIFTSYSTEMNAME"><Value>AND SHIFTSYSTEMNAME = '@SHIFTSYSTEMNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTSYSTEMNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSHIFTNAME"><Value>AND SHIFTNAME = '@SHIFTNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTFrom"><Value>AND ([ShiftStart] &gt;= '@STARTFrom@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTFrom@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTTo"><Value>AND ([ShiftStart] &lt;= '@STARTTo@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTTo@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<!--<Parameter Name="kAssemblyLineId"><Value>AND MachineId = '@AssemblyLineId@'</Value>-->
+				<Parameter Name="kAssemblyLineId"><Value>AND MachineId IN (@AssemblyLineId@)</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@AssemblyLineId@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kTeam"><Value>AND TEAMNAME = '@Team@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@Team@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kGPN"><Value>AND GPN = '@GPN@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@GPN@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="_RECORDCOUNTLIMIT"><Value>TOP @RECORDCOUNTLIMIT@</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@RECORDCOUNTLIMIT@" With="0"><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+			</InternalParameters>
+			<reportfile>
+				<param name="SHIFTSYSTEMNAME">@SHIFTSYSTEMNAME@</param>
+				<param name="SHIFTNAME">@SHIFTNAME@</param>
+				<param name="STARTFrom">@STARTFrom@</param>
+				<param name="STARTTo">@STARTTo@</param>
+				<param name="AssemblyLine">@AssemblyLineId@</param>
+				<param name="Team">@Team@</param>
+				<param name="GPN">@GPN@</param>
+				<param name="OPERATION">@OPERATION@</param>
+				<param name="UNFOLDALL">@UNFOLDALL@</param>
+				<param name="RECORDCOUNTLIMIT">@RECORDCOUNTLIMIT@</param>
+				<param name="SQLTEXT">@SELECT_Reports_MetricsCycles@</param>
+				<param name="SITENAME">@SITENAME@</param>
+			</reportfile>
+			<datasets><dataset name="DataSet1"><datacommand type="SQL"><sql>@SELECT_Reports_MetricsCycles@</sql></datacommand></dataset></datasets>
+		</report>
+		<report id="Production2a" LCID="hu-HU,en-US" reportfile="Production2a - @LCID@.rdl" connectionstring="defaultConnectionString">
+			<Displayname WordCode="Production2a.DisplayName">Termelés és hatékonyság riport (#2a)</Displayname>
+			<ExternalParameters>
+				<Parameter Name="SHIFTSYSTEMNAME"><Value></Value></Parameter>
+				<Parameter Name="SHIFTNAME"><Value></Value></Parameter>
+				<Parameter Name="STARTFrom"><Value></Value></Parameter>
+				<Parameter Name="STARTTo"><Value></Value></Parameter>
+				<Parameter Name="AssemblyLineId"><Value></Value></Parameter>
+				<Parameter Name="Team"><Value></Value></Parameter>
+				<Parameter Name="GPN"><Value></Value></Parameter>
+				<Parameter Name="OPERATION"><Value></Value></Parameter>
+				<Parameter Name="UNFOLDALL"><Value>true</Value></Parameter>
+				<Parameter Name="RECORDCOUNTLIMIT"><Value>@REPORTRECORDCOUNTLIMIT@</Value></Parameter>
+				<Parameter Name="SITENAME"><Value></Value></Parameter>
+			</ExternalParameters>
+			<ExternalParameterPresets>
+				<Preset Name="TODAY" Description="Today data up to now">
+					<Parameter Name="STARTFrom"><Value>@TODAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="YESTERDAY" Description="Yesterday data">
+					<Parameter Name="STARTFrom"><Value>@YESTERDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEK" Description="This week data, not including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEKANDTODAY" Description="This week data, including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTWEEK" Description="Last week data">
+					<Parameter Name="STARTFrom"><Value>@LASTWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTWEEKFRIDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTMONTH" Description="Last month data">
+					<Parameter Name="STARTFrom"><Value>@LASTMONTH1STDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTMONTHLASTDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+			</ExternalParameterPresets>
+			<InternalParameters>
+				<Parameter Name="kSHIFTSYSTEMNAME"><Value>AND SHIFTSYSTEMNAME = '@SHIFTSYSTEMNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTSYSTEMNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSHIFTNAME"><Value>AND SHIFTNAME = '@SHIFTNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTFrom"><Value>AND ([ShiftStart] &gt;= '@STARTFrom@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTFrom@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTTo"><Value>AND ([ShiftStart] &lt;= '@STARTTo@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTTo@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<!--<Parameter Name="kAssemblyLineId"><Value>AND MachineId = '@AssemblyLineId@'</Value>-->
+				<Parameter Name="kAssemblyLineId"><Value>AND MachineId IN (@AssemblyLineId@)</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@AssemblyLineId@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kTeam"><Value>AND TEAMNAME = '@Team@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@Team@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kGPN"><Value>AND GPN = '@GPN@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@GPN@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="_RECORDCOUNTLIMIT"><Value>TOP @RECORDCOUNTLIMIT@</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@RECORDCOUNTLIMIT@" With="0"><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+			</InternalParameters>
+			<reportfile>
+				<param name="SHIFTSYSTEMNAME">@SHIFTSYSTEMNAME@</param>
+				<param name="SHIFTNAME">@SHIFTNAME@</param>
+				<param name="STARTFrom">@STARTFrom@</param>
+				<param name="STARTTo">@STARTTo@</param>
+				<param name="AssemblyLine">@AssemblyLineId@</param>
+				<param name="Team">@Team@</param>
+				<param name="GPN">@GPN@</param>
+				<param name="OPERATION">@OPERATION@</param>
+				<param name="UNFOLDALL">@UNFOLDALL@</param>
+				<param name="RECORDCOUNTLIMIT">@RECORDCOUNTLIMIT@</param>
+				<param name="SQLTEXT">@SELECT_Reports_MetricsCyclesByHours@</param>
+				<param name="SITENAME">@SITENAME@</param>
+			</reportfile>
+			<datasets><dataset name="DataSet1"><datacommand type="SQL"><sql>@SELECT_Reports_MetricsCyclesByHours@</sql></datacommand></dataset></datasets>
+		</report>
+		<report id="Production2b" LCID="hu-HU,en-US" reportfile="Production2b - @LCID@.rdl" connectionstring="defaultConnectionString">
+			<Displayname WordCode="Production2b.DisplayName">Termelés és hatékonyság riport (#2b)</Displayname>
+			<ExternalParameters>
+				<Parameter Name="SHIFTSYSTEMNAME"><Value></Value></Parameter>
+				<Parameter Name="SHIFTNAME"><Value></Value></Parameter>
+				<Parameter Name="STARTFrom"><Value></Value></Parameter>
+				<Parameter Name="STARTTo"><Value></Value></Parameter>
+				<Parameter Name="AssemblyLineId"><Value></Value></Parameter>
+				<Parameter Name="Team"><Value></Value></Parameter>
+				<Parameter Name="GPN"><Value></Value></Parameter>
+				<Parameter Name="OPERATION"><Value></Value></Parameter>
+				<Parameter Name="UNFOLDALL"><Value>true</Value></Parameter>
+				<Parameter Name="RECORDCOUNTLIMIT"><Value>@REPORTRECORDCOUNTLIMIT@</Value></Parameter>
+				<Parameter Name="SITENAME"><Value></Value></Parameter>
+			</ExternalParameters>
+			<ExternalParameterPresets>
+				<Preset Name="TODAY" Description="Today data up to now">
+					<Parameter Name="STARTFrom"><Value>@TODAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="YESTERDAY" Description="Yesterday data">
+					<Parameter Name="STARTFrom"><Value>@YESTERDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEK" Description="This week data, not including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEKANDTODAY" Description="This week data, including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTWEEK" Description="Last week data">
+					<Parameter Name="STARTFrom"><Value>@LASTWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTWEEKFRIDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTMONTH" Description="Last month data">
+					<Parameter Name="STARTFrom"><Value>@LASTMONTH1STDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTMONTHLASTDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+			</ExternalParameterPresets>
+			<InternalParameters>
+				<Parameter Name="kSHIFTSYSTEMNAME"><Value>AND SHIFTSYSTEMNAME = '@SHIFTSYSTEMNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTSYSTEMNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSHIFTNAME"><Value>AND SHIFTNAME = '@SHIFTNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTFrom"><Value>AND ([ShiftStart] &gt;= '@STARTFrom@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTFrom@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTTo"><Value>AND ([ShiftStart] &lt;= '@STARTTo@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTTo@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<!--<Parameter Name="kAssemblyLineId"><Value>AND MachineId = '@AssemblyLineId@'</Value>-->
+				<Parameter Name="kAssemblyLineId"><Value>AND MachineId IN (@AssemblyLineId@)</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@AssemblyLineId@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kTeam"><Value>AND TEAMNAME = '@Team@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@Team@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kGPN"><Value>AND GPN = '@GPN@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@GPN@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="_RECORDCOUNTLIMIT"><Value>TOP @RECORDCOUNTLIMIT@</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@RECORDCOUNTLIMIT@" With="0"><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+			</InternalParameters>
+			<reportfile>
+				<param name="SHIFTSYSTEMNAME">@SHIFTSYSTEMNAME@</param>
+				<param name="SHIFTNAME">@SHIFTNAME@</param>
+				<param name="STARTFrom">@STARTFrom@</param>
+				<param name="STARTTo">@STARTTo@</param>
+				<param name="AssemblyLine">@AssemblyLineId@</param>
+				<param name="Team">@Team@</param>
+				<param name="GPN">@GPN@</param>
+				<param name="OPERATION">@OPERATION@</param>
+				<param name="UNFOLDALL">@UNFOLDALL@</param>
+				<param name="RECORDCOUNTLIMIT">@RECORDCOUNTLIMIT@</param>
+				<param name="SQLTEXT">@SELECT_Reports_MetricsCyclesByHours@</param>
+				<param name="SITENAME">@SITENAME@</param>
+			</reportfile>
+			<datasets><dataset name="DataSet1"><datacommand type="SQL"><sql>@SELECT_Reports_MetricsCyclesByHours@</sql></datacommand></dataset></datasets>
+		</report>
+		<report id="Production2c" LCID="hu-HU,en-US" reportfile="Production2c - @LCID@.rdl" connectionstring="defaultConnectionString">
+			<Displayname WordCode="Production2c.DisplayName">Termelés és hatékonyság riport (#2c)</Displayname>
+			<ExternalParameters>
+				<Parameter Name="SHIFTSYSTEMNAME"><Value></Value></Parameter>
+				<Parameter Name="SHIFTNAME"><Value></Value></Parameter>
+				<Parameter Name="STARTFrom"><Value></Value></Parameter>
+				<Parameter Name="STARTTo"><Value></Value></Parameter>
+				<Parameter Name="AssemblyLineId"><Value></Value></Parameter>
+				<Parameter Name="Team"><Value></Value></Parameter>
+				<Parameter Name="GPN"><Value></Value></Parameter>
+				<Parameter Name="OPERATION"><Value></Value></Parameter>
+				<Parameter Name="UNFOLDALL"><Value>true</Value></Parameter>
+				<Parameter Name="RECORDCOUNTLIMIT"><Value>@REPORTRECORDCOUNTLIMIT@</Value></Parameter>
+				<Parameter Name="SITENAME"><Value></Value></Parameter>
+			</ExternalParameters>
+			<ExternalParameterPresets>
+				<Preset Name="TODAY" Description="Today data up to now">
+					<Parameter Name="STARTFrom"><Value>@TODAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="YESTERDAY" Description="Yesterday data">
+					<Parameter Name="STARTFrom"><Value>@YESTERDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEK" Description="This week data, not including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEKANDTODAY" Description="This week data, including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTWEEK" Description="Last week data">
+					<Parameter Name="STARTFrom"><Value>@LASTWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTWEEKFRIDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTMONTH" Description="Last month data">
+					<Parameter Name="STARTFrom"><Value>@LASTMONTH1STDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTMONTHLASTDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+			</ExternalParameterPresets>
+			<InternalParameters>
+				<Parameter Name="kSHIFTSYSTEMNAME"><Value>AND SHIFTSYSTEMNAME = '@SHIFTSYSTEMNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTSYSTEMNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSHIFTNAME"><Value>AND SHIFTNAME = '@SHIFTNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTFrom"><Value>AND ([ShiftStart] &gt;= '@STARTFrom@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTFrom@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTTo"><Value>AND ([ShiftStart] &lt;= '@STARTTo@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTTo@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<!--<Parameter Name="kAssemblyLineId"><Value>AND MachineId = '@AssemblyLineId@'</Value>-->
+				<Parameter Name="kAssemblyLineId"><Value>AND MachineId IN (@AssemblyLineId@)</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@AssemblyLineId@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kTeam"><Value>AND TEAMNAME = '@Team@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@Team@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kGPN"><Value>AND GPN = '@GPN@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@GPN@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="_RECORDCOUNTLIMIT"><Value>TOP @RECORDCOUNTLIMIT@</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@RECORDCOUNTLIMIT@" With="0"><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+			</InternalParameters>
+			<reportfile>
+				<param name="SHIFTSYSTEMNAME">@SHIFTSYSTEMNAME@</param>
+				<param name="SHIFTNAME">@SHIFTNAME@</param>
+				<param name="STARTFrom">@STARTFrom@</param>
+				<param name="STARTTo">@STARTTo@</param>
+				<param name="AssemblyLine">@AssemblyLineId@</param>
+				<param name="Team">@Team@</param>
+				<param name="GPN">@GPN@</param>
+				<param name="OPERATION">@OPERATION@</param>
+				<param name="UNFOLDALL">@UNFOLDALL@</param>
+				<param name="RECORDCOUNTLIMIT">@RECORDCOUNTLIMIT@</param>
+				<param name="SQLTEXT">@SELECT_Reports_MetricsCyclesByHours@</param>
+				<param name="SITENAME">@SITENAME@</param>
+			</reportfile>
+			<datasets><dataset name="DataSet1"><datacommand type="SQL"><sql>@SELECT_Reports_MetricsCyclesByHours@</sql></datacommand></dataset></datasets>
+		</report>
+		<report id="Production2d" LCID="hu-HU,en-US" reportfile="Production2d - @LCID@.rdl" connectionstring="defaultConnectionString">
+			<Displayname WordCode="Production2d.DisplayName">Termelés és hatékonyság riport (#2d)</Displayname>
+			<ExternalParameters>
+				<Parameter Name="SHIFTSYSTEMNAME"><Value></Value></Parameter>
+				<Parameter Name="SHIFTNAME"><Value></Value></Parameter>
+				<Parameter Name="STARTFrom"><Value></Value></Parameter>
+				<Parameter Name="STARTTo"><Value></Value></Parameter>
+				<Parameter Name="AssemblyLineId"><Value></Value></Parameter>
+				<Parameter Name="Team"><Value></Value></Parameter>
+				<Parameter Name="GPN"><Value></Value></Parameter>
+				<Parameter Name="OPERATION"><Value></Value></Parameter>
+				<Parameter Name="UNFOLDALL"><Value>true</Value></Parameter>
+				<Parameter Name="RECORDCOUNTLIMIT"><Value>@REPORTRECORDCOUNTLIMIT@</Value></Parameter>
+				<Parameter Name="SITENAME"><Value></Value></Parameter>
+			</ExternalParameters>
+			<ExternalParameterPresets>
+				<Preset Name="TODAY" Description="Today data up to now">
+					<Parameter Name="STARTFrom"><Value>@TODAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="YESTERDAY" Description="Yesterday data">
+					<Parameter Name="STARTFrom"><Value>@YESTERDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEK" Description="This week data, not including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEKANDTODAY" Description="This week data, including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTWEEK" Description="Last week data">
+					<Parameter Name="STARTFrom"><Value>@LASTWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTWEEKFRIDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTMONTH" Description="Last month data">
+					<Parameter Name="STARTFrom"><Value>@LASTMONTH1STDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTMONTHLASTDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+			</ExternalParameterPresets>
+			<InternalParameters>
+				<Parameter Name="kSHIFTSYSTEMNAME"><Value>AND SHIFTSYSTEMNAME = '@SHIFTSYSTEMNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTSYSTEMNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSHIFTNAME"><Value>AND SHIFTNAME = '@SHIFTNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTFrom"><Value>AND ([ShiftStart] &gt;= '@STARTFrom@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTFrom@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTTo"><Value>AND ([ShiftStart] &lt;= '@STARTTo@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTTo@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<!--<Parameter Name="kAssemblyLineId"><Value>AND MachineId = '@AssemblyLineId@'</Value>-->
+				<Parameter Name="kAssemblyLineId"><Value>AND MachineId IN (@AssemblyLineId@)</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@AssemblyLineId@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kTeam"><Value>AND TEAMNAME = '@Team@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@Team@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kGPN"><Value>AND GPN = '@GPN@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@GPN@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="_RECORDCOUNTLIMIT"><Value>TOP @RECORDCOUNTLIMIT@</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@RECORDCOUNTLIMIT@" With="0"><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+			</InternalParameters>
+			<reportfile>
+				<param name="SHIFTSYSTEMNAME">@SHIFTSYSTEMNAME@</param>
+				<param name="SHIFTNAME">@SHIFTNAME@</param>
+				<param name="STARTFrom">@STARTFrom@</param>
+				<param name="STARTTo">@STARTTo@</param>
+				<param name="AssemblyLine">@AssemblyLineId@</param>
+				<param name="Team">@Team@</param>
+				<param name="GPN">@GPN@</param>
+				<param name="OPERATION">@OPERATION@</param>
+				<param name="UNFOLDALL">@UNFOLDALL@</param>
+				<param name="RECORDCOUNTLIMIT">@RECORDCOUNTLIMIT@</param>
+				<param name="SQLTEXT">@SELECT_Reports_MetricsCyclesByHours@</param>
+				<param name="SITENAME">@SITENAME@</param>
+			</reportfile>
+			<datasets><dataset name="DataSet1"><datacommand type="SQL"><sql>@SELECT_Reports_MetricsCyclesByHours@</sql></datacommand></dataset></datasets>
+		</report>
+		<report id="Production2e" LCID="hu-HU,en-US" reportfile="Production2e - @LCID@.rdl" connectionstring="defaultConnectionString">
+			<Displayname WordCode="Production2e.DisplayName">Termelés és hatékonyság riport (#2e)</Displayname>
+			<ExternalParameters>
+				<Parameter Name="SHIFTSYSTEMNAME"><Value></Value></Parameter>
+				<Parameter Name="SHIFTNAME"><Value></Value></Parameter>
+				<Parameter Name="STARTFrom"><Value></Value></Parameter>
+				<Parameter Name="STARTTo"><Value></Value></Parameter>
+				<Parameter Name="AssemblyLineId"><Value></Value></Parameter>
+				<Parameter Name="Team"><Value></Value></Parameter>
+				<Parameter Name="GPN"><Value></Value></Parameter>
+				<Parameter Name="OPERATION"><Value></Value></Parameter>
+				<Parameter Name="UNFOLDALL"><Value>true</Value></Parameter>
+				<Parameter Name="RECORDCOUNTLIMIT"><Value>@REPORTRECORDCOUNTLIMIT@</Value></Parameter>
+				<Parameter Name="SITENAME"><Value></Value></Parameter>
+			</ExternalParameters>
+			<ExternalParameterPresets>
+				<Preset Name="TODAY" Description="Today data up to now">
+					<Parameter Name="STARTFrom"><Value>@TODAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="YESTERDAY" Description="Yesterday data">
+					<Parameter Name="STARTFrom"><Value>@YESTERDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEK" Description="This week data, not including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEKANDTODAY" Description="This week data, including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTWEEK" Description="Last week data">
+					<Parameter Name="STARTFrom"><Value>@LASTWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTWEEKFRIDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTMONTH" Description="Last month data">
+					<Parameter Name="STARTFrom"><Value>@LASTMONTH1STDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTMONTHLASTDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+			</ExternalParameterPresets>
+			<InternalParameters>
+				<Parameter Name="kSHIFTSYSTEMNAME"><Value>AND SHIFTSYSTEMNAME = '@SHIFTSYSTEMNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTSYSTEMNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSHIFTNAME"><Value>AND SHIFTNAME = '@SHIFTNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTFrom"><Value>AND ([ShiftStart] &gt;= '@STARTFrom@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTFrom@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTTo"><Value>AND ([ShiftStart] &lt;= '@STARTTo@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTTo@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<!--<Parameter Name="kAssemblyLineId"><Value>AND MachineId = '@AssemblyLineId@'</Value>-->
+				<Parameter Name="kAssemblyLineId"><Value>AND MachineId IN (@AssemblyLineId@)</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@AssemblyLineId@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kTeam"><Value>AND TEAMNAME = '@Team@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@Team@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kGPN"><Value>AND GPN = '@GPN@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@GPN@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="_RECORDCOUNTLIMIT"><Value>TOP @RECORDCOUNTLIMIT@</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@RECORDCOUNTLIMIT@" With="0"><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+			</InternalParameters>
+			<reportfile>
+				<param name="SHIFTSYSTEMNAME">@SHIFTSYSTEMNAME@</param>
+				<param name="SHIFTNAME">@SHIFTNAME@</param>
+				<param name="STARTFrom">@STARTFrom@</param>
+				<param name="STARTTo">@STARTTo@</param>
+				<param name="AssemblyLine">@AssemblyLineId@</param>
+				<param name="Team">@Team@</param>
+				<param name="GPN">@GPN@</param>
+				<param name="OPERATION">@OPERATION@</param>
+				<param name="UNFOLDALL">@UNFOLDALL@</param>
+				<param name="RECORDCOUNTLIMIT">@RECORDCOUNTLIMIT@</param>
+				<param name="SQLTEXT">@SELECT_Reports_MetricsCyclesByGPN@</param>
+				<param name="SITENAME">@SITENAME@</param>
+			</reportfile>
+			<datasets><dataset name="DataSet1"><datacommand type="SQL"><sql>@SELECT_Reports_MetricsCyclesByGPN@</sql></datacommand></dataset></datasets>
+		</report>
+		<report id="Production2f" LCID="hu-HU,en-US" reportfile="Production2f - @LCID@.rdl" connectionstring="defaultConnectionString">
+			<Displayname WordCode="Production2f.DisplayName">Termelés és hatékonyság riport (#2f)</Displayname>
+			<ExternalParameters>
+				<Parameter Name="SHIFTSYSTEMNAME"><Value></Value></Parameter>
+				<Parameter Name="SHIFTNAME"><Value></Value></Parameter>
+				<Parameter Name="STARTFrom"><Value></Value></Parameter>
+				<Parameter Name="STARTTo"><Value></Value></Parameter>
+				<Parameter Name="AssemblyLineId"><Value></Value></Parameter>
+				<Parameter Name="Team"><Value></Value></Parameter>
+				<Parameter Name="GPN"><Value></Value></Parameter>
+				<Parameter Name="OPERATION"><Value></Value></Parameter>
+				<Parameter Name="UNFOLDALL"><Value>true</Value></Parameter>
+				<Parameter Name="RECORDCOUNTLIMIT"><Value>@REPORTRECORDCOUNTLIMIT@</Value></Parameter>
+				<Parameter Name="SITENAME"><Value></Value></Parameter>
+			</ExternalParameters>
+			<ExternalParameterPresets>
+				<Preset Name="TODAY" Description="Today data up to now">
+					<Parameter Name="STARTFrom"><Value>@TODAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="YESTERDAY" Description="Yesterday data">
+					<Parameter Name="STARTFrom"><Value>@YESTERDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEK" Description="This week data, not including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEKANDTODAY" Description="This week data, including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTWEEK" Description="Last week data">
+					<Parameter Name="STARTFrom"><Value>@LASTWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTWEEKFRIDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTMONTH" Description="Last month data">
+					<Parameter Name="STARTFrom"><Value>@LASTMONTH1STDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTMONTHLASTDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+			</ExternalParameterPresets>
+			<InternalParameters>
+				<Parameter Name="kSHIFTSYSTEMNAME"><Value>AND SHIFTSYSTEMNAME = '@SHIFTSYSTEMNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTSYSTEMNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSHIFTNAME"><Value>AND SHIFTNAME = '@SHIFTNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTFrom"><Value>AND ([ShiftStart] &gt;= '@STARTFrom@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTFrom@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTTo"><Value>AND ([ShiftStart] &lt;= '@STARTTo@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTTo@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<!--<Parameter Name="kAssemblyLineId"><Value>AND MachineId = '@AssemblyLineId@'</Value>-->
+				<Parameter Name="kAssemblyLineId"><Value>AND MachineId IN (@AssemblyLineId@)</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@AssemblyLineId@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kTeam"><Value>AND TEAMNAME = '@Team@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@Team@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kGPN"><Value>AND GPN = '@GPN@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@GPN@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="_RECORDCOUNTLIMIT"><Value>TOP @RECORDCOUNTLIMIT@</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@RECORDCOUNTLIMIT@" With="0"><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+			</InternalParameters>
+			<reportfile>
+				<param name="SHIFTSYSTEMNAME">@SHIFTSYSTEMNAME@</param>
+				<param name="SHIFTNAME">@SHIFTNAME@</param>
+				<param name="STARTFrom">@STARTFrom@</param>
+				<param name="STARTTo">@STARTTo@</param>
+				<param name="AssemblyLine">@AssemblyLineId@</param>
+				<param name="Team">@Team@</param>
+				<param name="GPN">@GPN@</param>
+				<param name="OPERATION">@OPERATION@</param>
+				<param name="UNFOLDALL">@UNFOLDALL@</param>
+				<param name="RECORDCOUNTLIMIT">@RECORDCOUNTLIMIT@</param>
+				<param name="SQLTEXT">@SELECT_Reports_MetricsCyclesByGPN@</param>
+				<param name="SITENAME">@SITENAME@</param>
+			</reportfile>
+			<datasets><dataset name="DataSet1"><datacommand type="SQL"><sql>@SELECT_Reports_MetricsCyclesByGPN@</sql></datacommand></dataset></datasets>
+		</report>
+		<report id="Production3" LCID="hu-HU,en-US" reportfile="Production3 - @LCID@.rdl" connectionstring="defaultConnectionString">
+			<Displayname WordCode="Production3.DisplayName">Termelés riport és hatékonyság metrikák (#3)</Displayname>
+			<ExternalParameters>
+				<Parameter Name="SHIFTSYSTEMNAME"><Value></Value></Parameter>
+				<Parameter Name="SHIFTNAME"><Value></Value></Parameter>
+				<Parameter Name="STARTFrom"><Value></Value></Parameter>
+				<Parameter Name="STARTTo"><Value></Value></Parameter>
+				<Parameter Name="AssemblyLineId"><Value></Value></Parameter>
+				<Parameter Name="Team"><Value></Value></Parameter>
+				<Parameter Name="GPN"><Value></Value></Parameter>
+				<Parameter Name="OPERATION"><Value></Value></Parameter>
+				<Parameter Name="UNFOLDALL"><Value>true</Value></Parameter>
+				<Parameter Name="RECORDCOUNTLIMIT"><Value>@REPORTRECORDCOUNTLIMIT@</Value></Parameter>
+				<Parameter Name="SITENAME"><Value></Value></Parameter>
+			</ExternalParameters>
+			<ExternalParameterPresets>
+				<Preset Name="TODAY" Description="Today data up to now">
+					<Parameter Name="STARTFrom"><Value>@TODAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="YESTERDAY" Description="Yesterday data">
+					<Parameter Name="STARTFrom"><Value>@YESTERDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEK" Description="This week data, not including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEKANDTODAY" Description="This week data, including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTWEEK" Description="Last week data">
+					<Parameter Name="STARTFrom"><Value>@LASTWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTWEEKFRIDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTMONTH" Description="Last month data">
+					<Parameter Name="STARTFrom"><Value>@LASTMONTH1STDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTMONTHLASTDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+			</ExternalParameterPresets>
+			<InternalParameters>
+				<Parameter Name="kSHIFTSYSTEMNAME"><Value>AND SHIFTSYSTEMNAME = '@SHIFTSYSTEMNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTSYSTEMNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSHIFTNAME"><Value>AND SHIFTNAME = '@SHIFTNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTFrom"><Value>AND ([ShiftStart] &gt;= '@STARTFrom@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTFrom@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTTo"><Value>AND ([ShiftStart] &lt;= '@STARTTo@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTTo@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<!--<Parameter Name="kAssemblyLineId"><Value>AND MachineId = '@AssemblyLineId@'</Value>-->
+				<Parameter Name="kAssemblyLineId"><Value>AND MachineId IN (@AssemblyLineId@)</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@AssemblyLineId@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kTeam"><Value>AND TEAMNAME = '@Team@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@Team@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kGPN"><Value>AND GPN = '@GPN@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@GPN@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="_RECORDCOUNTLIMIT"><Value>TOP @RECORDCOUNTLIMIT@</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@RECORDCOUNTLIMIT@" With="0"><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+			</InternalParameters>
+			<reportfile>
+				<param name="SHIFTSYSTEMNAME">@SHIFTSYSTEMNAME@</param>
+				<param name="SHIFTNAME">@SHIFTNAME@</param>
+				<param name="STARTFrom">@STARTFrom@</param>
+				<param name="STARTTo">@STARTTo@</param>
+				<param name="AssemblyLine">@AssemblyLineId@</param>
+				<param name="Team">@Team@</param>
+				<param name="GPN">@GPN@</param>
+				<param name="OPERATION">@OPERATION@</param>
+				<param name="UNFOLDALL">@UNFOLDALL@</param>
+				<param name="RECORDCOUNTLIMIT">@RECORDCOUNTLIMIT@</param>
+				<param name="SQLTEXT">@SELECT_Reports_MetricsCyclesByHoursGPN@</param>
+				<param name="SITENAME">@SITENAME@</param>
+			</reportfile>
+			<datasets><dataset name="DataSet1"><datacommand type="SQL"><sql>@SELECT_Reports_MetricsCyclesByHoursGPN@</sql></datacommand></dataset></datasets>
+		</report>
+		<report id="Harnesses1" LCID="hu-HU,en-US" reportfile="Harnesses1 - @LCID@.rdl" connectionstring="defaultConnectionString">
+			<Displayname WordCode="Harnesses1.DisplayName">Korbács riport (#1)</Displayname>
+			<ExternalParameters>
+				<Parameter Name="SHIFTSYSTEMNAME"><Value></Value></Parameter>
+				<Parameter Name="SHIFTNAME"><Value></Value></Parameter>
+				<Parameter Name="STARTFrom"><Value></Value></Parameter>
+				<Parameter Name="STARTTo"><Value></Value></Parameter>
+				<Parameter Name="UNFOLDALL"><Value>true</Value></Parameter>
+				<Parameter Name="RECORDCOUNTLIMIT"><Value>@REPORTRECORDCOUNTLIMIT@</Value></Parameter>
+				<Parameter Name="SITENAME"><Value></Value></Parameter>
+			</ExternalParameters>
+			<ExternalParameterPresets>
+				<Preset Name="TODAY" Description="Today data up to now">
+					<Parameter Name="STARTFrom"><Value>@TODAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="YESTERDAY" Description="Yesterday data">
+					<Parameter Name="STARTFrom"><Value>@YESTERDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEK" Description="This week data, not including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEK_AND_TODAY" Description="This week data, including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTWEEK" Description="Last week data">
+					<Parameter Name="STARTFrom"><Value>@LASTWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTWEEKFRIDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTMONTH" Description="Last month data">
+					<Parameter Name="STARTFrom"><Value>@LASTMONTH1STDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTMONTHLASTDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+			</ExternalParameterPresets>
+			<InternalParameters>
+				<Parameter Name="kSHIFTSYSTEMNAME"><Value>AND SHIFTSYSTEMNAME = '@SHIFTSYSTEMNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTSYSTEMNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSHIFTNAME"><Value>AND SHIFTNAME = '@SHIFTNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTFrom"><Value>AND ([ShiftStart] &gt;= '@STARTFrom@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTFrom@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTTo"><Value>AND ([ShiftStart] &lt;= '@STARTTo@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTTo@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="_RECORDCOUNTLIMIT"><Value>TOP @RECORDCOUNTLIMIT@</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@RECORDCOUNTLIMIT@" With="0"><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+			</InternalParameters>
+			<reportfile>
+				<param name="SHIFTSYSTEMNAME">@SHIFTSYSTEMNAME@</param>
+				<param name="SHIFTNAME">@SHIFTNAME@</param>
+				<param name="STARTFrom">@STARTFrom@</param>
+				<param name="STARTTo">@STARTTo@</param>
+				<param name="UNFOLDALL">@UNFOLDALL@</param>
+				<param name="SQLTEXT">@SELECT_XXX@</param>
+				<param name="SITENAME">@SITENAME@</param>
+			</reportfile>
+			<datasets><dataset name="DataSet1"><datacommand type="SQL"><sql>@SELECT_XXX@</sql></datacommand></dataset></datasets>
+		</report>
+		<report id="Harnesses2" LCID="hu-HU,en-US" reportfile="Harnesses2 - @LCID@.rdl" connectionstring="defaultConnectionString">
+			<Displayname WordCode="Harnesses2.DisplayName">Korbács riport (#2)</Displayname>
+			<ExternalParameters>
+				<Parameter Name="SHIFTSYSTEMNAME"><Value></Value></Parameter>
+				<Parameter Name="SHIFTNAME"><Value></Value></Parameter>
+				<Parameter Name="STARTFrom"><Value></Value></Parameter>
+				<Parameter Name="STARTTo"><Value></Value></Parameter>
+				<Parameter Name="UNFOLDALL"><Value>true</Value></Parameter>
+				<Parameter Name="RECORDCOUNTLIMIT"><Value>@REPORTRECORDCOUNTLIMIT@</Value></Parameter>
+				<Parameter Name="SITENAME"><Value></Value></Parameter>
+			</ExternalParameters>
+			<ExternalParameterPresets>
+				<Preset Name="TODAY" Description="Today data up to now">
+					<Parameter Name="STARTFrom"><Value>@TODAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="YESTERDAY" Description="Yesterday data">
+					<Parameter Name="STARTFrom"><Value>@YESTERDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEK" Description="This week data, not including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@YESTERDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="THISWEEK_AND_TODAY" Description="This week data, including today">
+					<Parameter Name="STARTFrom"><Value>@THISWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@TODAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTWEEK" Description="Last week data">
+					<Parameter Name="STARTFrom"><Value>@LASTWEEKMONDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTWEEKFRIDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+				<Preset Name="LASTMONTH" Description="Last month data">
+					<Parameter Name="STARTFrom"><Value>@LASTMONTH1STDAY@ 00:00:00</Value></Parameter>
+					<Parameter Name="STARTTo"><Value>@LASTMONTHLASTDAY@ 23:59:59</Value></Parameter>
+				</Preset>
+			</ExternalParameterPresets>
+			<InternalParameters>
+				<Parameter Name="kSHIFTSYSTEMNAME"><Value>AND SHIFTSYSTEMNAME = '@SHIFTSYSTEMNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTSYSTEMNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSHIFTNAME"><Value>AND SHIFTNAME = '@SHIFTNAME@'</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@SHIFTNAME@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTFrom"><Value>AND ([ShiftStart] &gt;= '@STARTFrom@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTFrom@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="kSTARTTo"><Value>AND ([ShiftStart] &lt;= '@STARTTo@')</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@STARTTo@" With=""><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+				<Parameter Name="_RECORDCOUNTLIMIT"><Value>TOP @RECORDCOUNTLIMIT@</Value>
+					<Conditions>
+						<Condition Type="equal" Test="@RECORDCOUNTLIMIT@" With="0"><Value></Value></Condition>
+					</Conditions>
+				</Parameter>
+			</InternalParameters>
+			<reportfile>
+				<param name="SHIFTSYSTEMNAME">@SHIFTSYSTEMNAME@</param>
+				<param name="SHIFTNAME">@SHIFTNAME@</param>
+				<param name="STARTFrom">@STARTFrom@</param>
+				<param name="STARTTo">@STARTTo@</param>
+				<param name="UNFOLDALL">@UNFOLDALL@</param>
+				<param name="SQLTEXT">@SELECT_XXX@</param>
+				<param name="SITENAME">@SITENAME@</param>
+			</reportfile>
+			<datasets><dataset name="DataSet1"><datacommand type="SQL"><sql>@SELECT_XXX@</sql></datacommand></dataset></datasets>
+		</report>
+	</reports>
+</ReportDefinitions>
