@@ -140,18 +140,18 @@
         /// </summary>
         public int CheckIntervalMaximum { get; private set; }
 
-        public string XmlLocalPath { get; private set; }
+        public string ScheduleMonitorXmlPath { get; private set; }
 
-        public string XmlRemotePath { get; private set; }
+        public string ScheduleXmlPath { get; private set; }
 
         #endregion Properties
-
-        public iSchedulerXMLProcessor(string localPath, string remotePath = null) : base()
+        
+        public iSchedulerXMLProcessor(string scheduleMonitorXmlPath, string scheduleXmlPath = null) : base()
         {
             try
             {
                 base._xmlNameSpace = string.Empty;
-                base._xmlFileDefinition = "@" + localPath;
+                base._xmlFileDefinition = "@" + scheduleMonitorXmlPath;
                 base._throwException = true;
                 XElement rootXE = base.GetRootElement();    // csak azért, hogy kiderüljenek az XML hibák!
                 base._throwException = false;
@@ -160,8 +160,8 @@
                 LCID = "en-US";    //fix érték, mert nincs honnan megtudni a beállítást!
                 CheckIntervalMinimum = 60; // 1 perc
                 CheckIntervalMaximum = 86400; // 1 nap
-                XmlLocalPath = localPath;
-                XmlRemotePath = string.IsNullOrEmpty(remotePath) ? localPath : remotePath;
+                ScheduleMonitorXmlPath = scheduleMonitorXmlPath;
+                ScheduleXmlPath = string.IsNullOrEmpty(scheduleXmlPath) ? scheduleMonitorXmlPath : scheduleXmlPath;
 
                 this._CheckInterval = -1;   // annak jelzése, hogy a beállítás még nem történt meg.
 

@@ -517,11 +517,19 @@ Az alábbi szabályok és elvek elvárások a Pluginnal szemben:
 <hr></hr>
 
 # Version History:
-## V1.5.5 (2019.05.22)
+## v1.5.7 (2019.06.04)
+### Patch: 
+1. Windows Service-ben a Log bejegyzések előállítása túl időköltséges volt (már a task oldalon) a PID lekérdezések miatt. Állandó lekérdezés helyett áttéve egy Lazy fieldbe.
+## v1.5.6 (2019.05.27)
+### Patch: 
+1. DefualtLogger Txt log implementáció: Logbejegyzések kiegészítése TimeStamp-pel
+2. DefualtLogger Txt log implementáció: A létrehozott logfájl nevébe bekerül prefxként a dátumbélyeg (YYYYMMDD_), így naponta új txt fájl keletkezik, és nem lesznek használhatatlanul nagyok a log fájlok.
+## v1.5.5 (2019.05.23)
 ### Patch:
-- A VRH.Common 2.2.0 változatának beállítása az Application.Container összhang miatt.
-- A Vrh.LinqXMLProcessor.Base 1.2.3 változatának beállítása az Application.Container összhang miatt.
-
+1. compatible_Lear branch!!! Nugetek Learhez igazítása
+## v1.5.4 (2019.05.21)
+### Patch: 
+1. To upgrade all Nugets to latest
 ## V1.5.2 (2018.12.11)
 ### Patch:
 1. Service név lekérdezésében hiba javítása

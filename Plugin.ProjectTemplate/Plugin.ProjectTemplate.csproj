@@ -60,7 +60,7 @@
       <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="InstanceFactory.FromXML, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.ApplicationContainer.1.1.3\lib\net45\InstanceFactory.FromXML.dll</HintPath>
+      <HintPath>..\packages\Vrh.ApplicationContainer.1.1.5\lib\net45\InstanceFactory.FromXML.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Diagnostics.Runtime, Version=0.8.31.1, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Diagnostics.Runtime.Latest.0.8.31.3\lib\net45\Microsoft.Diagnostics.Runtime.dll</HintPath>
@@ -69,33 +69,33 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Vrh.ApplicationContainer, Version=1.1.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.ApplicationContainer.1.1.3\lib\net45\Vrh.ApplicationContainer.dll</HintPath>
+    <Reference Include="Vrh.ApplicationContainer, Version=1.1.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.ApplicationContainer.1.1.5\lib\net45\Vrh.ApplicationContainer.dll</HintPath>
     </Reference>
     <Reference Include="Vrh.ApplicationContainer.ConsoleHost, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.ApplicationContainer.1.1.3\lib\net45\Vrh.ApplicationContainer.ConsoleHost.exe</HintPath>
+      <HintPath>..\packages\Vrh.ApplicationContainer.1.1.5\lib\net45\Vrh.ApplicationContainer.ConsoleHost.exe</HintPath>
     </Reference>
     <Reference Include="Vrh.ApplicationContainer.WindowsServiceHost, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.ApplicationContainer.1.1.3\lib\net45\Vrh.ApplicationContainer.WindowsServiceHost.exe</HintPath>
+      <HintPath>..\packages\Vrh.ApplicationContainer.1.1.5\lib\net45\Vrh.ApplicationContainer.WindowsServiceHost.exe</HintPath>
     </Reference>
-    <Reference Include="VRH.Common, Version=2.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\VRH.Common.2.2.0\lib\net45\VRH.Common.dll</HintPath>
+    <Reference Include="VRH.Common, Version=2.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\VRH.Common.2.3.0\lib\net45\VRH.Common.dll</HintPath>
     </Reference>
     <Reference Include="VRH.ConnectionStringStore, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\VRH.ConnectionStringStore.1.3.0\lib\net45\VRH.ConnectionStringStore.dll</HintPath>
     </Reference>
-    <Reference Include="Vrh.LinqXMLProcessor.Base, Version=1.2.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.LinqXMLProcessor.Base.1.2.3\lib\net40\Vrh.LinqXMLProcessor.Base.dll</HintPath>
+    <Reference Include="Vrh.LinqXMLProcessor.Base, Version=1.2.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.LinqXMLProcessor.Base.1.2.4\lib\net45\Vrh.LinqXMLProcessor.Base.dll</HintPath>
     </Reference>
-    <Reference Include="Vrh.Logger, Version=1.5.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.Logger.1.5.5\lib\net45\Vrh.Logger.dll</HintPath>
+    <Reference Include="Vrh.Logger, Version=1.5.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.Logger.1.5.7\lib\net45\Vrh.Logger.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -143,10 +143,10 @@
     <None Include="targetPlugins.Config.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="ApplicationContainer.Config.xml">
+    <None Include="LogConfig.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="LogConfig.xml">
+    <None Include="ApplicationContainer.Config.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <Content Include="targetPluginSkeleton.cs.txt" />

@@ -52,24 +52,25 @@ namespace iSchedulerMonitor
         /// <summary>
         /// iSchedulerMonitor időzítés figyelő osztály.
         /// </summary>
-        /// <param name="localPath">iScheduler.xml elérési helye a névvel együtt a plugin futtató környezetében.</param>
-        /// <param name="remotePath">ScheduleExecute akció által használt iScheduler.xml elérési helye a névvel együtt
+        /// <param name="scheduleMonitorXmlPath">iScheduler.xml elérési helye a névvel együtt a plugin futtató környezetében.</param>
+        /// <param name="scheduleXmlPath">ScheduleExecute akció által használt iScheduler.xml elérési helye a névvel együtt
         /// <param name="pluginReference">Az indító plugin példányra mutató referencia
         /// a távoli gépen. Ha egy gépen fut, akkor nem kötelező.</param>
-        public Monitor(string localPath, string remotePath, MonitorPlugin pluginReference)
+        public Monitor(string scheduleMonitorXmlPath, string scheduleXmlPath, MonitorPlugin pluginReference)
         {
             //try
             //{
 
             _pluginReference = pluginReference;
-            m_xmlp = new iSchedulerXMLProcessor(localPath, remotePath);
+            m_xmlp = new iSchedulerXMLProcessor(scheduleMonitorXmlPath, scheduleXmlPath);
             m_timer = new Timer(m_xmlp.CheckInterval * 1000); // !!! Ez itt a jó sor !!!
                                                               // m_timer = new Timer(20000); // !!! Ez meg itt a debug !!!
             m_timer.Elapsed += OnExamination;
 
             var logData = new Dictionary<string, string>
             {
-                { "xmlpath", localPath },
+                { "iSchedulerMonitor xml path", scheduleMonitorXmlPath },
+                { "iScheduler xml path", scheduleXmlPath },
                 { "Scheduled object type", m_xmlp.ObjectType },
                 { "Group Id", m_xmlp.GroupId },
                 { "Check interval", m_xmlp.CheckInterval.ToString() }
@@ -146,7 +147,7 @@ namespace iSchedulerMonitor
                             _pluginReference.LogThis($"Scheduled job found!", logData, null, LogLevel.Verbose, this.GetType());
 
                             int ixID = rdr.GetOrdinal("Id");
-                            Vrh.iScheduler.ScheduleExecute se = new Vrh.iScheduler.ScheduleExecute(m_xmlp.XmlLocalPath);
+                            Vrh.iScheduler.ScheduleExecute se = new Vrh.iScheduler.ScheduleExecute(m_xmlp.ScheduleXmlPath);
 
                             int ScheduledJobCounter = 0;
                             while (rdr.Read())
