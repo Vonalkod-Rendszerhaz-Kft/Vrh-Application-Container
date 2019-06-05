@@ -151,7 +151,7 @@
             try
             {
                 base._xmlNameSpace = string.Empty;
-                base._xmlFileDefinition = "@" + scheduleMonitorXmlPath;
+                base._xmlFileDefinition = scheduleMonitorXmlPath;
                 base._throwException = true;
                 XElement rootXE = base.GetRootElement();    // csak azért, hogy kiderüljenek az XML hibák!
                 base._throwException = false;
