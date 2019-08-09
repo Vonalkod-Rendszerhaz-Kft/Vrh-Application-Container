@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vrh.ApplicationContainer", "Vrh.ApplicationContainer\Vrh.ApplicationContainer.csproj", "{0F167592-DCC8-4CF5-9737-6F0B86D0F76F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestPlugins", "TestPlugins", "{DFAA4713-DE67-4DF8-A7E3-DC992C935CD3}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{DFAA4713-DE67-4DF8-A7E3-DC992C935CD3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InstanceFactory.FromXML", "InstanceFactory.FromXMLConfig\InstanceFactory.FromXML.csproj", "{E993C7D1-BEA9-4EB1-8012-46065E29AE10}"
 EndProject
