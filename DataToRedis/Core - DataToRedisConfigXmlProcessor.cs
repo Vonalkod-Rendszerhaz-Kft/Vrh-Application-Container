@@ -164,7 +164,11 @@ namespace Vrh.DataToRedisCore
                 this.Name = poolnameattribute == null ? string.Empty : poolnameattribute.Value;
 
                 var rediscsattribute = _poolElement.Attribute(XName.Get(REDISCONNECTIONSTRING_ATTRIBUTE));
-                this.RedisConnectionStringTxt = rediscsattribute == null ? string.Empty : rediscsattribute.Value;
+                string rediscsattributeValue = rediscsattribute == null ? string.Empty : rediscsattribute.Value;
+
+                try { this.RedisConnectionStringTxt = VRH.ConnectionStringStore.VRHConnectionStringStore.GetRedisConnectionString(rediscsattributeValue); }
+                catch { this.RedisConnectionStringTxt = rediscsattributeValue; }
+                
 
                 var sqlcsattribute = _poolElement.Attribute(XName.Get(SQLCONNECTIONSTRING_ATTRIBUTE));
                 this.SQLconnectionString = sqlcsattribute == null ? string.Empty : sqlcsattribute.Value;

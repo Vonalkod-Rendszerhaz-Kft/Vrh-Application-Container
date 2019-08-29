@@ -80,7 +80,12 @@ namespace Vrh.DataToRedisCore
             {
                 // split script on GO command
                 System.Collections.Generic.IEnumerable<string> commandStrings = Regex.Split(scripttext, @"^\s*GO\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase);
-                using (SqlConnection connection = new SqlConnection(connectionString))
+
+                string cs;
+                try { cs = VRH.ConnectionStringStore.VRHConnectionStringStore.GetSQLConnectionString(connectionString, false);  } 
+                catch { cs = connectionString; }
+                
+                using (SqlConnection connection = new SqlConnection(cs))
                 {
                     connection.Open();
                     foreach (string commandString in commandStrings)

@@ -99,7 +99,9 @@ namespace Vrh.DataToRedisCore
                 {
                     PoolHandler poolHandler = _poolHandlers.FirstOrDefault(x => x.Name == pool.Name);
 
-                    string connectionString = pool.SQLconnectionString;
+                    string connectionString;
+                    try { connectionString = VRH.ConnectionStringStore.VRHConnectionStringStore.GetSQLConnectionString(pool.SQLconnectionString, false); }
+                    catch { connectionString = pool.SQLconnectionString; }
 
                     string queryString = updateProcess.UpdateProcessSQLSqlText;
 
@@ -184,7 +186,9 @@ namespace Vrh.DataToRedisCore
                         {
                             process.PoolHandler = poolHandler;
 
-                            string connectionString = pool.SQLconnectionString;
+                            string connectionString;
+                            try { connectionString = VRH.ConnectionStringStore.VRHConnectionStringStore.GetSQLConnectionString(pool.SQLconnectionString, false); }
+                            catch { connectionString = pool.SQLconnectionString; }
 
                             string queryString = updateProcess.UpdateProcessSQLSqlText;
 
