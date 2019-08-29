@@ -29,6 +29,10 @@ elemeken keresztűl lehet elérni. Példa egy URL-re: *[application]/iSchedulerR
 
 ## Version History:
 
+#### 1.5.3 (2019.08.27) Patches - debug:
+- Csak újrafordítás?
+
+
 #### 1.5.2 (2019.05.27) Patches - debug:
 - Frissítés a Vrh.OneReport 1.4.2 változatára.
 

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Vrh.LinqXMLProcessor.Base;
+using VRH.ConnectionStringStore;
 
 namespace Service.Starter
 {
@@ -132,7 +133,14 @@ namespace Service.Starter
         /// <returns></returns>
         public string RedisConnection
         {
-            get {   return GetElementValue<string>(GetXElement(REDISCONNECTION_ELEMENT_NAME), String.Empty);    }
+            get
+            {
+                string rcs,rcs2;
+                rcs = GetElementValue<string>(GetXElement(REDISCONNECTION_ELEMENT_NAME), String.Empty);
+                try { rcs2 = VRH.ConnectionStringStore.VRHConnectionStringStore.GetRedisConnectionString(rcs); }
+                catch { rcs2 = rcs; }
+                return rcs;
+            }
         }
         public int RedisconnectRetries
         {

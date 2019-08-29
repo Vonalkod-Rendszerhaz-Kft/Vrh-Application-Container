@@ -186,6 +186,19 @@ public class SelectListGroup
 
 
 # Version History:
+
+## 2.7.0 (2019.08.15) Compatible changes:      
+### Compatibility API changes:      
+- Az EntityFramework extension bővítése az AlreadyOrdered függvénynel, amely megmondja egy IQueryable-ről, hogy rendezett-e már (tehát a további rendezéséhez az OrderBy, vagy a ThenBy-t kell-e használni)
+
+## 2.6.0 (2019.08.01) Compatible changes:      
+### Compatibility API changes:      
+- Extensions bővítése az EntityFramework extension-nel, EntityFrameworkQueryHelper bővítő osztály, SmartOrder bővítő metódus (IQueryable típusra)
+
+## 2.5.0 (2019.07.10) Compatible changes:      
+### Compatibility API changes:      
+- ExtensionMethods bővítése az Enum extensionssel, Enumdata attribútum osztály
+
 ## 2.3.0 (2019.05.14) Compatible changes:      
 - IManage interfész áthelyezése Vrh.Web.Common.Lib 1.18.1-es változatából.
 - Standard osztályok (CheckListJSON, ReturnInfoJSON, SelectListJSON) áthelyezése Vrh.Web.Common.Lib 1.18.1-es változatából.

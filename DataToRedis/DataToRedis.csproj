@@ -78,6 +78,9 @@
     <Reference Include="Vrh.ApplicationContainer, Version=1.1.5.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Vrh.ApplicationContainer.1.1.5\lib\net45\Vrh.ApplicationContainer.dll</HintPath>
     </Reference>
+    <Reference Include="VRH.Common, Version=2.7.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\VRH.Common.2.7.0\lib\net45\VRH.Common.dll</HintPath>
+    </Reference>
     <Reference Include="VRH.ConnectionStringStore, Version=2.2.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\VRH.ConnectionStringStore.2.2.3\lib\net45\VRH.ConnectionStringStore.dll</HintPath>
     </Reference>
