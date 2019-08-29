@@ -22,6 +22,7 @@
 
             public const string MONITORSERVICE = "MonitorService";
             public const string CHECKINTERVAL = "CheckInterval";
+            public const string ISCHEDULERPARAMETERS = "iSchedulerParameters";
         }
 
         private class Attributes
@@ -130,6 +131,21 @@
         private int _CheckInterval;
         #endregion CheckInterval properties
 
+        #region iSchedulerParameters property
+        /// <summary>
+        /// Az iScheduler xml paraméter file pontos elérési útja.
+        /// Ha nincs megadva a plugin InstanceData paramétereként, akkor ez lesz használatos, ha pedig ez sincs megadva, 
+        /// akkor maga a plug InstanceConfig paramétereként megadott file.
+        /// Minimum: 60 sec (1perc), maximum: 86400 sec (1nap).
+        /// Ha a tulajdonság nem létezik, vagy értelmezhetetlen, akkor a minimum lesz.
+        /// </summary>
+        public string iSchedulerParameters
+        {
+            get { return GetElementValue(GetXElement(Elements.MONITORSERVICE, Elements.ISCHEDULERPARAMETERS), ""); }
+        }
+        private string _iSchedulerParameters;
+        #endregion iSchedulerParameters properties
+
         /// <summary>
         /// Az időzítések figyelésének minimum értéke.
         /// </summary>
@@ -160,8 +176,9 @@
                 LCID = "en-US";    //fix érték, mert nincs honnan megtudni a beállítást!
                 CheckIntervalMinimum = 60; // 1 perc
                 CheckIntervalMaximum = 86400; // 1 nap
-                ScheduleMonitorXmlPath = scheduleMonitorXmlPath;
-                ScheduleXmlPath = string.IsNullOrEmpty(scheduleXmlPath) ? scheduleMonitorXmlPath : scheduleXmlPath;
+                this.ScheduleMonitorXmlPath = scheduleMonitorXmlPath;
+                this.ScheduleXmlPath = string.IsNullOrEmpty(scheduleXmlPath) ? this.iSchedulerParameters : scheduleXmlPath;
+                this.ScheduleXmlPath = string.IsNullOrEmpty(this.ScheduleXmlPath) ? this.ScheduleMonitorXmlPath : this.ScheduleXmlPath;
 
                 this._CheckInterval = -1;   // annak jelzése, hogy a beállítás még nem történt meg.
 
