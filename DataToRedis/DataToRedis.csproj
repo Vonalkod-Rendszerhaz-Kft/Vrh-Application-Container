@@ -1,21 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{1F47D82A-1730-41E2-B164-DE5BBAAA4CD3}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{3927C934-BDC2-4A26-AB0F-BA79958FFF47}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Vrh.ApplicationContainer.ConsoleHost</RootNamespace>
-    <AssemblyName>Vrh.ApplicationContainer.ConsoleHost</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <RootNamespace>Vrh.DataToRedis</RootNamespace>
+    <AssemblyName>DataToRedis.ApplicationContainer.Plugin</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -25,7 +23,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -46,18 +43,12 @@
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="StackExchange.Redis, Version=1.2.6.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\StackExchange.Redis.1.2.6\lib\net45\StackExchange.Redis.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.IO.Compression" />
-    <Reference Include="System.Messaging" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.Helpers.dll</HintPath>
     </Reference>
@@ -80,53 +71,65 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="VRH.Common, Version=2.3.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\VRH.Common.2.3.0\lib\net45\VRH.Common.dll</HintPath>
+    <Reference Include="Microsoft.Diagnostics.Runtime, Version=0.8.31.1, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Diagnostics.Runtime.Latest.0.8.31.3\lib\net45\Microsoft.Diagnostics.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Vrh.ApplicationContainer, Version=1.1.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.ApplicationContainer.1.1.5\lib\net45\Vrh.ApplicationContainer.dll</HintPath>
     </Reference>
     <Reference Include="VRH.ConnectionStringStore, Version=2.2.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\VRH.ConnectionStringStore.2.2.3\lib\net45\VRH.ConnectionStringStore.dll</HintPath>
     </Reference>
-    <Reference Include="Vrh.LinqXMLProcessor.Base, Version=1.2.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.LinqXMLProcessor.Base.1.2.4\lib\net45\Vrh.LinqXMLProcessor.Base.dll</HintPath>
-    </Reference>
     <Reference Include="Vrh.Logger, Version=1.5.7.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Vrh.Logger.1.5.7\lib\net45\Vrh.Logger.dll</HintPath>
     </Reference>
+    <Reference Include="Vrh.Redis.DataPoolHandler, Version=1.10.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.Redis.DataPoolHandler.1.10.3\lib\net45\Vrh.Redis.DataPoolHandler.dll</HintPath>
+    </Reference>
+    <Reference Include="Vrh.Web.Common.Lib, Version=1.11.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.Web.Common.Lib.1.11.1\lib\net45\Vrh.Web.Common.Lib.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="Core - DataToRedisConfigXmlProcessor.cs" />
+    <Compile Include="Core - ExtendedOneData.cs" />
+    <Compile Include="Core - PoolHandler.cs" />
+    <Compile Include="Core - Process.cs" />
+    <Compile Include="Core - SQLToRedisControl.cs" />
+    <Compile Include="Core - UpdateBatchControl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="App.config" />
-    <None Include="forNuGet packaging\Vrh.ApplicationContainer.ConsoleHost.exe.config" />
     <None Include="packages.config" />
+    <Compile Include="DataToRedisPlugin.cs" />
+    <None Include="Vrh.ApplicationContainer.WindowsServiceHost.exe.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Vrh.NugetModuls.Documentations\Vrh.ApplicationContainer\ReadMe.md" />
     <None Include="Vrh.NugetModuls.Documentations\VRH.Common\ReadMe.md" />
     <None Include="Vrh.NugetModuls.Documentations\Vrh.LinqXMLProcessor.Base\ReadMe.md" />
+    <None Include="Vrh.NugetModuls.Documentations\Vrh.Log4Pro.MultilanguageManager\ReadMe.md" />
     <None Include="Vrh.NugetModuls.Documentations\Vrh.Logger\ReadMe.md" />
+    <None Include="Vrh.NugetModuls.Documentations\Vrh.Redis.DataPoolHandler\ReadMe.md" />
+    <None Include="Vrh.NugetModuls.Documentations\Vrh.Web.Common.Lib\ReadMe.md" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\InstanceFactory.Fake\InstanceFactory.Fake.csproj">
-      <Project>{8fda2d43-ed1d-4352-8d5a-ccd4f8c73aa7}</Project>
-      <Name>InstanceFactory.Fake</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\InstanceFactory.FromXMLConfig\InstanceFactory.FromXML.csproj">
-      <Project>{e993c7d1-bea9-4eb1-8012-46065e29ae10}</Project>
-      <Name>InstanceFactory.FromXML</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Vrh.ApplicationContainer\Vrh.ApplicationContainer.csproj">
-      <Project>{0f167592-dcc8-4cf5-9737-6f0b86d0f76f}</Project>
-      <Name>Vrh.ApplicationContainer</Name>
-    </ProjectReference>
+    <None Include="Plugins.Config.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Vrh.ApplicationContainer.ConsoleHost.exe.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="LogConfig.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <Content Include="Plugins.Config.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="ApplicationContainer.Config.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <Content Include="DataToRedis.Config.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
   </ItemGroup>

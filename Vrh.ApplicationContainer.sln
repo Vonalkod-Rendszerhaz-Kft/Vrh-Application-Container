@@ -31,6 +31,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.ProjectTemplate.Inst
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vrh.ApplicationContainer.ConsoleHost", "Vrh.ApplicationContainer.ConsoleHost\Vrh.ApplicationContainer.ConsoleHost.csproj", "{1F47D82A-1730-41E2-B164-DE5BBAAA4CD3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataToRedis", "DataToRedis\DataToRedis.csproj", "{3927C934-BDC2-4A26-AB0F-BA79958FFF47}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AndonDataToRedis", "AndonDataToRedis\AndonDataToRedis.csproj", "{43FA7D19-08FB-42AD-B7E5-DB45B43B0C8F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -85,6 +89,14 @@ Global
 		{1F47D82A-1730-41E2-B164-DE5BBAAA4CD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1F47D82A-1730-41E2-B164-DE5BBAAA4CD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1F47D82A-1730-41E2-B164-DE5BBAAA4CD3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3927C934-BDC2-4A26-AB0F-BA79958FFF47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3927C934-BDC2-4A26-AB0F-BA79958FFF47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3927C934-BDC2-4A26-AB0F-BA79958FFF47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3927C934-BDC2-4A26-AB0F-BA79958FFF47}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43FA7D19-08FB-42AD-B7E5-DB45B43B0C8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43FA7D19-08FB-42AD-B7E5-DB45B43B0C8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43FA7D19-08FB-42AD-B7E5-DB45B43B0C8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43FA7D19-08FB-42AD-B7E5-DB45B43B0C8F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -99,6 +111,8 @@ Global
 		{275CB54C-6639-4CB5-A34B-A9D7FD5A9714} = {DFAA4713-DE67-4DF8-A7E3-DC992C935CD3}
 		{62D7348C-5CC1-4F6F-8BD6-8DD4F4A8B0E9} = {A02CD324-C509-4050-882C-A2727AE736B2}
 		{D87370E4-46E4-4E81-9B6E-29F8DBFD1DAB} = {A02CD324-C509-4050-882C-A2727AE736B2}
+		{3927C934-BDC2-4A26-AB0F-BA79958FFF47} = {DFAA4713-DE67-4DF8-A7E3-DC992C935CD3}
+		{43FA7D19-08FB-42AD-B7E5-DB45B43B0C8F} = {DFAA4713-DE67-4DF8-A7E3-DC992C935CD3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8B808B22-F202-4D12-A56E-DEC843AC3722}
