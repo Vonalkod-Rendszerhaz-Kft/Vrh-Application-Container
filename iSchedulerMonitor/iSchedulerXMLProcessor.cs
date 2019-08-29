@@ -17,7 +17,7 @@
         private class Elements
         {
             public const string DATABASECONNECTIONSTRING = "DatabaseConnectionString";
-            public const string OBJECTTYPE = "ObjectType";
+            public const string SCHEDULEDOBJECTTYPE = "ScheduledObjectType";
             public const string GROUPID = "GroupId";
 
             public const string MONITORSERVICE = "MonitorService";
@@ -72,8 +72,8 @@
             {
                 if (_ObjectType == null)
                 {
-                    _ObjectType = GetElementValue(GetXElement(Elements.OBJECTTYPE), "");
-                    if (string.IsNullOrWhiteSpace(_ObjectType)) { throw new ApplicationException($"The <{Elements.OBJECTTYPE}> element is missing or empty!"); }
+                    _ObjectType = GetElementValue(GetXElement(Elements.SCHEDULEDOBJECTTYPE), "");
+                    if (string.IsNullOrWhiteSpace(_ObjectType)) { throw new ApplicationException($"The <{Elements.SCHEDULEDOBJECTTYPE}> element is missing or empty!"); }
                 }
                 return _ObjectType;
             }
