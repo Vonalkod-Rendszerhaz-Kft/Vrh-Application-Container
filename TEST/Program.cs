@@ -35,6 +35,7 @@ namespace TEST
                         , "VRH Terminator for ALM"
                         , "VRH Redis for ALM"
                     };
+                    Console.WriteLine(DateTime.Now);
                     foreach (string servicename in servicenameList)
                     {
                         string semaforname = $"Service.Starter.Semafor.{servicename}";
