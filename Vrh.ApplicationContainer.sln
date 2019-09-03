@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataToRedis", "DataToRedis\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AndonDataToRedis", "AndonDataToRedis\AndonDataToRedis.csproj", "{43FA7D19-08FB-42AD-B7E5-DB45B43B0C8F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TEST", "TEST\TEST.csproj", "{D6D6DB2D-9697-4433-9418-450D74637A10}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -97,6 +99,10 @@ Global
 		{43FA7D19-08FB-42AD-B7E5-DB45B43B0C8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{43FA7D19-08FB-42AD-B7E5-DB45B43B0C8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{43FA7D19-08FB-42AD-B7E5-DB45B43B0C8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6D6DB2D-9697-4433-9418-450D74637A10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6D6DB2D-9697-4433-9418-450D74637A10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6D6DB2D-9697-4433-9418-450D74637A10}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6D6DB2D-9697-4433-9418-450D74637A10}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

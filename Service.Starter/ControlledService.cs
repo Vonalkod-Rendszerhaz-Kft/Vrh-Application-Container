@@ -105,7 +105,7 @@ namespace Service.Starter
         /// <param name="service">Az elindítandó service</param>
         private void StartThis(ServiceController service)
         {
-            CreateRedisSemafor(service);
+            CreateServiceStartSemafor(service);
             DateTime startTime = DateTime.UtcNow;
             service.Start();
             while(service.Status != ServiceControllerStatus.Running)
@@ -119,7 +119,7 @@ namespace Service.Starter
                     throw new Exception($"Service restart timout occured! Service: {service.ServiceName}, status: {service.Status}, timout: {Properties.MaxStartingWait}");
                 }
             }
-            CreateRedisSemafor(service);
+            CreateServiceStartSemafor(service);
             _myOwnerPlugin.LogThis($"Restart of service {service.ServiceName} was succesfull!", null, null, LogLevel.Warning, this.GetType());
         }
 
@@ -127,11 +127,11 @@ namespace Service.Starter
         /// Beteszi a Redisbe a service indítás semaforját
         /// </summary>
         /// <param name="service"></param>
-        private void CreateRedisSemafor(ServiceController service)
+        private void CreateServiceStartSemafor(ServiceController service)
         {
             Dictionary<string, string> logData = new Dictionary<string, string>();
             TimeSpan redisSemaforTime = _myOwnerPlugin.Configuration.DefaultRedisSemaforTime;
-            string semaforName = service.ServiceName;
+            string servicenameforSemafor = service.ServiceName;
             var serviceDefinition = _myOwnerPlugin.Configuration.GetControlledService(service.ServiceName);
             if (serviceDefinition == null)
             {
@@ -140,9 +140,9 @@ namespace Service.Starter
             if (serviceDefinition != null)
             {
                 redisSemaforTime = serviceDefinition.CreateRedisSemaforTime;
-                semaforName = serviceDefinition.ServiceName;
+                servicenameforSemafor = serviceDefinition.ServiceName;
             }
-            semaforName = RedisSemafor(semaforName);
+            string semaforName = BuildSemaforName(servicenameforSemafor);
             logData.Add("Service name", service.ServiceName);
             logData.Add("Redis connection established", _myOwnerPlugin.RedisConnection != null ? "Yes" : "No");
             logData.Add("Redis Semafor Time", redisSemaforTime.ToString());
@@ -153,7 +153,8 @@ namespace Service.Starter
                 var redisDb = _myOwnerPlugin.RedisConnection?.GetDatabase();
                 if (redisDb != null)
                 {
-                    redisDb.StringSet(semaforName, DateTime.Now.ToString(), Properties.CreateRedisSemaforTime);
+                    string semaforvalue = $"from:{DateTime.Now}, len={Properties.CreateRedisSemaforTime}"; ;
+                    redisDb.StringSet(semaforName, semaforvalue, Properties.CreateRedisSemaforTime);
                     _myOwnerPlugin.LogThis($"Redis semafor is created.", logData, null, LogLevel.Information, this.GetType());
                 }
             }
@@ -161,7 +162,7 @@ namespace Service.Starter
             {
                 foreach (var dService in service.ServicesDependedOn)
                 {
-                    CreateRedisSemafor(dService);
+                    CreateServiceStartSemafor(dService);
                 }
             }
         }
@@ -169,7 +170,7 @@ namespace Service.Starter
         /// <summary>
         /// Redisen használt semafor kulcs
         /// </summary>
-        private string RedisSemafor(string serviceName)
+        private string BuildSemaforName(string serviceName)
         {
             return $"Service.Starter.Semafor.{serviceName}";
         }

@@ -196,6 +196,11 @@ namespace IVServiceWatchdog
             LogThis($"Exited: {Thread.CurrentThread.Name}", logData, null, LogLevel.Debug);
         }
 
+        private string BuildSemaforName(string serviceName)
+        {
+            return $"Service.Starter.Semafor.{serviceName}";
+        }
+        
         /// <summary>
         /// Megmondja, van-e Redisben semafor erre a checkre
         /// </summary>
@@ -209,7 +214,7 @@ namespace IVServiceWatchdog
                 var redisDb = RedisConnection?.GetDatabase();
                 if (redisDb != null)
                 {
-                    string semaforname = $"Service.Starter.Semafor.{_configuration.WindowsServiceName}";
+                    string semaforname = BuildSemaforName(_configuration.WindowsServiceName);
                     var semaforvalue = redisDb.StringGet(semaforname);
                     if (!semaforvalue.IsNullOrEmpty)
                     {

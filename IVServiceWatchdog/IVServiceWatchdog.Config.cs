@@ -135,9 +135,14 @@ namespace IVServiceWatchdog
             {
                 string rcs, rcs2;
                 rcs = GetElementValue<string>(GetXElement(REDISCONNECTION_ELEMENT_NAME), String.Empty);
-                try { rcs2 = VRH.ConnectionStringStore.VRHConnectionStringStore.GetRedisConnectionString(rcs); }
+                try
+                {
+                    rcs2 = VRH.ConnectionStringStore.VRHConnectionStringStore.GetRedisConnectionString(rcs);
+                    int ix = rcs2.IndexOf('=');
+                    if (ix >= 0) rcs2 = rcs2.Substring(ix + 1, rcs2.Length - ix - 1);
+                }
                 catch { rcs2 = rcs; }
-                return rcs;
+                return rcs2;
             }
         }
         public int RedisconnectRetries

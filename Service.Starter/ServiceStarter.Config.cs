@@ -30,34 +30,27 @@ namespace Service.Starter
             get
             {
                 List<ServiceProperties> services = new List<ServiceProperties>();
-                TimeSpan defaultIntervall = DefualtCheckInterval;
-                bool defaultDependenciesSemafor = DefaultDependenciesSemafor;
-                TimeSpan defaultMaxStartingWait = MaxStartingWait;
-                TimeSpan defaultRedisSemaforTime = DefaultRedisSemaforTime;
                 foreach (var service in GetAllXElements(CONTROLLEDSERVICES_ELEMENT_NAME, SERVICE_ELEMENT_NAME))
                 {
                     string name = GetAttribute<string>(service, NAME_ATTRIBUTE_IN_SERVICE_ELEMENT, String.Empty);
                     if (!String.IsNullOrEmpty(name))
                     {
-                        ServiceProperties sp = new ServiceProperties()
-                                                {
-                                                    ServiceName = name,
-                                                };
-                        TimeSpan interval = GetAttribute<TimeSpan>(service, CHECKINTERVAL_ATTRIBUTE_IN_SERVICE_ELEMENT, new TimeSpan(0));
-                        if (interval.TotalMilliseconds <= 0)
+                        ServiceProperties sp = new ServiceProperties() {   ServiceName = name,   };
+                        TimeSpan interval = GetAttribute<TimeSpan>(service, CHECKINTERVAL_ATTRIBUTE_IN_SERVICE_ELEMENT, DefaultCheckInterval);
+                        sp.CheckInterval = TimeSpan.FromMilliseconds(Math.Abs(interval.TotalMilliseconds));
+
+                        if (sp.CheckInterval.TotalMilliseconds > 0)
                         {
-                            interval = defaultIntervall;
-                        }
-                        if (interval.TotalMilliseconds > 0)
-                        {
-                            sp.CheckInterval = interval;
-                            sp.DependenciesSemafor = GetExtendedBoolAttribute(service, DEPENDENCIESSEMAFOR_ATTRIBUTE_IN_SERVICE_ELEMENT, defaultDependenciesSemafor, "yes", "1", "true");
+                            sp.DependenciesSemafor = GetExtendedBoolAttribute(service, DEPENDENCIESSEMAFOR_ATTRIBUTE_IN_SERVICE_ELEMENT, DefaultDependenciesSemafor, "yes", "1", "true");
+
                             TimeSpan maxWaitTime = new TimeSpan(0);
-                            TimeSpan.TryParse(GetAttribute<string>(service, MAXSTARTINGTIME_ATTRIBUTE_IN_SERVICE_ELEMENT, defaultMaxStartingWait.ToString()), out maxWaitTime);                           
-                            sp.MaxStartingWait = maxWaitTime;
+                            TimeSpan.TryParse(GetAttribute<string>(service, MAXSTARTINGTIME_ATTRIBUTE_IN_SERVICE_ELEMENT, DefaultMaxStartingTime.ToString()), out maxWaitTime);
+                            sp.MaxStartingWait = TimeSpan.FromMilliseconds(Math.Abs(maxWaitTime.TotalMilliseconds));
+
                             TimeSpan redisSemaforTime = new TimeSpan(0);
-                            TimeSpan.TryParse(GetAttribute<string>(service, MAXSTARTINGTIME_ATTRIBUTE_IN_SERVICE_ELEMENT, defaultMaxStartingWait.ToString()), out redisSemaforTime);
-                            sp.CreateRedisSemaforTime = redisSemaforTime.TotalMilliseconds > 0 ? redisSemaforTime : defaultRedisSemaforTime;
+                            TimeSpan.TryParse(GetAttribute<string>(service, CREATEREDISSEMAFOR_ATTRIBUTE_IN_SERVICE_ELEMENT, DefaultRedisSemaforTime.ToString()), out redisSemaforTime);
+                            sp.CreateRedisSemaforTime = TimeSpan.FromMilliseconds(Math.Abs(redisSemaforTime.TotalMilliseconds));
+
                             services.Add(sp);
                         }
                     }
@@ -79,7 +72,7 @@ namespace Service.Starter
         /// <summary>
         /// Visszadja az alapértelmezett ellenőrzési intervallumot
         /// </summary>
-        public TimeSpan DefualtCheckInterval
+        public TimeSpan DefaultCheckInterval
         {
             get
             {                
@@ -107,9 +100,9 @@ namespace Service.Starter
         {
             get
             {
-                TimeSpan interval = new TimeSpan(0);
-                TimeSpan.TryParse(GetAttribute<string>(GetXElement(CONTROLLEDSERVICES_ELEMENT_NAME), CREATEREDISSEMAFOR_ATTRIBUTE_IN_CONTROLLEDSERVICES_ELEMENT, "00:00:00"), out interval);
-                return interval;
+                TimeSpan redissemafortime = new TimeSpan(0);
+                TimeSpan.TryParse(GetAttribute<string>(GetXElement(CONTROLLEDSERVICES_ELEMENT_NAME), CREATEREDISSEMAFOR_ATTRIBUTE_IN_CONTROLLEDSERVICES_ELEMENT, "00:00:00"), out redissemafortime);
+                return redissemafortime;
             }
 
         }
@@ -117,7 +110,7 @@ namespace Service.Starter
         /// <summary>
         /// Visszadja az alapértelmezett maximum várakozási uidőt a service indítás megtörténtére
         /// </summary>
-        public TimeSpan MaxStartingWait
+        public TimeSpan DefaultMaxStartingTime
         {
             get
             {
@@ -137,9 +130,14 @@ namespace Service.Starter
             {
                 string rcs,rcs2;
                 rcs = GetElementValue<string>(GetXElement(REDISCONNECTION_ELEMENT_NAME), String.Empty);
-                try { rcs2 = VRH.ConnectionStringStore.VRHConnectionStringStore.GetRedisConnectionString(rcs); }
+                try
+                {
+                    rcs2 = VRH.ConnectionStringStore.VRHConnectionStringStore.GetRedisConnectionString(rcs);
+                    int ix = rcs2.IndexOf('=');
+                    if (ix >= 0) rcs2 = rcs2.Substring(ix+1, rcs2.Length- ix - 1);
+                }
                 catch { rcs2 = rcs; }
-                return rcs;
+                return rcs2;
             }
         }
         public int RedisconnectRetries
