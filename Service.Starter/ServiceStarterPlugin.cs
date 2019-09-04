@@ -51,7 +51,7 @@ namespace Service.Starter
                 if (string.IsNullOrEmpty(configParameterFile))  {    configParameterFile = _myData.Type.PluginConfig;   }
                 Configuration = new ServiceStarterParameterFileProcessor(configParameterFile);
                 Configuration.ConfigProcessorEvent += ConfigProcessorEvent;
-                _lazyRedisConnection = new Lazy<ConnectionMultiplexer>(RedisConnectionInitializer);
+                _lazyRedisConnection = new Lazy<ConnectionMultiplexer>(RedisConnectionInitializer, LazyThreadSafetyMode.PublicationOnly);
                 foreach (var service in Configuration.AllControlledServices) {   _controlledServices.Add(new ControlledService(service, this));    }
                 base.Start();
             }
@@ -136,7 +136,10 @@ namespace Service.Starter
         /// </summary>
         internal ConnectionMultiplexer RedisConnection
         {
-            get { return _lazyRedisConnection.Value; }
+            get
+            {
+                return _lazyRedisConnection.Value;
+            }
         }
         private ConnectionMultiplexer RedisConnectionInitializer()
         {
@@ -150,15 +153,20 @@ namespace Service.Starter
                         cm.PreserveAsyncOrder = false;
                         return cm;
                     }
-                    catch (Exception ex) { LogThis($"Attempting ({i} of {Configuration.RedisconnectRetries}) to establish connection to Redis server {Configuration.RedisConnection}", null, ex, LogLevel.Warning, this.GetType()); }
+                    catch (Exception ex)
+                    {
+                        LogThis($"Attempting ({i} of {Configuration.RedisconnectRetries}) to establish connection to Redis server {Configuration.RedisConnection}", null, ex, LogLevel.Warning, this.GetType());
+                    }
                 }
-                LogThis($"Error to connect to Redis server {Configuration.RedisConnection}. All {Configuration.RedisconnectRetries} connect attempt failed.", null, null, LogLevel.Fatal, this.GetType());
-                return null;
+                string text = $"Error to connect to Redis server {Configuration.RedisConnection}. All {Configuration.RedisconnectRetries} connect attempt failed.";
+                LogThis(text, null, null, LogLevel.Fatal, this.GetType());
+                throw new Exception(text);
             }
             else
             {
-                LogThis($"No Redis connection string is specified. No connection to Redis server {Configuration.RedisConnection} is established.", null, null, LogLevel.Fatal, this.GetType());
-                return null;
+                string text = $"No Redis connection string is specified. No connection to Redis server {Configuration.RedisConnection} is established.";
+                LogThis(text, null, null, LogLevel.Fatal, this.GetType());
+                throw new Exception(text);
             }
         }
 

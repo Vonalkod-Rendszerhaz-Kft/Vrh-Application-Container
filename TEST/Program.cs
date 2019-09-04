@@ -11,17 +11,20 @@ namespace TEST
     {
         static void Main(string[] args)
         {
-            var cm = ConnectionMultiplexer.Connect("localhost:6379,defaultDatabase=7");
-            var redisDb = cm?.GetDatabase();
-            if (redisDb != null)
+            IDatabase redisDb=null;
+            ConnectionMultiplexer cm=null;
+            while (true)
             {
-                while (true)
+                System.Threading.Thread.Sleep(2000);
+                Console.Clear();
+                try
                 {
-
-                    System.Threading.Thread.Sleep(2000);
-                    Console.Clear();
-                    //Console.ReadLine();
-                    List<string> servicenameList = new List<string>()
+                    if (cm==null) cm= ConnectionMultiplexer.Connect("localhost:6379,defaultDatabase=7");
+                    redisDb = cm?.GetDatabase();
+                }
+                catch { cm = null; redisDb = null; }
+                //Console.ReadLine();
+                List<string> servicenameList = new List<string>()
                     {
                         "VRH Starter for ALM"
                         , "VRH DataController WPWF for ALM"
@@ -35,13 +38,20 @@ namespace TEST
                         , "VRH Terminator for ALM"
                         , "VRH Redis for ALM"
                     };
-                    Console.WriteLine(DateTime.Now);
-                    foreach (string servicename in servicenameList)
+                Console.WriteLine(DateTime.Now);
+                foreach (string servicename in servicenameList)
+                {
+                    string semaforname = $"Service.Starter.Semafor.{servicename}";
+                    try
                     {
-                        string semaforname = $"Service.Starter.Semafor.{servicename}";
-                        var semaforvalue = redisDb.StringGet(semaforname);
+                        RedisValue semaforvalue=new RedisValue ();
+                        if (redisDb != null) semaforvalue = redisDb.StringGet(semaforname);
                         if (semaforvalue.IsNullOrEmpty) semaforvalue = "EMPTY";
                         Console.WriteLine($"{semaforname.PadRight(60)}: {semaforvalue}");
+                    }
+                    catch
+                    {
+                        Console.WriteLine($"{semaforname.PadRight(60)}: ???");
                     }
                 }
             }

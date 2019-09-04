@@ -32,10 +32,10 @@ namespace Service.Starter
                 List<ServiceProperties> services = new List<ServiceProperties>();
                 foreach (var service in GetAllXElements(CONTROLLEDSERVICES_ELEMENT_NAME, SERVICE_ELEMENT_NAME))
                 {
-                    string name = GetAttribute<string>(service, NAME_ATTRIBUTE_IN_SERVICE_ELEMENT, String.Empty);
-                    if (!String.IsNullOrEmpty(name))
+                    string servicename = GetAttribute<string>(service, NAME_ATTRIBUTE_IN_SERVICE_ELEMENT, String.Empty);
+                    if (!String.IsNullOrEmpty(servicename))
                     {
-                        ServiceProperties sp = new ServiceProperties() {   ServiceName = name,   };
+                        ServiceProperties sp = new ServiceProperties() {   ServiceName = servicename,   };
                         TimeSpan interval = GetAttribute<TimeSpan>(service, CHECKINTERVAL_ATTRIBUTE_IN_SERVICE_ELEMENT, DefaultCheckInterval);
                         sp.CheckInterval = TimeSpan.FromMilliseconds(Math.Abs(interval.TotalMilliseconds));
 

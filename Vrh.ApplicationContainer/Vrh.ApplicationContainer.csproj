@@ -123,6 +123,7 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
+    <None Include="Vrh.ApplicationContainer.nuspec" />
     <None Include="Vrh.NugetModuls.Documentations\VRH.Common\ReadMe.md" />
     <None Include="Vrh.NugetModuls.Documentations\Vrh.LinqXMLProcessor.Base\ReadMe.md" />
     <None Include="Vrh.NugetModuls.Documentations\Vrh.Logger\ReadMe.md" />

@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>Vrh.ApplicationContainer</id>
+    <version>$version$</version>
+    <title>Vrh.ApplicationContainer keret szerviz</title>
+    <authors>Görcsös Zoltán</authors>
+    <owners>Vonalkód Rendszerház Kft.</owners>
+    <tags>VRH, Log4Pro, PLugin</tags>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <copyright>$copyright$</copyright>
+    <releaseNotes>
+      2.0.0.0 Patches:
+      - ServiceStarter plugin javítása a redis kapcsolódás résznél
+      - nuget csomag a felfrissített változathoz
+    </releaseNotes>
+    <projectUrl>http://gitlab.vonalkod.hu/vrh/Vrh.WebForm</projectUrl>
+    <dependencies>
+    </dependencies>
+  </metadata>
+  <files>
+  </files>
+</package>

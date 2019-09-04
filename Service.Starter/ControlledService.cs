@@ -43,6 +43,16 @@ namespace Service.Starter
         /// </summary>
         public ServiceProperties Properties { get; private set; }
 
+        public bool AllServicesDependedOnRunning(ServiceController service)
+        {
+            if (service.ServicesDependedOn == null || service.ServicesDependedOn.Length <= 0) return true;
+            foreach (var dservice in service.ServicesDependedOn)
+            {
+                if (dservice.Status != ServiceControllerStatus.Running) return false;
+            }
+            return true;
+        }
+
         /// <summary>
         /// Ellenőrzi a Service-futását.
         /// </summary>
@@ -73,7 +83,7 @@ namespace Service.Starter
                     }
                     _myOwnerPlugin.LogThis($"Service {service.ServiceName} found, status checked. Current status: {service.Status}.!", null, null, LogLevel.Verbose, this.GetType());
                     /// ha pont itt megváltozik a státusz, akkor az zavaró lehet, mert a log és a történtek nem lesznek szinkronban.!
-                    if (service.Status == ServiceControllerStatus.Stopped) { StartThis(service); }
+                    if (service.Status == ServiceControllerStatus.Stopped && AllServicesDependedOnRunning(service)) { StartThis(service); }
                     else
                     {
                         _myOwnerPlugin.LogThis($"Service status of {service.ServiceName} is {service.Status}, start is skipped.", null, null, LogLevel.Verbose, this.GetType());
@@ -105,6 +115,7 @@ namespace Service.Starter
         /// <param name="service">Az elindítandó service</param>
         private void StartThis(ServiceController service)
         {
+
             CreateServiceStartSemafor(service);
             DateTime startTime = DateTime.UtcNow;
             service.Start();
@@ -129,42 +140,46 @@ namespace Service.Starter
         /// <param name="service"></param>
         private void CreateServiceStartSemafor(ServiceController service)
         {
-            Dictionary<string, string> logData = new Dictionary<string, string>();
-            TimeSpan redisSemaforTime = _myOwnerPlugin.Configuration.DefaultRedisSemaforTime;
-            string servicenameforSemafor = service.ServiceName;
-            var serviceDefinition = _myOwnerPlugin.Configuration.GetControlledService(service.ServiceName);
-            if (serviceDefinition == null)
+            try
             {
-                serviceDefinition = _myOwnerPlugin.Configuration.GetControlledService(service.DisplayName);
-            }
-            if (serviceDefinition != null)
-            {
-                redisSemaforTime = serviceDefinition.CreateRedisSemaforTime;
-                servicenameforSemafor = serviceDefinition.ServiceName;
-            }
-            string semaforName = BuildSemaforName(servicenameforSemafor);
-            logData.Add("Service name", service.ServiceName);
-            logData.Add("Redis connection established", _myOwnerPlugin.RedisConnection != null ? "Yes" : "No");
-            logData.Add("Redis Semafor Time", redisSemaforTime.ToString());
-            logData.Add("Redis Semafor Name", semaforName);
-            _myOwnerPlugin.LogThis($"Attempting to create semafor...", logData, null, LogLevel.Verbose, this.GetType());
-            if (redisSemaforTime.TotalMilliseconds > 0)
-            {
-                var redisDb = _myOwnerPlugin.RedisConnection?.GetDatabase();
-                if (redisDb != null)
+                Dictionary<string, string> logData = new Dictionary<string, string>();
+                TimeSpan semafortime = _myOwnerPlugin.Configuration.DefaultRedisSemaforTime;
+                string servicenameforSemafor = service.ServiceName;
+                var serviceDefinition = _myOwnerPlugin.Configuration.GetControlledService(service.ServiceName);
+                if (serviceDefinition == null)
                 {
-                    string semaforvalue = $"from:{DateTime.Now}, len={Properties.CreateRedisSemaforTime}"; ;
-                    redisDb.StringSet(semaforName, semaforvalue, Properties.CreateRedisSemaforTime);
-                    _myOwnerPlugin.LogThis($"Redis semafor is created.", logData, null, LogLevel.Information, this.GetType());
+                    serviceDefinition = _myOwnerPlugin.Configuration.GetControlledService(service.DisplayName);
+                }
+                if (serviceDefinition != null)
+                {
+                    semafortime = serviceDefinition.CreateRedisSemaforTime;
+                    servicenameforSemafor = serviceDefinition.ServiceName;
+                }
+                string semaforName = BuildSemaforName(servicenameforSemafor);
+                logData.Add("Service name", service.ServiceName);
+                logData.Add("Redis connection established", _myOwnerPlugin.RedisConnection != null ? "Yes" : "No");
+                logData.Add("Redis Semafor Time", semafortime.ToString());
+                logData.Add("Redis Semafor Name", semaforName);
+                _myOwnerPlugin.LogThis($"Attempting to create semafor...", logData, null, LogLevel.Verbose, this.GetType());
+                if (semafortime.TotalMilliseconds > 0)
+                {
+                    var redisDb = _myOwnerPlugin.RedisConnection?.GetDatabase();
+                    if (redisDb != null)
+                    {
+                        string semaforvalue = $"from:{DateTime.Now}, len={semafortime}"; ;
+                        redisDb.StringSet(semaforName, semaforvalue, semafortime);
+                        _myOwnerPlugin.LogThis($"Redis semafor is created.", logData, null, LogLevel.Information, this.GetType());
+                    }
+                }
+                if (Properties.DependenciesSemafor && service.ServicesDependedOn.Length > 0)
+                {
+                    foreach (var dService in service.ServicesDependedOn)
+                    {
+                        CreateServiceStartSemafor(dService);
+                    }
                 }
             }
-            if (Properties.DependenciesSemafor && service.ServicesDependedOn.Length > 0)
-            {
-                foreach (var dService in service.ServicesDependedOn)
-                {
-                    CreateServiceStartSemafor(dService);
-                }
-            }
+            catch { }
         }
 
         /// <summary>
