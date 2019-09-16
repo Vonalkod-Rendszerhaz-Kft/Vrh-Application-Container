@@ -18,12 +18,12 @@ using System.Reflection;
 using System.Globalization;
 using System.IO.IsolatedStorage;
 using System.IO;
+using System.Messaging;
 
 using VRH.Common;
 using Vrh.ApplicationContainer;
 using Vrh.LinqXMLProcessor.Base;
 using Vrh.Logger;
-using System.Messaging;
 using IVConnector.Plugin.InterventionService;
 
 namespace IVConnector.Plugin
@@ -53,10 +53,6 @@ namespace IVConnector.Plugin
                 {
                     if (_configuration.ConnectorType == IVConnectorType.TCP)
                     {
-                        if (!IPAddress.TryParse(_configuration.IP, out IPAddress ip))
-                        {
-                            throw new FatalException("Configuration Error: invalid IP address.", null, null);
-                        }
                         try
                         {
                             if (_listener != null)
@@ -64,7 +60,7 @@ namespace IVConnector.Plugin
                                 _listener.Stop();
                                 _listener = null;
                             }
-                            _listener = new TcpListener(IPAddress.Parse(_configuration.IP), _configuration.Port);
+                            _listener = new TcpListener(_configuration.IP, _configuration.Port);
                             _listener.Start();
                         }
                         catch (Exception ex)
@@ -75,8 +71,7 @@ namespace IVConnector.Plugin
                                                                         new KeyValuePair<string, string>("IVConnector plugin instance", _pluginReference.InstanceName),
                                                                         new KeyValuePair<string, string>("IVConnector plugin version", _pluginReference.PluginVersion),
                                                                         new KeyValuePair<string, string>("Configuration file", _configuration.ConfigurationFileDefinition),
-                                                                        new KeyValuePair<string, string>("IP value", _configuration.IP),
-                                                                        new KeyValuePair<string, string>("Port value", _configuration.Port.ToString())
+                                                                        new KeyValuePair<string, string>("Listen socket", _configuration.ListenTCPIPSocket)
                                                                         );
                         }
                     }
@@ -109,8 +104,7 @@ namespace IVConnector.Plugin
                     };
                     if (_configuration.ConnectorType == IVConnectorType.TCP)
                     {
-                        data.Add("Watcher IP", _configuration.IP);
-                        data.Add("Watcher Port", _configuration.Port.ToString());
+                        data.Add("Listen socket", _configuration.ListenTCPIPSocket);
                         data.Add("Message prefix", msgPrefix);
                         data.Add("Message suffix", msgSuffix);
                         data.Add("Intervention Id separator", idSeparator);
@@ -139,8 +133,7 @@ namespace IVConnector.Plugin
                                     new KeyValuePair<string, string>("IVConnector plugin instance", _pluginReference.InstanceName),
                                     new KeyValuePair<string, string>("IVConnector plugin version", _pluginReference.PluginVersion),
                                     new KeyValuePair<string, string>("Configuration file", _configuration.ConfigurationFileDefinition),
-                                    new KeyValuePair<string, string>("IP value", _configuration.IP),
-                                    new KeyValuePair<string, string>("Port value", _configuration.Port.ToString())
+                                    new KeyValuePair<string, string>("Listen socket", _configuration.ListenTCPIPSocket)
                                   );
             }
         }

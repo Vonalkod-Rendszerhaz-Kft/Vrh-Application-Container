@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Vrh.ApplicationContainer</RootNamespace>
     <AssemblyName>Vrh.ApplicationContainer</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -89,8 +89,8 @@
     <Reference Include="VRH.Common, Version=2.7.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\VRH.Common.2.7.0\lib\net45\VRH.Common.dll</HintPath>
     </Reference>
-    <Reference Include="VRH.ConnectionStringStore, Version=2.2.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\VRH.ConnectionStringStore.2.2.3\lib\net45\VRH.ConnectionStringStore.dll</HintPath>
+    <Reference Include="VRH.ConnectionStringStore, Version=2.3.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\VRH.ConnectionStringStore.2.3.2\lib\net451\VRH.ConnectionStringStore.dll</HintPath>
     </Reference>
     <Reference Include="Vrh.LinqXMLProcessor.Base, Version=1.2.4.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Vrh.LinqXMLProcessor.Base.1.2.4\lib\net45\Vrh.LinqXMLProcessor.Base.dll</HintPath>
@@ -123,7 +123,9 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
-    <None Include="Vrh.ApplicationContainer.nuspec" />
+    <None Include="Vrh.ApplicationContainer.nuspec">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Vrh.NugetModuls.Documentations\VRH.Common\ReadMe.md" />
     <None Include="Vrh.NugetModuls.Documentations\Vrh.LinqXMLProcessor.Base\ReadMe.md" />
     <None Include="Vrh.NugetModuls.Documentations\Vrh.Logger\ReadMe.md" />

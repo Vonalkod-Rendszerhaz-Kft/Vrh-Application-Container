@@ -4,9 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using System.Net;
+using System.Messaging;
+
 using Vrh.LinqXMLProcessor.Base;
 using VRH.Common;
 using Vrh.Logger;
+using VRH.ConnectionStringStore;
+using Vrh.ApplicationContainer;
 
 namespace IVConnector.Plugin
 {
@@ -48,14 +53,51 @@ namespace IVConnector.Plugin
             }
         }
 
+        private IPAddress ip;
+        private int port;
+        private string socket = null;
         /// <summary>
         /// IV Connecrtor Listener IP
         /// </summary>
-        public string IP
+        public string ListenTCPIPSocket
         {
             get
             {
-                return GetElementValue<string>(GetXElement(IP_ELEMENT_NAME), "127.0.0.1");
+                string cs = null, _csname = null;
+                try
+                {
+                    _csname = GetElementValue<string>(GetXElement(LISTENTCPIPSOCKET_NAME), "");
+                    cs = VRHConnectionStringStore.GetTCPIPsocketConnectionString(string.IsNullOrEmpty(_csname) ? "VRH.ivConnector:ListenTCPIPSocket" : _csname);
+                }
+                catch { cs = null; }
+                string socket = !string.IsNullOrEmpty(cs) ? cs
+                        : !string.IsNullOrEmpty(_csname) ? _csname
+                        : "127.0.0.1:1981";
+                try
+                {
+                    ip = IPAddress.Parse(socket.Split(':')[0]);
+                    port = int.Parse(socket.Split(':')[1]);
+                    return socket;
+                }
+                catch (Exception ex)
+                {
+                    ip = null; port = 0;
+                    var data = new Dictionary<string, string>() { { "ListenTCPIPSocket name", _csname }, { "ListenTCPIPSocket", socket } };
+                    throw new FatalException("Configuration Error: invalid TCPIP socket name/address.", ex, null);
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// IV Connecrtor Listener IP
+        /// </summary>
+        public IPAddress IP
+        {
+            get
+            {
+                if (ip == null) socket = ListenTCPIPSocket;
+                return ip;
             }
         }
 
@@ -66,7 +108,8 @@ namespace IVConnector.Plugin
         {
             get
             {
-                return GetElementValue<int>(GetXElement(PORT_ELEMENT_NAME), 1981);
+                if (ip == null) socket = ListenTCPIPSocket;
+                return port;
             }
         }
 
@@ -166,7 +209,17 @@ namespace IVConnector.Plugin
         {
             get
             {
-                return GetElementValue<string>(GetXElement(INQUEUE_ELEMENT_NAME), String.Empty);
+                string cs = null, _csname = null;
+                try
+                {
+                    _csname = GetElementValue<string>(GetXElement(INQUEUE_ELEMENT_NAME), "");
+                    cs = VRHConnectionStringStore.GetMSMQConnectionString(string.IsNullOrEmpty(_csname) ? "VRH.ivConnector:InMSMQ" : _csname);
+                }
+                catch { cs = null; }
+                string msmqcs = !string.IsNullOrEmpty(cs) ? cs
+                        : !string.IsNullOrEmpty(_csname) ? _csname
+                        : @".\private$\inmsmq";
+                return msmqcs;
             }
         }
 
@@ -353,8 +406,7 @@ namespace IVConnector.Plugin
         private const string MESSAGE_ELEMENT_NAME = "Message";
         private const string IVID_ATTRIBUTE_IN_MESSAGE_ELEMENT = "IVID";
         // TCP Config
-        private const string IP_ELEMENT_NAME = "IP";
-        private const string PORT_ELEMENT_NAME = "Port";
+        private const string LISTENTCPIPSOCKET_NAME = "ListenTCPIPSocket";
         private const string ACK_ELEMENT_NAME = "Ack";
         private const string RECEIVETIMEOUT_ELEMENT_NAME = "ReceiveTimeout";
         // MSMQ Config
