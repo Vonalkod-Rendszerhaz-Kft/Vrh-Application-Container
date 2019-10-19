@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Vrh.LinqXMLProcessor.Base;
+using Vrh.XmlProcessing;
 using Vrh.ApplicationContainer;
 using Vrh.Logger;
 
@@ -13,13 +13,13 @@ namespace InstanceFactory.FromXML
     /// <summary>
     /// Az XML-ben tárolt konfiguráció elérésére szopolgáló osztály
     /// </summary>
-    class PluginsConfig : LinqXMLProcessorBaseClass
+    class PluginsConfig : LinqXMLProcessorBase
     {
         /// <summary>
         /// Constructor 
         /// </summary>
         /// <param name="parameterFile">XML fájl aminek  afeldolgozásárta az osztály készül</param>
-        public PluginsConfig(string parameterFile)
+        public PluginsConfig(string parameterFile):base(parameterFile)
         {
             _xmlFileDefinition = parameterFile;
         }

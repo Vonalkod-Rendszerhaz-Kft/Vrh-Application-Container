@@ -28,7 +28,8 @@ namespace InstanceFactory.FromXML
                 configFile = @"Plugins.Config.xml";
             }
             _pluginConfig = new PluginsConfig(configFile);
-            _pluginConfig.ConfigProcessorEvent += _pluginConfig_ConfigProcessorEvent;
+            // ez az esemény nem létezik az XmlProcesing alatti LinqXmlProcessorbase alatt
+            //_pluginConfig.ConfigProcessorEvent += _pluginConfig_ConfigProcessorEvent;
             _errors.Capacity = _pluginConfig.StackSize;
             _infos.Capacity = _pluginConfig.StackSize;
             Dictionary<string, string> data = new Dictionary<string, string>()
@@ -121,19 +122,19 @@ namespace InstanceFactory.FromXML
         /// ConfigProcessorEvent eseményre feliratkozó metódus 
         /// </summary>
         /// <param name="e">Esemény argumentumok</param>
-        private void _pluginConfig_ConfigProcessorEvent(Vrh.LinqXMLProcessor.Base.ConfigProcessorEventArgs e)
-        {
-            Vrh.Logger.LogLevel level =
-                e.Exception.GetType().Name == typeof(Vrh.LinqXMLProcessor.Base.ConfigProcessorWarning).Name
-                    ? Vrh.Logger.LogLevel.Warning
-                    : Vrh.Logger.LogLevel.Error;
-            Dictionary<string, string> data = new Dictionary<string, string>()
-            {
-                { "ConfigProcessor class", e.ConfigProcessor },
-                { "Config file", e.ConfigFile },
-            };
-            LogThis(String.Format("Configuration issue: {0}", e.Message), data, e.Exception, level);
-        }
+        //private void _pluginConfig_ConfigProcessorEvent(Vrh.LinqXMLProcessor.Base.ConfigProcessorEventArgs e)
+        //{
+        //    Vrh.Logger.LogLevel level =
+        //        e.Exception.GetType().Name == typeof(Vrh.LinqXMLProcessor.Base.ConfigProcessorWarning).Name
+        //            ? Vrh.Logger.LogLevel.Warning
+        //            : Vrh.Logger.LogLevel.Error;
+        //    Dictionary<string, string> data = new Dictionary<string, string>()
+        //    {
+        //        { "ConfigProcessor class", e.ConfigProcessor },
+        //        { "Config file", e.ConfigFile },
+        //    };
+        //    LogThis(String.Format("Configuration issue: {0}", e.Message), data, e.Exception, level);
+        //}
 
         /// <summary>
         /// Logol egy bejegyzést, tölti a message stackekekt is 
@@ -252,7 +253,8 @@ namespace InstanceFactory.FromXML
                     // TODO: dispose managed state (managed objects).
                     if (_pluginConfig != null)
                     {
-                        _pluginConfig.ConfigProcessorEvent -= _pluginConfig_ConfigProcessorEvent;
+                        // ez az esemény nem létezik az XmlProcesing alatti LinqXmlProcessorbase alatt
+                        //_pluginConfig.ConfigProcessorEvent -= _pluginConfig_ConfigProcessorEvent;
                         _pluginConfig.Dispose();
                     }
                 }

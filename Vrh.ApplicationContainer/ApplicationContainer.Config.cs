@@ -4,7 +4,7 @@ using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Vrh.LinqXMLProcessor.Base;
+using Vrh.XmlProcessing;
 
 namespace Vrh.ApplicationContainer
 {
@@ -14,14 +14,14 @@ namespace Vrh.ApplicationContainer
     ///         Naming pattern: {YourClassName}XmlProcessor 
     ///         Mindig használd az XmlProcessor suffix-et!
     /// </summary>
-    public class ApplicationContainerConfig : LinqXMLProcessorBaseClass
+    public class ApplicationContainerConfig : LinqXMLProcessorBase
     {
         /// <summary>
         /// Constructor 
         ///     TODO: Nevezd át az osztály nevére!
         /// </summary>
         /// <param name="parameterFile">XML fájl aminek a feldolgozására az osztály készül</param>
-        public ApplicationContainerConfig(string parameterFile)
+        public ApplicationContainerConfig(string parameterFile):base(parameterFile)
         {
             _xmlFileDefinition = parameterFile;
         }

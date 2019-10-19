@@ -11,9 +11,11 @@
     <description>$description$</description>
     <copyright>$copyright$</copyright>
     <releaseNotes>
-      2.0.0.0 Patches:
-      - ServiceStarter plugin javítása a redis kapcsolódás résznél
-      - nuget csomag a felfrissített változathoz
+      3.0.1.0 (2019.10.19):
+      - javítás
+      3.0.0.0 (2019.10.19):
+      - frissítés a legújabb beépülő nuget csomagokra
+      - XmlProcessing beépítése, LinqXmlProcessorBase és ConnectionStringStore helyett
     </releaseNotes>
     <projectUrl>http://gitlab.vonalkod.hu/vrh/Vrh.WebForm</projectUrl>
     <dependencies>

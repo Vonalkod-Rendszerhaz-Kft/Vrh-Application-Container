@@ -10,14 +10,14 @@ using System.ComponentModel.Composition.Primitives;
 using System.ComponentModel.Composition.Hosting;
 using System.Reflection;
 using System.Diagnostics;
-using Newtonsoft.Json;
 using System.Configuration;
 using Vrh.Logger;
 using System.ServiceModel;
 using VRH.Common;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using Microsoft.Diagnostics.Runtime;
+using Newtonsoft.Json;
+using Vrh.XmlProcessing;
 
 namespace Vrh.ApplicationContainer
 {
@@ -44,7 +44,8 @@ namespace Vrh.ApplicationContainer
                 configFile = @"ApplicationContainer.Config.xml";
             }
             _config = new ApplicationContainerConfig(configFile);
-            _config.ConfigProcessorEvent += _config_ConfigProcessorEvent;
+            // Ez az esemény nem létezik az XmlProcessing alatti LinqXmlProcessorBase osztályban
+            // _config.ConfigProcessorEvent += _config_ConfigProcessorEvent;
 
             
             _errorStack.Capacity = _config.MessageStackSize;
@@ -613,19 +614,19 @@ namespace Vrh.ApplicationContainer
             }
         }
 
-        private void _config_ConfigProcessorEvent(LinqXMLProcessor.Base.ConfigProcessorEventArgs e)
-        {
-            LogLevel level =
-                e.Exception.GetType().Name == typeof(Vrh.LinqXMLProcessor.Base.ConfigProcessorWarning).Name
-                    ? LogLevel.Warning
-                    : LogLevel.Error;
-            Dictionary<string, string> data = new Dictionary<string, string>()
-            {
-                { "ConfigProcessor class", e.ConfigProcessor },
-                { "Config file", e.ConfigFile },
-            };
-            LogThis(String.Format("Configuration issue: {0}", e.Message), data, e.Exception, level);
-        }
+        //private void _config_ConfigProcessorEvent(LinqXMLProcessor.Base.ConfigProcessorEventArgs e)
+        //{
+        //    LogLevel level =
+        //        e.Exception.GetType().Name == typeof(Vrh.LinqXMLProcessor.Base.ConfigProcessorWarning).Name
+        //            ? LogLevel.Warning
+        //            : LogLevel.Error;
+        //    Dictionary<string, string> data = new Dictionary<string, string>()
+        //    {
+        //        { "ConfigProcessor class", e.ConfigProcessor },
+        //        { "Config file", e.ConfigFile },
+        //    };
+        //    LogThis(String.Format("Configuration issue: {0}", e.Message), data, e.Exception, level);
+        //}
 
         /// <summary>
         /// Betölti az instance factory plugint
@@ -1191,7 +1192,8 @@ namespace Vrh.ApplicationContainer
                     // TODO: dispose managed state (managed objects).
                     if (_config != null)
                     {
-                        _config.ConfigProcessorEvent -= _config_ConfigProcessorEvent;
+                        // Ez az esemény nem létezik az XmlProcessing alatti LinqXmlProcessorBase osztályban
+                        // _config.ConfigProcessorEvent -= _config_ConfigProcessorEvent;
                         _config.Dispose();
                     }
                     var pluginItem = _pluginContainer.FirstOrDefault();
