@@ -11,6 +11,8 @@
     <description>$description$</description>
     <copyright>$copyright$</copyright>
     <releaseNotes>
+      3.0.2.0 (2019.10.19):
+      - visszatérés .net 4.5.1-re
       3.0.1.0 (2019.10.19):
       - javítás
       3.0.0.0 (2019.10.19):
