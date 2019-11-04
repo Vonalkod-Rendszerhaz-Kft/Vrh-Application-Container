@@ -59,7 +59,7 @@ namespace Vrh.ApplicationContainer
         /// <param name="type">Plugin típusa</param>
         /// <param name="version">Verzió</param>
         /// <returns>betöltött pluginek listája</returns>
-        Dictionary<string, IPlugin> BuildAllFromThisUnderThisVersion(Type type, String version);
+        Dictionary<string, IPlugin> BuildAllFromThisUnderThisVersion(Type type, string version);
 
         /// <summary>
         /// 
@@ -68,6 +68,6 @@ namespace Vrh.ApplicationContainer
         /// <param name="name"></param>
         /// <param name="version"></param>
         /// <returns></returns>
-        IPlugin BuildThis(Type type, String name, String version);
+        IPlugin BuildThis(Type type, string name, string version);
     }
 }

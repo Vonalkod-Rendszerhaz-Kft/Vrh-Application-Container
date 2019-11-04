@@ -249,26 +249,25 @@ Minden ApplicationContainer plugin kötelezően a PluginAncestor leszármazott, 
 <hr></hr>
 
 # Version History:
-## 1.1.5 (2019.05.23)
-### Patches: 
-1. Az application controller keretben nem használt Nugetek eltávolítása keret szintről
-## 1.1.4 (2019.05.22)
-### Patches: 
-1. Nugetek upgrade-je
-## 1.1.3 (2019.03.06)
-### Patches: 
-1. Naplózás finomítása 
+## 3.0.3 (2019.10.31)
+1. Sok inkompatibilis változtatás a felhasznált saját Nuget elemek inkompatibilis megváltoztatása miatt
+
 ## 1.1.2 (2018.12.03)
 ### Patches: 
 1. Dokumentáció kiegészítése az 1.1.0-ban létrehozott váltzozásokhoz
+
 ## 1.1.1 (2018.12.03)
 ### Patches: 
 1. VISX, NUGET igazítás, target framework rendezés, projekt atríbútumok az 1.1.0-modósításaihoz
+
 ## 1.1.0 (2018.11.30)
 ### Compatibility API Changes:
 1. Console és Service Hostokra egyaránt bevezetésre kerül az APPCONFIG és INUSEBY indítási paraméter.
 2.  InstanceFactory.FromXML: Plugin.Config.xml-ben az Inuse attríbutúm bevezetése az Instance tag-ekl alá
+
 ## 1.0.0 (2018.04.09)
 Initial release version
+
 ## 1.0.0-alpha (2017.02.21)
 Working prototype
+

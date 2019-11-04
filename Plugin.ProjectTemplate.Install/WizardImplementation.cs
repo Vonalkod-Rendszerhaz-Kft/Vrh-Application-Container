@@ -15,10 +15,12 @@ namespace Plugin.ProjectTemplate.Install
         {
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "VSTHRD010:Invoke single-threaded types on Main thread", Justification = "<Pending>")]
         public void ProjectFinishedGenerating(Project project)
         {            
             foreach (Configuration config in project.ConfigurationManager)
             {
+
                 string startProgramValue = Path.Combine(Path.GetDirectoryName(project.FileName), config.Properties.Item("OutputPath").Value) + Path.DirectorySeparatorChar + "Vrh.ApplicationContainer.ConsoleHost.exe";
                 config.Properties.Item("StartAction").Value = 1; //Launch external program
                 config.Properties.Item("StartProgram").Value = startProgramValue;

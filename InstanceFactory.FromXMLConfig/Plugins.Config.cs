@@ -45,9 +45,9 @@ namespace InstanceFactory.FromXML
                 foreach (var item in GetAllXElements(PLUGINS_ELEMENT_NAME, PLUGIN_ELEMENT_NAME))
                 {
                     PluginDefinition plugin = GetPluginInfo(item);
-                    if (String.IsNullOrEmpty(plugin.TypeName))
+                    if (string.IsNullOrEmpty(plugin.TypeName))
                     {
-                        Dictionary<string, string> data = new Dictionary<string, string>()
+                        var data = new Dictionary<string, string>()
                         {
                             { "ConfigFile", this._xmlFileDefinition },
                         };
@@ -63,7 +63,8 @@ namespace InstanceFactory.FromXML
         /// <summary>
         /// Visszaadja a plugin példányokatokat
         /// </summary>
-        /// <param name="type"></param>
+        /// <param name="pluginType">plugin típus</param>
+        /// <param name="version">plugin verzió</param>
         /// <returns></returns>
         public IEnumerable<InstanceDefinition> GetInstances(string pluginType, string version)
         {
@@ -79,21 +80,23 @@ namespace InstanceFactory.FromXML
                 PluginDefinition plugin = GetPluginInfo(pluginElement);
                 foreach (var item in pluginElement.Descendants())
                 {
-                    InstanceDefinition instance = new InstanceDefinition();
-                    instance.Id = GetAttribute(item, ID_ATTRIBUTE_IN_INSTANCE_ELEMENT, String.Empty);
-                    instance.Name = GetAttribute(item, NAME_ATTRIBUTE_IN_INSTANCE_ELEMENT, String.Empty);
-                    instance.Description = GetAttribute(item, DESCRIPTION_ATTRIBUTE_IN_INSTANCE_ELEMENT, String.Empty);
-                    instance.InuseBy= GetAttribute(item, INUSE_ATTRIBUTE_IN_INSTANCE_ELEMENT, String.Empty);
-                    instance.InstanceConfig = GetAttribute(item, INSTANCECONFIG_ATTRIBUTE_IN_INSTANCE_ELEMENT, String.Empty);
-                    instance.InstanceData = GetAttribute(item, INSTANCEDATA_ATTRIBUTE_IN_INSTANCE_ELEMENT, String.Empty);
-                    instance.Type = plugin;
-                    if (String.IsNullOrEmpty(instance.Id))
+                    var instance = new InstanceDefinition
                     {
-                        Dictionary<string, string> data = new Dictionary<string, string>()
+                        Id = GetAttribute(item, ID_ATTRIBUTE_IN_INSTANCE_ELEMENT, string.Empty),
+                        Name = GetAttribute(item, NAME_ATTRIBUTE_IN_INSTANCE_ELEMENT, string.Empty),
+                        Description = GetAttribute(item, DESCRIPTION_ATTRIBUTE_IN_INSTANCE_ELEMENT, string.Empty),
+                        InuseBy = GetAttribute(item, INUSE_ATTRIBUTE_IN_INSTANCE_ELEMENT, string.Empty),
+                        InstanceConfig = GetAttribute(item, INSTANCECONFIG_ATTRIBUTE_IN_INSTANCE_ELEMENT, string.Empty),
+                        InstanceData = GetAttribute(item, INSTANCEDATA_ATTRIBUTE_IN_INSTANCE_ELEMENT, string.Empty),
+                        Type = plugin
+                    };
+                    if (string.IsNullOrEmpty(instance.Id))
+                    {
+                        var data = new Dictionary<string, string>()
                         {
                             { "ConfigFile", this._xmlFileDefinition },
                         };
-                        VrhLogger.Log<string>("Config Error! Instance Id not defined!", data, null, LogLevel.Warning, this.GetType());
+                        VrhLogger.Log("Config Error! Instance Id not defined!", data, null, LogLevel.Warning, this.GetType());
                         continue;
                     }
                     instances.Add(instance);
@@ -131,17 +134,19 @@ namespace InstanceFactory.FromXML
         /// <returns></returns>
         private PluginDefinition GetPluginInfo(XElement pluginNode)
         {
-            PluginDefinition plugin = new PluginDefinition();
-            plugin.TypeName = GetAttribute(pluginNode, TYPE_ATTRIBUTE_IN_PLUGIN_ELEMENT, String.Empty);
-            plugin.Version = GetAttribute(pluginNode, VERSION_ATTRIBUTE_IN_PLUGIN_ELEMENT, String.Empty);
-            plugin.Singletone = GetAttribute(pluginNode, SINGLETONE_ATTRIBUTE_IN_PLUGIN_ELEMENT, false);
-            plugin.AutoStart = GetAttribute(pluginNode, AUTOSTART_ATTRIBUTE_IN_PLUGIN_ELEMENT, true);
-            plugin.PluginConfig = GetAttribute(pluginNode, PLUGINCONFIG_ATTRIBUTE_IN_PLUGIN_ELEMENT, String.Empty);
-            plugin.PluginDirectory = GetAttribute(pluginNode, PLUGINDIRECTORY_ATTRIBUTE_IN_PLUGIN_ELEMENT, String.Empty);
-            plugin.Assembly = GetAttribute(pluginNode, ASSEMBLY_ATTRIBUTE_IN_PLUGIN_ELEMENT, String.Empty);
-            plugin.FactoryMethodName = GetAttribute(pluginNode, FACTORY_ATTRIBUTE_IN_PLUGIN_ELEMENT, String.Empty);
-            plugin.Description = GetAttribute(pluginNode, DESCRIPTION_ATTRIBUTE_IN_PLUGIN_ELEMENT, String.Empty);
-            if (String.IsNullOrEmpty(plugin.Assembly))
+            var plugin = new PluginDefinition
+            {
+                TypeName = GetAttribute(pluginNode, TYPE_ATTRIBUTE_IN_PLUGIN_ELEMENT, string.Empty),
+                Version = GetAttribute(pluginNode, VERSION_ATTRIBUTE_IN_PLUGIN_ELEMENT, string.Empty),
+                Singletone = GetAttribute(pluginNode, SINGLETONE_ATTRIBUTE_IN_PLUGIN_ELEMENT, false),
+                AutoStart = GetAttribute(pluginNode, AUTOSTART_ATTRIBUTE_IN_PLUGIN_ELEMENT, true),
+                PluginConfig = GetAttribute(pluginNode, PLUGINCONFIG_ATTRIBUTE_IN_PLUGIN_ELEMENT, string.Empty),
+                PluginDirectory = GetAttribute(pluginNode, PLUGINDIRECTORY_ATTRIBUTE_IN_PLUGIN_ELEMENT, string.Empty),
+                Assembly = GetAttribute(pluginNode, ASSEMBLY_ATTRIBUTE_IN_PLUGIN_ELEMENT, string.Empty),
+                FactoryMethodName = GetAttribute(pluginNode, FACTORY_ATTRIBUTE_IN_PLUGIN_ELEMENT, string.Empty),
+                Description = GetAttribute(pluginNode, DESCRIPTION_ATTRIBUTE_IN_PLUGIN_ELEMENT, string.Empty)
+            };
+            if (string.IsNullOrEmpty(plugin.Assembly))
             {
                 plugin.Assembly = plugin.TypeName + ".dll";
             }
@@ -169,7 +174,6 @@ namespace InstanceFactory.FromXML
         private const string ASSEMBLY_ATTRIBUTE_IN_PLUGIN_ELEMENT = "Assembly";
         private const string FACTORY_ATTRIBUTE_IN_PLUGIN_ELEMENT = "Factory";
         private const string DESCRIPTION_ATTRIBUTE_IN_PLUGIN_ELEMENT = "Description";
-        private const string INSTANCE_ELEMENT_NAME = "Instance";
         private const string ID_ATTRIBUTE_IN_INSTANCE_ELEMENT = "Id";
         private const string NAME_ATTRIBUTE_IN_INSTANCE_ELEMENT = "Name";
         private const string DESCRIPTION_ATTRIBUTE_IN_INSTANCE_ELEMENT = "Description";

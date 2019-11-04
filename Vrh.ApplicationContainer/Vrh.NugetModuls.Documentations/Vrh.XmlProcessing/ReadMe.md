@@ -749,6 +749,14 @@ Ha hibaérzékenység nem, de például logolás szükséges, akkor ezt a Config
 ***
 ## Version History:
 
+### 1.5.8 (2019.10.25)
+#### Patches:
+1. Lemaradt Install.ps1 script pótlása a Nuget csomagban
+
+### 1.5.7 (2019.10.25)
+#### Patches:
+- A nuget csomag telepítéskor elkészíti azt a minimális konfigurációt, ami a telepítés helyén való instant működőképességhez szükséges. (**Minden Nuget csomagnak ez lenne a célja a belézárt komponenst illetően: A telepítés teljes automatizálása, ami azonnali használatbavételt tesz lehetővé a telepítés helyén a komponens mélyebb ismerete (pl. konfigurálás módja) nélkül!**)
+
 #### 1.5.6 (2019.10.01) Patches:
 - Az XmlConnection összefűzős konstruktorán kellett javítani. Az elsődleges sztringből nem vette figyelembe a Root elemet.
 

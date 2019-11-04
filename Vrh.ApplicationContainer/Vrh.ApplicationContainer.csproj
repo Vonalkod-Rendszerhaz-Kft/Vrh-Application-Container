@@ -30,7 +30,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\Vrh.ApplicationContainer.XML</DocumentationFile>
+    <DocumentationFile>bin\Release\Vrh.ApplicationContainer.xml</DocumentationFile>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
@@ -56,11 +56,11 @@
     <Reference Include="VRH.Common, Version=2.10.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\VRH.Common.2.10.0\lib\net45\VRH.Common.dll</HintPath>
     </Reference>
-    <Reference Include="Vrh.Logger, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.Logger.2.0.0\lib\net451\Vrh.Logger.dll</HintPath>
+    <Reference Include="Vrh.Logger, Version=2.0.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.Logger.2.0.2\lib\net451\Vrh.Logger.dll</HintPath>
     </Reference>
-    <Reference Include="Vrh.XmlProcessing, Version=1.5.6.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.XmlProcessing.1.5.6\lib\net45\Vrh.XmlProcessing.dll</HintPath>
+    <Reference Include="Vrh.XmlProcessing, Version=1.5.8.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.XmlProcessing.1.5.8\lib\net45\Vrh.XmlProcessing.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -81,8 +81,10 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="Documentation\ReadMe.md" />
+    <None Include="forNuget packaging\app.config.install.xdt" />
+    <None Include="forNuget packaging\Install.ps1" />
     <None Include="packages.config" />
-    <None Include="Vrh.ApplicationContainer.nuspec">
+    <None Include="forNuget packaging\Vrh.ApplicationContainer.nuspec">
       <SubType>Designer</SubType>
     </None>
     <None Include="Vrh.NugetModuls.Documentations\VRH.Common\ReadMe.md" />
@@ -95,13 +97,22 @@
     <None Include="_CreateNewNuGetPackage\RunMeToUploadNuGetPackage.cmd" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="ApplicationContainer.Config.xml" />
-    <None Include="LogConfig.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <None Include="ApplicationContainer.Config.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="XmlParser.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="_CreateNewNuGetPackage\DoNotModify\NuGet.exe" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="forNuget packaging\ApplicationContainer.Config.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="LogConfig.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy /Y /R "$(SolutionDir)Vrh.ApplicationContainer\ApplicationContainer.Config.xml" "$(SolutionDir)\Vrh.ApplicationContainer.ConsoleHost\bin\$(ConfigurationName)"

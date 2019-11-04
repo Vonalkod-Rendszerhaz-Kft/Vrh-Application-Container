@@ -57,7 +57,8 @@ namespace Vrh.ApplicationContainer
     /// <summary>
     /// Delegate definició a plugin állapotváltozását jelző eseményhez 
     /// </summary>
-    /// <param name="plugin"></param>
+    /// <param name="pluginId">plugin azonosító</param>
+    /// <param name="condition">plugin állapot</param>
     public delegate void PluginStatusChangedEventHandler(Guid pluginId, PluginStateEnum condition);
 
     /// <summary>
@@ -89,6 +90,9 @@ namespace Vrh.ApplicationContainer
             }
         }
 
+        /// <summary>
+        /// Visszaadja  aplugin státuszát
+        /// </summary>
         public PluginStatus Status
         {
             get
@@ -99,13 +103,6 @@ namespace Vrh.ApplicationContainer
                     ErrorInfo = Logger.LogHelper.GetExceptionInfo(_myErrorStateInfo),
                 };
                 long size = 0;
-                //object o = this;
-                //using (Stream s = new MemoryStream())
-                //{
-                //    BinaryFormatter formatter = new BinaryFormatter();
-                //    formatter.Serialize(s, o);
-                //    size = s.Length;
-                //}
                 status.CurrentSizeInByte = size;
                 return status;
             }
@@ -197,38 +194,53 @@ namespace Vrh.ApplicationContainer
         /// Logol egy bejegyzést, tölti a message stackekekt is 
         /// </summary>
         /// <param name="message">Szöveges információ</param>
-        /// <param name="data">adatok (kulcs-érték párként)</param>
+        /// <param name="dataIn">adatok (kulcs-érték párként)</param>
         /// <param name="ex">Kivétel</param>
         /// <param name="level">Log szint</param>
+        /// <param name="type"></param>
         /// <param name="caller">Hivási hely (metódus)</param>
         /// <param name="line">Hivási hely (forrássor)</param>
         public void LogThis(string message, Dictionary<string, string> dataIn, Exception ex, Vrh.Logger.LogLevel level, Type type = null, [CallerMemberName]string caller = "", [CallerLineNumber]int line = 0)
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
-            if (dataIn != null) {    foreach (var item in dataIn) {   data.Add(item.Key, item.Value);   }    }
-            VrhLogger.Log<string>(message, data, ex, level, type != null ? type : this.GetType(), caller, line);
-
-
-            // itt azért kell a data2 (korábban itt ehelyett is a data volt használatban), mert ha ugyenezt a data-ban csinálnánk, 
-            // akkor a referencia átadás miatt a fenti VrhLogger.Log hívásnak átadott paraméterben, és ezáltal az ott keletkezett log rekorban is látszódna a változás!!!!!
-
+            if (dataIn != null) 
+            {    
+                foreach (var item in dataIn) 
+                {   
+                    data.Add(item.Key, item.Value);   
+                }    
+            }
+            VrhLogger.Log<string>(message, data, ex, level, type ?? this.GetType(), caller, line);
             Dictionary<string, string> data2 = new Dictionary<string, string>();
-            if (dataIn != null) { foreach (var item in dataIn) { data2.Add(item.Key, item.Value); } }
-            if (ex != null) {    data2.Add("Exception", Vrh.Logger.LogHelper.GetExceptionInfo(ex));    }
-
+            if (dataIn != null) 
+            { 
+                foreach (var item in dataIn) 
+                { 
+                    data2.Add(item.Key, item.Value); 
+                } 
+            }
+            if (ex != null) 
+            {    
+                data2.Add("Exception", Vrh.Logger.LogHelper.GetExceptionInfo(ex));    
+            }
             MessageStackEntry e = new MessageStackEntry() {   Body = message,Data = data2,TimeStamp = DateTime.UtcNow     };
-
             switch (level)
             {
                 case Vrh.Logger.LogLevel.Information:
                 case Vrh.Logger.LogLevel.Warning:
                     e.Type = level == Vrh.Logger.LogLevel.Warning ? Level.Warning : Level.Info;
-                    lock (_infos) {   _infos.DropItem(e);   }
+                    lock (_infos) 
+                    {   
+                        _infos.DropItem(e);   
+                    }
                     break;
                 case Vrh.Logger.LogLevel.Error:
                 case Vrh.Logger.LogLevel.Fatal:
                     e.Type = level == Vrh.Logger.LogLevel.Fatal ? Level.FatalError : Level.Error;
-                    lock (_errors) {    _errors.DropItem(e);    }
+                    lock (_errors) 
+                    {    
+                        _errors.DropItem(e);    
+                    }
                     break;
                 default:
                     break;
@@ -247,7 +259,7 @@ namespace Vrh.ApplicationContainer
                             { "Name", _myData.Name },
                             { "Type", _myData.Type.TypeName },
                         };
-            LogThis(String.Format("Plugin status change from {0} to {1}", _myStatus, PluginStateEnum.Error), data, null, Logger.LogLevel.Information);
+            LogThis($"Plugin status change from {_myStatus} to {PluginStateEnum.Error}", data, null, Logger.LogLevel.Information);
             lock (_locker)
             {
                 _myStatus = PluginStateEnum.Error;
@@ -290,7 +302,7 @@ namespace Vrh.ApplicationContainer
                             { "InternalId", _myData?.InternalId.ToString() },
                             { "Plugin id", _myData?.Id },
                         };
-                        LogThis(String.Format("Plugin status change from {0} to {1}", _myStatus, value), data, null, Logger.LogLevel.Information);
+                        LogThis($"Plugin status change from {_myStatus} to {value}", data, null, Logger.LogLevel.Information);
                         _myStatus = value;
                     }
                 }
@@ -415,10 +427,13 @@ namespace Vrh.ApplicationContainer
         /// <summary>
         /// Instance level locker
         /// </summary>
-        protected Object _locker = new Object();
+        protected object _locker = new object();
 
         #region IDisposable Support
-        protected bool disposedValue = false; // To detect redundant calls
+        /// <summary>
+        /// To detect redundant calls
+        /// </summary>
+        protected bool disposedValue = false;
 
         /// <summary>
         /// Plugin felszabadítás
@@ -434,13 +449,13 @@ namespace Vrh.ApplicationContainer
                     {
                         // TODO: dispose managed state (managed objects).
                         BeginDispose();
+                        
                     }
                     finally
                     {
                         EndDispose();
                     }
                 }
-
                 // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
                 // TODO: set large fields to null.
                 disposedValue = true;
@@ -460,7 +475,7 @@ namespace Vrh.ApplicationContainer
         public virtual void Dispose()
         {
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-            Dispose(true);
+            Dispose(true);            
             // TODO: uncomment the following line if the finalizer is overridden above.
             // GC.SuppressFinalize(this);
         }

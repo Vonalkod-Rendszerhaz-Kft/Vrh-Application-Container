@@ -45,9 +45,9 @@ namespace Vrh.ApplicationContainer
             get
             {
                 string value = ConfigurationManager.AppSettings[ApplicationContainer.GetApplicationConfigName(INSTANCEFACTORYASSEMBLY_ELEMENT_NAME)];
-                if (String.IsNullOrEmpty(value))
+                if (string.IsNullOrEmpty(value))
                 {
-                    value = GetElementValue(GetXElement(CONFIG_ELEMENT_NAME, INSTANCEFACTORYASSEMBLY_ELEMENT_NAME), String.Empty);
+                    value = GetElementValue(GetXElement(CONFIG_ELEMENT_NAME, INSTANCEFACTORYASSEMBLY_ELEMENT_NAME), string.Empty);
                 }
                 return value;
             }
@@ -61,9 +61,9 @@ namespace Vrh.ApplicationContainer
             get
             {
                 string value = ConfigurationManager.AppSettings[ApplicationContainer.GetApplicationConfigName(INSTANCEFACTORYTYPE_ELEMENT_NAME)];
-                if (String.IsNullOrEmpty(value))
+                if (string.IsNullOrEmpty(value))
                 {
-                    value = GetElementValue(GetXElement(CONFIG_ELEMENT_NAME, INSTANCEFACTORYTYPE_ELEMENT_NAME), String.Empty);
+                    value = GetElementValue(GetXElement(CONFIG_ELEMENT_NAME, INSTANCEFACTORYTYPE_ELEMENT_NAME), string.Empty);
                 }
                 return value;
             }
@@ -77,9 +77,9 @@ namespace Vrh.ApplicationContainer
             get
             {
                 string value = ConfigurationManager.AppSettings[ApplicationContainer.GetApplicationConfigName(INSTANCEFACTORYVERSION_ELEMENT_NAME)];
-                if (String.IsNullOrEmpty(value))
+                if (string.IsNullOrEmpty(value))
                 {
-                    value = GetElementValue(GetXElement(CONFIG_ELEMENT_NAME, INSTANCEFACTORYVERSION_ELEMENT_NAME), String.Empty);
+                    value = GetElementValue(GetXElement(CONFIG_ELEMENT_NAME, INSTANCEFACTORYVERSION_ELEMENT_NAME), string.Empty);
                 }
                 return value;
             }
@@ -93,7 +93,7 @@ namespace Vrh.ApplicationContainer
             get
             {
                 string strValue = ConfigurationManager.AppSettings[ApplicationContainer.GetApplicationConfigName(MESSAGESTACKSIZE_ELEMENT_NAME)];
-                if (!String.IsNullOrEmpty(strValue))
+                if (!string.IsNullOrEmpty(strValue))
                 {
                     int intValue = GetValue<int>(strValue, -1);
                     if (intValue > 0)

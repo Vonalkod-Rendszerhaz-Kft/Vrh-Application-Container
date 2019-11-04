@@ -11,9 +11,13 @@ using System.Configuration;
 using VRH.Common;
 using System.Runtime.CompilerServices;
 using Vrh.Logger;
+using Vrh.XmlProcessing;
 
 namespace InstanceFactory.FromXML
 {
+    /// <summary>
+    /// InstanceFactory implementáció, amerlyik egy XML config fájl lapján dolgozik
+    /// </summary>
     [Export(typeof(IInstanceFactory))]
     public class InstanceFactoryFromXML : IInstanceFactory
     {
@@ -23,23 +27,22 @@ namespace InstanceFactory.FromXML
         public InstanceFactoryFromXML()
         {
             string configFile = ConfigurationManager.AppSettings[_configFileSettingKey];
-            if (String.IsNullOrEmpty(configFile))
+            if (string.IsNullOrEmpty(configFile))
             {
                 configFile = @"Plugins.Config.xml";
             }
             _pluginConfig = new PluginsConfig(configFile);
-            // ez az esemény nem létezik az XmlProcesing alatti LinqXmlProcessorbase alatt
-            //_pluginConfig.ConfigProcessorEvent += _pluginConfig_ConfigProcessorEvent;
+            _pluginConfig.ConfigProcessorEvent += PluginConfig_ConfigProcessorEvent;
             _errors.Capacity = _pluginConfig.StackSize;
             _infos.Capacity = _pluginConfig.StackSize;
-            Dictionary<string, string> data = new Dictionary<string, string>()
+            var data = new Dictionary<string, string>()
             {
                 { "Type", this.GetType().FullName },
                 { "Version", this.GetType().Assembly.Version() },
                 { "Assembly",  this.GetType().Assembly.Location },
                 { "Config file", configFile },
             };
-            LogThis("Instance Factory plugin loaded!", data, null, Vrh.Logger.LogLevel.Information);
+            LogThis("Instance Factory plugin loaded!", data, null, LogLevel.Information);
         }
 
         #region IInstanceFactory members
@@ -72,7 +75,7 @@ namespace InstanceFactory.FromXML
                         { "Version", item.Version },
                         { "Description", item.Description },
                     };
-                    LogThis("This plugin already defined with this version!!!", data, null, Vrh.Logger.LogLevel.Error);                    
+                    LogThis("This plugin already defined with this version!!!", data, null, LogLevel.Error);                    
                     continue;
                 }
                 else
@@ -122,19 +125,19 @@ namespace InstanceFactory.FromXML
         /// ConfigProcessorEvent eseményre feliratkozó metódus 
         /// </summary>
         /// <param name="e">Esemény argumentumok</param>
-        //private void _pluginConfig_ConfigProcessorEvent(Vrh.LinqXMLProcessor.Base.ConfigProcessorEventArgs e)
-        //{
-        //    Vrh.Logger.LogLevel level =
-        //        e.Exception.GetType().Name == typeof(Vrh.LinqXMLProcessor.Base.ConfigProcessorWarning).Name
-        //            ? Vrh.Logger.LogLevel.Warning
-        //            : Vrh.Logger.LogLevel.Error;
-        //    Dictionary<string, string> data = new Dictionary<string, string>()
-        //    {
-        //        { "ConfigProcessor class", e.ConfigProcessor },
-        //        { "Config file", e.ConfigFile },
-        //    };
-        //    LogThis(String.Format("Configuration issue: {0}", e.Message), data, e.Exception, level);
-        //}
+        private void PluginConfig_ConfigProcessorEvent(ConfigProcessorEventArgs e)
+        {
+            Vrh.Logger.LogLevel level =
+                e.Exception.GetType().Name == typeof(ConfigProcessorWarning).Name
+                    ? Vrh.Logger.LogLevel.Warning
+                    : Vrh.Logger.LogLevel.Error;
+            var data = new Dictionary<string, string>()
+            {
+                { "ConfigProcessor class", e.ConfigProcessor },
+                { "Config file", e.ConfigFile },
+            };
+            LogThis($"Configuration issue: {e.Message}", data, e.Exception, level);
+        }
 
         /// <summary>
         /// Logol egy bejegyzést, tölti a message stackekekt is 
@@ -145,7 +148,7 @@ namespace InstanceFactory.FromXML
         /// <param name="level">Log szint</param>
         /// <param name="caller">Hivási hely (metódus)</param>
         /// <param name="line">Hivási hely (forrássor)</param>
-        private void LogThis(string message, Dictionary<string, string> data, Exception ex, Vrh.Logger.LogLevel level, [CallerMemberName]string caller = "", [CallerLineNumber]int line = 0)
+        private void LogThis(string message, Dictionary<string, string> data, Exception ex, LogLevel level, [CallerMemberName]string caller = "", [CallerLineNumber]int line = 0)
         {
             VrhLogger.Log<string>(message, data, ex, level, this.GetType(), caller, line);
             MessageStackEntry e = new MessageStackEntry()
@@ -193,49 +196,65 @@ namespace InstanceFactory.FromXML
         /// <summary>
         /// A configurációs osztály 
         /// </summary>
-        private PluginsConfig _pluginConfig;
+        private readonly PluginsConfig _pluginConfig;
 
         /// <summary>
         /// A .config fileban ez alatt az app settzings kulcs alatt kell elhelyezni a configurációra vonatkozó információt
         /// </summary>
-        private string _configFileSettingKey
-        {
-            get
-            {
-                return String.Format("{0}:{1}", MODULEPREFIX, "ConfigurationFile");
-            }
-        }
+        private string _configFileSettingKey => $"{MODULEPREFIX}:ConfigurationFile";
 
         /// <summary>
         /// FixStack a hiba információk gyűjtésére
         /// </summary>
-        private FixStack<MessageStackEntry> _errors = new FixStack<MessageStackEntry>(50);
+        private readonly FixStack<MessageStackEntry> _errors = new FixStack<MessageStackEntry>(50);
 
         /// <summary>
         /// FixStack a működési információk gyűjtésére
         /// </summary>
-        private FixStack<MessageStackEntry> _infos = new FixStack<MessageStackEntry>(50);
+        private readonly FixStack<MessageStackEntry> _infos = new FixStack<MessageStackEntry>(50);
 
         /// <summary>
-        /// Ez  adefiniált modul azonosító
+        /// Ez a definiált modul azonosító
         /// </summary>
         internal const string MODULEPREFIX = "Vrh.ApplicationContainer.InstanceFactory.FromXML";
 
+        /// <summary>
+        /// ???
+        /// </summary>
+        /// <returns></returns>
         public Dictionary<string, IPlugin> BuildAll()
         {                                    
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// ???
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public Dictionary<string, IPlugin> BuildAllFromThis(Type type)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// ???
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="version"></param>
+        /// <returns></returns>
         public Dictionary<string, IPlugin> BuildAllFromThisUnderThisVersion(Type type, string version)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        ///  ???
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="name"></param>
+        /// <param name="version"></param>
+        /// <returns></returns>
         public IPlugin BuildThis(Type type, string name, string version)
         {
             throw new NotImplementedException();
@@ -244,6 +263,10 @@ namespace InstanceFactory.FromXML
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 
+        /// <summary>
+        /// part od dispose poattern
+        /// </summary>
+        /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
@@ -273,6 +296,9 @@ namespace InstanceFactory.FromXML
         // }
 
         // This code added to correctly implement the disposable pattern.
+        /// <summary>
+        /// part of dispose pattern
+        /// </summary>
         public void Dispose()
         {
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.

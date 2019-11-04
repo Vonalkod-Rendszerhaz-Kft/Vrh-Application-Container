@@ -517,6 +517,12 @@ Az alábbi szabályok és elvek elvárások a Pluginnal szemben:
 <hr></hr>
 
 # Version History:
+## v2.0.1 (2019.10.25)
+### Patches:
+1. A nuget csomag telepítéskor elkészíti azt a minimális konfigurációt, ami a telepítés helyén való instant működőképességhez szükséges. (**Minden Nuget csomagnak ez lenne a célja a belézárt komponenst illetően: A telepítés teljes automatizálása, ami azonnali használatbavételt tesz lehetővé a telepítés helyén a komponens mélyebb ismerete (pl. konfigurálás módja) nélkül!**)
+2. Főverzió emeléskor az Obsolete-nek jelölt elemeket ki kell dobni a kódból, ezt most pótoltam
+3. Instanmt kipróbálhatóság futatahatóság a repoba felrakott állapotban (konfig fájlok tartalma, stb.)
+
 ## v1.5.7 (2019.06.04)
 ### Patch: 
 1. Windows Service-ben a Log bejegyzések előállítása túl időköltséges volt (már a task oldalon) a PID lekérdezések miatt. Állandó lekérdezés helyett áttéve egy Lazy fieldbe.

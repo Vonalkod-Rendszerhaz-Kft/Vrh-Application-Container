@@ -20,11 +20,17 @@
       <!-- plugin class cs file skeleton -->
       <ProjectItem ReplaceParameters="true" TargetFileName="$safeprojectname$Plugin.cs" OpenInEditor="true">targetPluginSkeleton.cs.txt</ProjectItem>    
       <!-- Config files -->
+      <ProjectItem ReplaceParameters="true" TargetFileName="ApplicationContainer.Config.xml">targetApplicationContainer.Config.xml</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="LogConfig.xml">targetLogConfig.xml</ProjectItem>
       <ProjectItem ReplaceParameters="true" TargetFileName="Plugins.Config.xml">targetPlugins.Config.xml</ProjectItem>
-      <ProjectItem TargetFileName="ApplicationContainer.Config.xml">targetApplicationContainer.Config.xml</ProjectItem>
-      <ProjectItem TargetFileName="LogConfig.xml">targetLogConfig.xml</ProjectItem>    
-      <ProjectItem TargetFileName="Vrh.ApplicationContainer.ConsoleHost.exe.config">targetVrh.ApplicationContainer.ConsoleHost.exe.config</ProjectItem>
-      <ProjectItem TargetFileName="Vrh.ApplicationContainer.WindowsServiceHost.exe.config">targetVrh.ApplicationContainer.WindowsServiceHost.exe.config</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="Vrh.ApplicationContainer.ConsoleHost.exe.config">targetVrh.ApplicationContainer.ConsoleHost.exe.config</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="Vrh.ApplicationContainer.WindowsServiceHost.exe.config">targetVrh.ApplicationContainer.WindowsServiceHost.exe.config</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="XmlParser.xml">targetXmlParser.xml</ProjectItem>
+      <!-- VRH Modul documentations -->
+      <ProjectItem ReplaceParameters="false" TargetFileName="Vrh.NugetModuls.Documentations\Vrh.ApplicationContainer\ReadMe.md">target.Doc.Vrh.ApplicationContainer.ReadMe.md</ProjectItem>
+      <ProjectItem ReplaceParameters="false" TargetFileName="Vrh.NugetModuls.Documentations\VRH.Common\ReadMe.md">target.Doc.VRH.Common.ReadMe.md</ProjectItem>
+      <ProjectItem ReplaceParameters="false" TargetFileName="Vrh.NugetModuls.Documentations\Vrh.Logger\ReadMe.md">target.Doc.Vrh.Logger.ReadMe.md</ProjectItem>
+      <ProjectItem ReplaceParameters="false" TargetFileName="Vrh.NugetModuls.Documentations\Vrh.XmlProcessing\ReadMe.md">target.Doc.Vrh.XmlProcessing.ReadMe.md</ProjectItem>
     </Project>
   </TemplateContent>
   <WizardExtension>

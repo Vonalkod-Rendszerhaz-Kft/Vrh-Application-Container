@@ -7,21 +7,36 @@ using System.Runtime.Serialization;
 
 namespace Vrh.ApplicationContainer
 {
+    /// <summary>
+    /// Plugin státuszát leíró típus
+    /// </summary>
     [DataContract]
     public class PluginStatus
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public PluginStatus()
         {
             State = PluginStateEnum.Unknown;
             ErrorInfo = null;
         }
 
+        /// <summary>
+        /// Státusz állapot
+        /// </summary>
         [DataMember]
         public PluginStateEnum State { get; set; }
 
+        /// <summary>
+        /// Hiba állapot információ
+        /// </summary>
         [DataMember]
         public string ErrorInfo { get; set; }
 
+        /// <summary>
+        /// Plugin instance jelenelegi memoria foglalása (TODO: jelenleg még nincs mögötte implementáció!!!)
+        /// </summary>
         [DataMember]
         public long CurrentSizeInByte { get; set; }
     }
@@ -32,10 +47,10 @@ namespace Vrh.ApplicationContainer
     [DataContract]
     public enum PluginStateEnum
     {
-        [EnumMember]
         /// <summary>
         /// Ismeretlen
         /// </summary>
+        [EnumMember]
         Unknown = 0,
         /// <summary>
         /// Plugin töltődik (példányosítás alatt)

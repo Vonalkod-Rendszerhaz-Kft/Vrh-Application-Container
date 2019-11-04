@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>$title$</id>
+    <version>$version$</version>
+    <title></title>
+    <authors>Görcsös Zoltán</authors>
+    <owners>Vonalkód Rendszerház Kft.</owners>
+    <tags>VRH, Log4Pro, Application Container, High Avability</tags>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <copyright>$copyright$</copyright>
+    <releaseNotes>
+      v3.0.3 (2019.10.28):
+      - Fejlesztőkörnyezet működőképesség (custom VS projecttemplate) és nuget csomag frissítés utáni működőképesség visszaállítása
+    </releaseNotes>
+    <projectUrl>http://redmine.vonalkod.hu/projects/vrh-applicationcontainer</projectUrl>
+    <iconUrl>http://nuget.vonalkod.hu/content/projectavatars/applicationcontainer.png</iconUrl>
+  </metadata>
+  <files>    
+    <file src="ApplicationContainer.Config.xml" target="content" />
+    <file src="app.config.install.xdt" target="content" />
+    <file src="..\..\Vrh.ApplicationContainer.ConsoleHost\forNuGet packaging\Vrh.ApplicationContainer.ConsoleHost.exe.config" target="content" />
+    <file src="..\..\Vrh.ApplicationContainer.ConsoleHost\bin\Release\Vrh.ApplicationContainer.ConsoleHost.exe" target="lib\net451" />
+    <file src="..\..\Vrh.ApplicationContainer.WindowsServiceHost\for NuGet packaging\Vrh.ApplicationContainer.WindowsServiceHost.exe.config" target="content" />
+    <file src="..\..\Vrh.ApplicationContainer.WindowsServiceHost\bin\Release\Vrh.ApplicationContainer.WindowsServiceHost.exe" target="lib\net451" />    
+    <file src="..\..\InstanceFactory.FromXMLConfig\bin\Release\InstanceFactory.FromXML.dll" target="lib\net451" />
+    <file src="..\..\InstanceFactory.FromXMLConfig\bin\Release\InstanceFactory.FromXML.xml" target="lib\net451" />
+    <file src="..\..\InstanceFactory.FromXMLConfig\forNuget packaging\Plugins.Config.xml.transform" target="content" />    
+    <file src="..\Documentation\ReadMe.md" target="content\Vrh.NugetModuls.Documentations\Vrh.ApplicationContainer" />
+    <file src="Install.ps1" target="tools"/>
+  </files>
+</package>

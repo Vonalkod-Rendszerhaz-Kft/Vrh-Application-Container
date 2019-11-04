@@ -19,7 +19,10 @@ namespace TEST
                 Console.Clear();
                 try
                 {
-                    if (cm==null) cm= ConnectionMultiplexer.Connect("localhost:6379,defaultDatabase=7");
+                    if (cm==null)
+                    {
+                        cm = ConnectionMultiplexer.Connect("localhost:6379,defaultDatabase=7");
+                    }
                     redisDb = cm?.GetDatabase();
                 }
                 catch { cm = null; redisDb = null; }
@@ -45,8 +48,14 @@ namespace TEST
                     try
                     {
                         RedisValue semaforvalue=new RedisValue ();
-                        if (redisDb != null) semaforvalue = redisDb.StringGet(semaforname);
-                        if (semaforvalue.IsNullOrEmpty) semaforvalue = "EMPTY";
+                        if (redisDb != null)
+                        {
+                            semaforvalue = redisDb.StringGet(semaforname);
+                        }
+                        if (semaforvalue.IsNullOrEmpty)
+                        {
+                            semaforvalue = "EMPTY";
+                        }
                         Console.WriteLine($"{semaforname.PadRight(60)}: {semaforvalue}");
                     }
                     catch

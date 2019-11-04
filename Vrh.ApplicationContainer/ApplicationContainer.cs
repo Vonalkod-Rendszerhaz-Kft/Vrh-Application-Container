@@ -39,14 +39,12 @@ namespace Vrh.ApplicationContainer
             _startupTimeStamp = DateTime.UtcNow;
             _wcfServiceInstance.ApplicationContainerReference = this;
             string configFile = ConfigurationManager.AppSettings[GetApplicationConfigName(CONFIGURATIONFILE_ELEMENT_NAME)];
-            if (String.IsNullOrEmpty(configFile))
+            if (string.IsNullOrEmpty(configFile))
             {
                 configFile = @"ApplicationContainer.Config.xml";
             }
             _config = new ApplicationContainerConfig(configFile);
-            // Ez az esemény nem létezik az XmlProcessing alatti LinqXmlProcessorBase osztályban
-            // _config.ConfigProcessorEvent += _config_ConfigProcessorEvent;
-
+            _config.ConfigProcessorEvent += Config_ConfigProcessorEvent;
             
             _errorStack.Capacity = _config.MessageStackSize;
             _infoStack.Capacity = _config.MessageStackSize;
@@ -76,7 +74,7 @@ namespace Vrh.ApplicationContainer
                         { "InstanceFactory version", _usedInstanceFactory?.GetType().Assembly.Version() },
                         { "IntsanceFactory config", _usedInstanceFactory?.Config },
                     };
-            LogThis(String.Format("Vrh.ApplicationContainer {0} started.", this.GetType().Assembly.Version()), data, null, LogLevel.Information);
+            LogThis($"Vrh.ApplicationContainer {this.GetType().Assembly.Version()} started.", data, null, LogLevel.Information);
         }
 
         //private void TestDiagnostic()
@@ -178,6 +176,9 @@ namespace Vrh.ApplicationContainer
         //    }
         //}
 
+        /// <summary>
+        /// Az Application contaner keret állapotleíróját adja vissza
+        /// </summary>
         public ApplicationContainerInfo MyInfo
         {
             get
@@ -203,6 +204,9 @@ namespace Vrh.ApplicationContainer
             }
         }
 
+        /// <summary>
+        /// Hibatároló verem
+        /// </summary>
         public List<MessageStackEntry> ErrorStack
         {
             get
@@ -214,6 +218,9 @@ namespace Vrh.ApplicationContainer
             }
         }
 
+        /// <summary>
+        /// Információtároló verem
+        /// </summary>
         public List<MessageStackEntry> InfoStack
         {
             get
@@ -225,6 +232,9 @@ namespace Vrh.ApplicationContainer
             }
         }
 
+        /// <summary>
+        /// A definiált és/vagy betöltött pluginok listája
+        /// </summary>
         public List<PluginDefinition> DefinedOrLoadedPlugins
         {
             get
@@ -267,6 +277,9 @@ namespace Vrh.ApplicationContainer
             }
         }
 
+        /// <summary>
+        /// Az instancefactory működéséhez tartozó hibák tárolóverme
+        /// </summary>
         public List<MessageStackEntry> InstanceFactoryErrorStack
         {
             get
@@ -282,6 +295,9 @@ namespace Vrh.ApplicationContainer
             }
         }
 
+        /// <summary>
+        /// Az instancefactory működéséhez tartozó információk tárolóverme
+        /// </summary>
         public List<MessageStackEntry> InstanceFactoryInfoStack
         {
             get
@@ -297,6 +313,12 @@ namespace Vrh.ApplicationContainer
             }
         }
 
+        /// <summary>
+        /// Visszaadja a adott plugin betöltött instance-ait
+        /// </summary>
+        /// <param name="pluginType">plugin típus</param>
+        /// <param name="version">verzió</param>
+        /// <returns>a plugin betöltött instanc-ai</returns>
         public List<InstanceDefinition> GetInstances(string pluginType, string version)
         {
             List<InstanceDefinition> instances = new List<InstanceDefinition>();
@@ -307,33 +329,63 @@ namespace Vrh.ApplicationContainer
             return instances;
         }
 
+        /// <summary>
+        /// Visszadja az adott plugin instance státusz információit
+        /// </summary>
+        /// <param name="internalId">plugin instance azonosítója</param>
+        /// <returns>státusz információ</returns>
         public PluginStatus GetPluginStatus(Guid internalId)
         {
             return FindPluginInstanceReference(internalId).Status;
         }
 
+        /// <summary>
+        /// Visszadja az adott plugin instance működéséhez kapcsolodó hibatároló tartalmát
+        /// </summary>
+        /// <param name="internalId">plugin instance azonosítója</param>
+        /// <returns>habák listája</returns>
         public List<MessageStackEntry> GetPluginInstanceErrors(Guid internalId)
         {
             return FindPluginInstanceReference(internalId).Errors;
         }
 
+        /// <summary>
+        /// Visszadja az adott plugin instance működéséhez kapcsolodó információkat
+        /// </summary>
+        /// <param name="internalId">plugin instance azonosítója</param>
+        /// <returns>információk a példány működéséről</returns>
         public List<MessageStackEntry> GetPluginInstanceInfos(Guid internalId)
         {
             return FindPluginInstanceReference(internalId).Infos;
         }
 
+        /// <summary>
+        /// Elindítja a plugin működését (IPlugin.Start hívása)
+        /// </summary>
+        /// <param name="internalId">plugin példény azonosítója</param>
+        /// <returns>az indítás sikeres voltát (true) jelzi</returns>
         public bool StartPlugin(Guid internalId)
         {
             var pluginReference = FindPluginInstanceReference(internalId);
             return CallPluginAcctionWithWaitForPluginStateChange(pluginReference, pluginReference.Start);
         }
 
+        /// <summary>
+        /// Leállítja az adott plugin működését
+        /// </summary>
+        /// <param name="internalId">plugin instance azonosítója</param>
+        /// <returns>a művelet sikeres (true) / sikertelen (false) voltát jelzi vissza</returns>
         public bool StopPlugin(Guid internalId)
         {
             var pluginReference = FindPluginInstanceReference(internalId);
             return CallPluginAcctionWithWaitForPluginStateChange(pluginReference, pluginReference.Stop);
         }
 
+        /// <summary>
+        /// Újratölti a plugin példányt annak tényléges eldobásával, majd újrapéldányosításával
+        /// </summary>
+        /// <param name="internalId">plugin instance azonosítója</param>
+        /// <returns>a művelet sikeres (true) / sikertelen (false) voltát jelzi vissza</returns>
         public bool ReloadPluginInstance(Guid internalId)
         {
             bool retValue = true;
@@ -353,6 +405,12 @@ namespace Vrh.ApplicationContainer
             return true;
         }
 
+        /// <summary>
+        /// A 
+        /// </summary>
+        /// <param name="pluginType"></param>
+        /// <param name="version"></param>
+        /// <returns></returns>
         public bool FollowPluginDefinitionChange(string pluginType, string version)
         {
             var pluginsNow = GetAllPluginDefinition();
@@ -448,7 +506,7 @@ namespace Vrh.ApplicationContainer
             }
             else
             {
-                throw new Exception(String.Format("Plugin not found! (id = {0})", internalId));
+                throw new Exception($"Plugin not found! (id = {internalId})");
             }
         }
 
@@ -466,7 +524,7 @@ namespace Vrh.ApplicationContainer
             }
             else
             {
-                throw new Exception(String.Format("Plugin not found! (id = {0})", internalId));
+                throw new Exception($"Plugin not found! (id = {internalId})");
             }
         }
 
@@ -475,9 +533,9 @@ namespace Vrh.ApplicationContainer
         ///  Ha a plugin nem jelenti vissza a PluginStatusChanged eseményen át az állapotot a timouton belül, akkor timoutra fut.
         /// </summary>
         /// <param name="pluginReference">plugin példány</param>
-        /// <param name="targetState">várt állapot</param>
         /// <param name="ipluginAction">Az IPlugin metzódus hívás, amely után várunk az adott állapot bekövetkeztére</param>
-        /// <param name="timeOut">timout</param>
+        /// <param name="timeOut">ennyi idő alatt kell bekövetkeznie az állapotváltásnak</param>
+        /// <param name="throwException">dobjon-e kivételt, vagy lenyelje őket</param>
         /// <returns>True, ha a várt állapot bekövetkezett timouton belül, egyébként false</returns>
         private bool CallPluginAcctionWithWaitForPluginStateChange(IPlugin pluginReference, Action ipluginAction, byte timeOut = 5, bool throwException = true)
         {
@@ -548,9 +606,8 @@ namespace Vrh.ApplicationContainer
                             { "Requested initial state", requestedInitialState.ToString() },
                             { "Expected plugin state", expectedTargetState.ToString() },
                         };
-                        throw new Exception(String.Format("Action not allowed when the plugin state is {0}! Accepted initial state: {1} only! ",
-                                pluginReference.Status.State, requestedInitialState
-                            ));
+                        throw new Exception($"Action not allowed when the plugin state is {pluginReference.Status.State}! " +
+                            $"Accepted initial state: {requestedInitialState} only! ");
                     }
                 }
                 if (plugin.Key != null)
@@ -614,19 +671,19 @@ namespace Vrh.ApplicationContainer
             }
         }
 
-        //private void _config_ConfigProcessorEvent(LinqXMLProcessor.Base.ConfigProcessorEventArgs e)
-        //{
-        //    LogLevel level =
-        //        e.Exception.GetType().Name == typeof(Vrh.LinqXMLProcessor.Base.ConfigProcessorWarning).Name
-        //            ? LogLevel.Warning
-        //            : LogLevel.Error;
-        //    Dictionary<string, string> data = new Dictionary<string, string>()
-        //    {
-        //        { "ConfigProcessor class", e.ConfigProcessor },
-        //        { "Config file", e.ConfigFile },
-        //    };
-        //    LogThis(String.Format("Configuration issue: {0}", e.Message), data, e.Exception, level);
-        //}
+        private void Config_ConfigProcessorEvent(ConfigProcessorEventArgs e)
+        {
+            LogLevel level =
+                e.Exception.GetType().Name == typeof(ConfigProcessorWarning).Name
+                    ? LogLevel.Warning
+                    : LogLevel.Error;
+            Dictionary<string, string> data = new Dictionary<string, string>()
+            {
+                { "ConfigProcessor class", e.ConfigProcessor },
+                { "Config file", e.ConfigFile },
+            };
+            LogThis($"Configuration issue: {e.Message}", data, e.Exception, level);
+        }
 
         /// <summary>
         /// Betölti az instance factory plugint
@@ -635,7 +692,7 @@ namespace Vrh.ApplicationContainer
         {
             lock (_instanceLocker)
             {
-                string appDir = String.Empty;
+                string appDir = string.Empty;
                 string assemblyPattern = _config.InstanceFactoryAssembly;
                 string version = _config.InstanceFactoryVersion;
                 string concrateType = _config.InstanceFactoryType;
@@ -644,55 +701,56 @@ namespace Vrh.ApplicationContainer
                     RegistrationBuilder registration = new RegistrationBuilder();
                     registration.ForType<IInstanceFactory>().ExportInterfaces();
                     appDir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
-                    if (String.IsNullOrEmpty(assemblyPattern))
+                    if (string.IsNullOrEmpty(assemblyPattern))
                     {
                         assemblyPattern = "*.dll";
                     }
-                    DirectoryInfo d = new DirectoryInfo(appDir);
+                    var d = new DirectoryInfo(appDir);
                     FileInfo[] files = d.GetFiles(assemblyPattern);
-                    AggregateCatalog catalog = new AggregateCatalog();
-                    if (files.Count() == 0)
+                    using (AggregateCatalog catalog = new AggregateCatalog())
                     {
-                        // TODO: ML
-                        throw new FatalException("Nem található a feltételnek megfelelő dll az alakalmazás könyvtárában!", null
-                                                    , new KeyValuePair<string, string>("Application directory", appDir)
-                                                    , new KeyValuePair<string, string>("AssemblyPattern", assemblyPattern)
-                                                    );
-                    }
-                    foreach (FileInfo file in files)
-                    {
-                        Assembly assembly = Assembly.LoadFrom(file.FullName);
-                        bool addThis = true;
-                        if (!String.IsNullOrEmpty(concrateType))
+                        if (files.Count() == 0)
                         {
-                            addThis = assembly.ExportedTypes.Any(x => x.Name == concrateType || x.FullName == concrateType);
+                            // TODO: ML
+                            throw new FatalException("Nem található a feltételnek megfelelő dll az alakalmazás könyvtárában!", null
+                                                        , new KeyValuePair<string, string>("Application directory", appDir)
+                                                        , new KeyValuePair<string, string>("AssemblyPattern", assemblyPattern)
+                                                        );
                         }
-                        if (!String.IsNullOrEmpty(version))
+                        foreach (FileInfo file in files)
                         {
-                            addThis = addThis && FileVersionInfo.GetVersionInfo(assembly.Location).ProductVersion == version;
+                            Assembly assembly = Assembly.LoadFrom(file.FullName);
+                            bool addThis = true;
+                            if (!string.IsNullOrEmpty(concrateType))
+                            {
+                                addThis = assembly.ExportedTypes.Any(x => x.Name == concrateType || x.FullName == concrateType);
+                            }
+                            if (!string.IsNullOrEmpty(version))
+                            {
+                                addThis = addThis && FileVersionInfo.GetVersionInfo(assembly.Location).ProductVersion == version;
+                            }
+                            if (addThis)
+                            {
+                                catalog.Catalogs.Add(new AssemblyCatalog(file.FullName));
+                            }
                         }
-                        if (addThis)
+                        _container = new CompositionContainer(catalog, CompositionOptions.DisableSilentRejection | CompositionOptions.IsThreadSafe);
+                        if (_container.Catalog.Count() == 0)
                         {
-                            catalog.Catalogs.Add(new AssemblyCatalog(file.FullName));
+                            // TODO: ML
+                            throw new FatalException("Nem található a feltételeknek megfellelő InstanceFactory plugin!", null
+                                                        , new KeyValuePair<string, string>("Application directory", appDir)
+                                                        , new KeyValuePair<string, string>("AssemblyPattern", assemblyPattern)
+                                                        , new KeyValuePair<string, string>("Conrate Type", concrateType)
+                                                        , new KeyValuePair<string, string>("Version", version)
+                                );
                         }
+                        _container.ComposeParts(this);
                     }
-                    _container = new CompositionContainer(catalog, CompositionOptions.DisableSilentRejection | CompositionOptions.IsThreadSafe);
-                    if (_container.Catalog.Count() == 0)
-                    {
-                        // TODO: ML
-                        throw new FatalException("Nem található a feltételeknek megfellelő InstanceFactory plugin!", null
-                                                    , new KeyValuePair<string, string>("Application directory", appDir)
-                                                    , new KeyValuePair<string, string>("AssemblyPattern", assemblyPattern)
-                                                    , new KeyValuePair<string, string>("Conrate Type", concrateType)
-                                                    , new KeyValuePair<string, string>("Version", version)
-                            );
-                    }
-                    _container.ComposeParts(this);
                 }
                 catch (FatalException ex)
                 {
                     LogThis("Fatal Exception oocured: Application contianer not work!", null, ex, LogLevel.Fatal);
-                    //throw ex;
                 }
                 catch (Exception ex)
                 {
@@ -704,10 +762,9 @@ namespace Vrh.ApplicationContainer
                                                     , new KeyValuePair<string, string>("Version", version)
                                         );
                     LogThis("Fatal Exception oocured: Application contianer not work!", null, fatalex, LogLevel.Fatal);
-                    //throw fatalex;
                 }
             }
-        }
+            }
 
         private List<PluginDefinition> GetAllPluginDefinition()
         {
@@ -725,7 +782,7 @@ namespace Vrh.ApplicationContainer
                             { "Version", plugin.Version },
                             { "Plugin directory", plugin.PluginDirectory },
                         };
-                        LogThis(String.Format("Configuration issue! Plugin {0} with this version {1} allready defined!", plugin.TypeName, plugin.Version), data, null, LogLevel.Information);
+                        LogThis($"Configuration issue! Plugin {plugin.TypeName} with this version {plugin.Version} allready defined!", data, null, LogLevel.Information);
                         continue;
                     }
                     data = new Dictionary<string, string>()
@@ -737,9 +794,9 @@ namespace Vrh.ApplicationContainer
                         { "Auto start", plugin.AutoStart.ToString() },
                         { "Singletone", plugin.Singletone.ToString() },
                     };
-                    LogThis(String.Format("Plugin found: {0}", plugin.TypeName), data, null, LogLevel.Information);
+                    LogThis($"Plugin found: {plugin.TypeName}", data, null, LogLevel.Information);
                     string pluginAssembly;
-                    if (String.IsNullOrEmpty(plugin.PluginDirectory) || plugin.PluginDirectory.Substring(0, 1) != "@") // If start with @ sign: the name included path
+                    if (string.IsNullOrEmpty(plugin.PluginDirectory) || plugin.PluginDirectory.Substring(0, 1) != "@") // If start with @ sign: the name included path
                     {
                         pluginAssembly = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + Path.DirectorySeparatorChar + plugin.PluginDirectory;
                     }
@@ -748,74 +805,76 @@ namespace Vrh.ApplicationContainer
                         pluginAssembly = plugin.PluginDirectory.TrimStart('@');
                     }
                     pluginAssembly = pluginAssembly + Path.DirectorySeparatorChar + plugin.Assembly;
-                    DirectoryInfo dir = new DirectoryInfo(Path.GetDirectoryName(pluginAssembly));
+                    var dir = new DirectoryInfo(Path.GetDirectoryName(pluginAssembly));
                     if (!dir.Exists)
                     {
                         data = new Dictionary<string, string>()
                     {
                         { "Defined plugin directory", Path.GetDirectoryName(pluginAssembly) },
                     };
-                        LogThis(String.Format("{0} type plugins not loaded!", plugin.TypeName), data, new Exception("Defined plugin directory not found!"), LogLevel.Fatal);
+                        LogThis($"{plugin.TypeName} type plugins not loaded!", data, new Exception("Defined plugin directory not found!"), LogLevel.Fatal);
                         continue;
                     }
                     else
                     {
                         FileInfo[] files = dir.GetFiles(Path.GetFileName(pluginAssembly));
-                        AggregateCatalog catalog = new AggregateCatalog();
-                        if (files.Count() == 0)
+                        using (AggregateCatalog catalog = new AggregateCatalog())
                         {
-                            data = new Dictionary<string, string>()
+                            if (files.Count() == 0)
+                            {
+                                data = new Dictionary<string, string>()
                             {
                                 { "Assembly full path", pluginAssembly },
                             };
-                            LogThis(String.Format("{0} type plugins not loaded!", plugin.TypeName), data, new Exception("Plugin assembly is not exists!"), LogLevel.Fatal);
-                            continue;
-                        }
-                        else
-                        {
-                            var file = files.FirstOrDefault();
-                            Assembly assembly = Assembly.LoadFrom(file.FullName);
-                            Type pluginType = assembly.GetType(plugin.TypeName);
-                            plugin.Type = pluginType;
-                            if (pluginType == null)
-                            {
-                                data = new Dictionary<string, string>()
-                                {
-                                    { "Assembly full path", pluginAssembly },
-                                    { "Specified type", plugin.TypeName },
-                                };
-                                LogThis(String.Format("{0} type plugins not loaded!", plugin.TypeName), data, new Exception("Plugin assembly is not contains the specified type!"), LogLevel.Fatal);
+                                LogThis($"{plugin.TypeName} type plugins not loaded!", data, new Exception("Plugin assembly is not exists!"), LogLevel.Fatal);
                                 continue;
                             }
                             else
                             {
-                                if (FileVersionInfo.GetVersionInfo(assembly.Location).ProductVersion != plugin.Version)
+                                var file = files.FirstOrDefault();
+                                Assembly assembly = Assembly.LoadFrom(file.FullName);
+                                Type pluginType = assembly.GetType(plugin.TypeName);
+                                plugin.Type = pluginType;
+                                if (pluginType == null)
                                 {
                                     data = new Dictionary<string, string>()
+                                {
+                                    { "Assembly full path", pluginAssembly },
+                                    { "Specified type", plugin.TypeName },
+                                };
+                                    LogThis($"{plugin.TypeName} type plugins not loaded!", data, new Exception("Plugin assembly is not contains the specified type!"), LogLevel.Fatal);
+                                    continue;
+                                }
+                                else
+                                {
+                                    if (FileVersionInfo.GetVersionInfo(assembly.Location).ProductVersion != plugin.Version)
+                                    {
+                                        data = new Dictionary<string, string>()
                                     {
                                         { "Assembly full path", pluginAssembly },
                                         { "Specified version", plugin.Version },
                                         { "Assembly version", FileVersionInfo.GetVersionInfo(assembly.Location).ProductVersion },
                                     };
-                                    LogThis(String.Format("{0} type plugins not loaded!", plugin.TypeName), data, new Exception("Wrong Plugin version!"), LogLevel.Fatal);
-                                    continue;
-                                }
-                                else
-                                {
-                                    Type pluginInterface = pluginType.GetInterface(typeof(IPlugin).Name);
-                                    if (pluginInterface == null)
-                                    {
-                                        data = new Dictionary<string, string>()
-                                    {
-                                        { "Assembly full path", pluginAssembly },
-                                        { "Specified type", plugin.TypeName },
-                                    };
-                                        LogThis(String.Format("{0} type plugins not loaded!", plugin.TypeName), data, new Exception("Type is not implement the IPlugin interface!"), LogLevel.Fatal);
+                                        LogThis($"{plugin.TypeName} type plugins not loaded!", data, new Exception("Wrong Plugin version!"), LogLevel.Fatal);
                                         continue;
                                     }
                                     else
                                     {
-                                        plugins.Add(plugin);
+                                        Type pluginInterface = pluginType.GetInterface(typeof(IPlugin).Name);
+                                        if (pluginInterface == null)
+                                        {
+                                            data = new Dictionary<string, string>()
+                                    {
+                                        { "Assembly full path", pluginAssembly },
+                                        { "Specified type", plugin.TypeName },
+                                    };
+                                            LogThis($"{plugin.TypeName} type plugins not loaded!", data, new Exception("Type is not implement the IPlugin interface!"), LogLevel.Fatal);
+                                            continue;
+                                        }
+                                        else
+                                        {
+                                            plugins.Add(plugin);
+                                        }
                                     }
                                 }
                             }
@@ -826,6 +885,11 @@ namespace Vrh.ApplicationContainer
             return plugins;
         }
 
+        /// <summary>
+        /// Felszedi a plugin definicióhoz tartozó összes példány definiciót
+        /// </summary>
+        /// <param name="plugin">plugin típus leíró</param>
+        /// <returns>a plugin  típus alá tartozó példányok listája</returns>
         public IEnumerable<InstanceDefinition> GetAllDefinedInstances(PluginDefinition plugin)
         {
             IEnumerable<InstanceDefinition> instances;
@@ -857,14 +921,18 @@ namespace Vrh.ApplicationContainer
             }
             else
             {
-                InstanceDefinition instance = new InstanceDefinition();
-                instance.Id = "Singletone";
-                instance.Name = String.Format("Singletone instance of {0}", plugin.TypeName);
-                instance.Description = String.Format("Singletone instance of {0}, version: {1}", plugin.TypeName, plugin.Version);
-                instance.InstanceConfig = String.Empty;
-                instance.Type = plugin;
-                List<InstanceDefinition> instanceList = new List<InstanceDefinition>();
-                instanceList.Add(instance);
+                InstanceDefinition instance = new InstanceDefinition
+                {
+                    Id = "Singletone",
+                    Name = $"Singletone instance of {plugin.TypeName}",
+                    Description = $"Singletone instance of {plugin.TypeName}, version: {plugin.Version}",
+                    InstanceConfig = string.Empty,
+                    Type = plugin
+                };
+                var instanceList = new List<InstanceDefinition>
+                {
+                    instance
+                };
                 instances = instanceList;
             }
             foreach (var instance in instances)
@@ -893,7 +961,7 @@ namespace Vrh.ApplicationContainer
                             { "Instance level config", instance.InstanceConfig },
                             { "Instance data", instance.InstanceData?.ToString() }
                         };
-                    LogThis(String.Format("Instance allready exists: {0}", instance.Id), data, null, LogLevel.Error);
+                    LogThis($"Instance allready exists: {instance.Id}", data, null, LogLevel.Error);
                     return;
                 }
                 data = new Dictionary<string, string>()
@@ -903,11 +971,11 @@ namespace Vrh.ApplicationContainer
                             { "Instance level config", instance.InstanceConfig },
                             { "Instance data", instance.InstanceData?.ToString() }
                         };
-                LogThis(String.Format("Instance found: {0}", instance.Id), data, null, LogLevel.Information);
+                LogThis($"Instance found: {instance.Id}", data, null, LogLevel.Information);
                 string factory = instance.Type.FactoryMethodName;
-                if (String.IsNullOrEmpty(factory))
+                if (string.IsNullOrEmpty(factory))
                 {
-                    factory = String.Format("{0}Factory", instance.Type.Type.Name);
+                    factory = $"{instance.Type.Type.Name}Factory";
                 }
                 MethodInfo factoryMethod = instance.Type.Type.GetMethod(factory, BindingFlags.Public | BindingFlags.Static);
                 IPlugin pluginInstance = null;
@@ -915,12 +983,11 @@ namespace Vrh.ApplicationContainer
                 {
                     if (factoryMethod != null)
                     {
-                        Object[] parameters = new Object[] { (Object)instance, (Object)instance.InstanceData };
+                        object[] parameters = new object[] { (object)instance, (object)instance.InstanceData };
                         DateTime loadStart = DateTime.UtcNow;
                         pluginInstance = (IPlugin)factoryMethod.Invoke(null, parameters);
                         instance.LastKnownLoadTimeStamp = loadStart;
                         instance.LastKnownLoadTimeCost = DateTime.UtcNow.Subtract(loadStart).TotalSeconds;
-
                     }
                     else
                     {
@@ -931,7 +998,7 @@ namespace Vrh.ApplicationContainer
                                                     { "Instance id", instance.Id },
                                                     { "Specified Factory", factory },
                                                 };
-                        LogThis(String.Format("Specified factory ({0}) not found! Try use parameterles public constructor.", factory),
+                        LogThis($"Specified factory ({factory}) not found! Try use parameterles public constructor.",
                             data, null, LogLevel.Warning);
                         var constructors = instance.Type.Type.GetConstructors(BindingFlags.Instance | BindingFlags.Public);
                         var pars = constructors[0].GetParameters();
@@ -951,7 +1018,7 @@ namespace Vrh.ApplicationContainer
                                                     { "Plugin version", instance.Type.Version },
                                                     { "Instance id", instance.Id },
                                                 };
-                            LogThis(String.Format("Constructor not found! Plugin instance not created!", factory), data, null, LogLevel.Error);
+                            LogThis($"Constructor not found! Plugin instance not created! (Factory: {factory})", data, null, LogLevel.Error);
                         }
                     }
                 }
@@ -964,8 +1031,7 @@ namespace Vrh.ApplicationContainer
                                                     { "Instance id", instance.Id },
                                                     { "Used factory", factoryMethod != null ? factoryMethod.Name : "Constructor" }
                                                 };
-                    LogThis(String.Format("{0} type plugin not loaded! Error in Plugin instantiation with {1}!", instance.Type.TypeName, factoryMethod != null ? factoryMethod.Name : "Constructor"),
-                        data, ex, LogLevel.Fatal);
+                    LogThis($"Plugin not loaded! Error in Plugin instantiation!", data, ex, LogLevel.Fatal);
                 }
                 if (pluginInstance != null)
                 {
@@ -974,9 +1040,9 @@ namespace Vrh.ApplicationContainer
                                                     { "Plugin type", instance.Type.TypeName },
                                                     { "Plugin version", instance.Type.Version },
                                                     { "Instance id", instance.Id },
+                                                    { "Factory methode", factoryMethod != null ? factoryMethod.Name : "Constructor" }, 
                                                 };
-                    LogThis(String.Format("Plugin instance loaded!", instance.Type.TypeName, factoryMethod != null ? factoryMethod.Name : "Constructor"),
-                        data, null, LogLevel.Information);
+                    LogThis("Plugin instance loaded!", data, null, LogLevel.Information);
                     _pluginContainer.Add(instance, pluginInstance);
                     pluginInstance.WhoAmI = instance;
                     pluginInstance.PluginStatusChanged += PluginInstance_PluginStatusChanged;
@@ -1034,12 +1100,12 @@ namespace Vrh.ApplicationContainer
                             { "BaseAddresses", sb.ToString() },
                             { "State", _service.State.ToString() },
                         };
-                    LogThis(String.Format("Application service host started and opened!"), data, null, LogLevel.Information);
+                    LogThis("Application service host started and opened!", data, null, LogLevel.Information);
                 }
             }
             catch (Exception ex)
             {
-                LogThis(String.Format("Error occured in start Application host service!"), null, ex, LogLevel.Error);
+                LogThis("Error occured in start Application host service!", null, ex, LogLevel.Error);
             }
         }
 
@@ -1055,7 +1121,7 @@ namespace Vrh.ApplicationContainer
             }
             catch (Exception ex)
             {
-                LogThis(String.Format("Error occured in stop Application host service!"), null, ex, LogLevel.Error);
+                LogThis("Error occured in stop Application host service!", null, ex, LogLevel.Error);
             }
         }
 
@@ -1137,51 +1203,67 @@ namespace Vrh.ApplicationContainer
 
 #pragma warning disable 0649
         [Import]
-        private IInstanceFactory _usedInstanceFactory;
+        private readonly IInstanceFactory _usedInstanceFactory;
 #pragma warning restore 0649
 
         private CompositionContainer _container;
 
-        private ApplicationContainerConfig _config;
+        private readonly ApplicationContainerConfig _config;
 
-        private Dictionary<InstanceDefinition, IPlugin> _pluginContainer = new Dictionary<InstanceDefinition, IPlugin>();
+        private readonly Dictionary<InstanceDefinition, IPlugin> _pluginContainer = new Dictionary<InstanceDefinition, IPlugin>();
 
-        private List<PluginDefinition> _loadedPluginDefinitions = new List<PluginDefinition>();
+        private readonly List<PluginDefinition> _loadedPluginDefinitions = new List<PluginDefinition>();
 
+#pragma warning disable IDE0069 // Disposable fields should be disposed: This is a mistaken Warning. This is sisposed across multiple methathesis... 
         private ServiceHost _service;
+#pragma warning restore IDE0069 // Disposable fields should be disposed
 
-        private ApplicationContainerService _wcfServiceInstance = new ApplicationContainerService();
+        private readonly ApplicationContainerService _wcfServiceInstance = new ApplicationContainerService();
 
-        private Object _instanceLocker = new Object();
+        private readonly object _instanceLocker = new object();
 
-        private DateTime _startupTimeStamp;
+        private readonly DateTime _startupTimeStamp;
 
         private TimeSpan _lastStartupCost;
 
         /// <summary>
         /// Verem az utolsó X db hibával kapcsolatos információ tárolására
         /// </summary>
-        private FixStack<MessageStackEntry> _errorStack = new FixStack<MessageStackEntry>();
+        private readonly FixStack<MessageStackEntry> _errorStack = new FixStack<MessageStackEntry>();
 
         /// <summary>
         /// Verem az utolsó X db működéssel kapcsolatos információ tárolására
         /// </summary>
-        private FixStack<MessageStackEntry> _infoStack = new FixStack<MessageStackEntry>();
+        private readonly FixStack<MessageStackEntry> _infoStack = new FixStack<MessageStackEntry>();
 
         /// <summary>
         /// Modul azonosító
         /// </summary>
         internal const string MODULEPREFIX = "Vrh.ApplicationContainer";
+        
+        /// <summary>
+        /// A hazsnált config fájlt definiáló app settings elem neve
+        /// </summary>
         internal const string CONFIGURATIONFILE_ELEMENT_NAME = "ConfigurationFile";
-        public static string GetApplicationConfigName(string key)
+        
+        /// <summary>
+        /// Visszadja az application config kulcs nevet (modul prefix + kulcs)
+        /// </summary>
+        /// <param name="key">beállítás kulcs</param>
+        /// <returns>erős név kulcs</returns>
+        internal static string GetApplicationConfigName(string key)
         {
-            return String.Format("{0}:{1}", ApplicationContainer.MODULEPREFIX, key);
+            return $"{ApplicationContainer.MODULEPREFIX}:{key}";           
         }
 
 
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 
+        /// <summary>
+        /// Dispose implementáció
+        /// </summary>
+        /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
@@ -1192,8 +1274,7 @@ namespace Vrh.ApplicationContainer
                     // TODO: dispose managed state (managed objects).
                     if (_config != null)
                     {
-                        // Ez az esemény nem létezik az XmlProcessing alatti LinqXmlProcessorBase osztályban
-                        // _config.ConfigProcessorEvent -= _config_ConfigProcessorEvent;
+                        _config.ConfigProcessorEvent -= Config_ConfigProcessorEvent;
                         _config.Dispose();
                     }
                     var pluginItem = _pluginContainer.FirstOrDefault();
@@ -1205,6 +1286,7 @@ namespace Vrh.ApplicationContainer
                             pluginItem = _pluginContainer.FirstOrDefault();
                         }
                     }
+                    _container?.Dispose();                   
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
@@ -1220,7 +1302,10 @@ namespace Vrh.ApplicationContainer
         //   Dispose(false);
         // }
 
-        // This code added to correctly implement the disposable pattern.
+
+        /// <summary>
+        /// This code added to correctly implement the disposable pattern.
+        /// </summary>
         public void Dispose()
         {
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.

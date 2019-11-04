@@ -249,6 +249,9 @@ Minden ApplicationContainer plugin kötelezően a PluginAncestor leszármazott, 
 <hr></hr>
 
 # Version History:
+## 3.0.3 (2019.10.31)
+1. Sok inkompatibilis változtatás a felhasznált saját Nuget elemek inkompatibilis megváltoztatása miatt
+
 ## 1.1.2 (2018.12.03)
 ### Patches: 
 1. Dokumentáció kiegészítése az 1.1.0-ban létrehozott váltzozásokhoz

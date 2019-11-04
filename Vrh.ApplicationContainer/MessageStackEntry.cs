@@ -41,15 +41,30 @@ namespace Vrh.ApplicationContainer
     [DataContract]
     public enum Level
     {
+        /// <summary>
+        /// Ismeretlen / nem besorolt
+        /// </summary>
         [EnumMember]
         Unknown = 0,
+        /// <summary>
+        /// Végzetes (működést gátoló) hiba
+        /// </summary>
         [EnumMember]
         FatalError = 1,
-        [EnumMember]
+        /// <summary>
+        /// Hiba
+        /// </summary>
+        [EnumMember]      
         Error = 2,
+        /// <summary>
+        /// Figyelmeztetés
+        /// </summary>
         [EnumMember]
         Warning = 3,
-        [EnumMember]
+        /// <summary>
+        /// Információ
+        /// </summary>
+        [EnumMember]      
         Info = 4,
     }
 }
