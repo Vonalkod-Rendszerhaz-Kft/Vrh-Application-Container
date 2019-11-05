@@ -249,6 +249,10 @@ Minden ApplicationContainer plugin kötelezően a PluginAncestor leszármazott, 
 <hr></hr>
 
 # Version History:
+## 3.0.4 (2019.11.05):
+### Patches:
+1. Kódtisztításnál hibásan readonly-ra állított field javítása (MEF Import, csak nem érti meg a Roslyn...)
+
 ## 3.0.3 (2019.10.31)
 1. Sok inkompatibilis változtatás a felhasznált saját Nuget elemek inkompatibilis megváltoztatása miatt
 

@@ -33,9 +33,11 @@ namespace Vrh.ApplicationContainer
         public ApplicationContainer(string[] args)
         {
             string inuseby = "TRUE";
-            string dummystring = CommandLine.GetCommandLineArgument(args, "-INUSEBY");
-            if (dummystring != null) { inuseby = dummystring.ToUpper(); }
-
+            string dummyString = CommandLine.GetCommandLineArgument(args, "-INUSEBY");
+            if (dummyString != null) 
+            { 
+                inuseby = dummyString.ToUpper(); 
+            }
             _startupTimeStamp = DateTime.UtcNow;
             _wcfServiceInstance.ApplicationContainerReference = this;
             string configFile = ConfigurationManager.AppSettings[GetApplicationConfigName(CONFIGURATIONFILE_ELEMENT_NAME)];
@@ -1203,7 +1205,9 @@ namespace Vrh.ApplicationContainer
 
 #pragma warning disable 0649
         [Import]
-        private readonly IInstanceFactory _usedInstanceFactory;
+#pragma warning disable IDE0044 // Add readonly modifier: This is a fake Warning 'cause DI over MEF!!!
+        private IInstanceFactory _usedInstanceFactory;
+#pragma warning restore IDE0044 // Add readonly modifier
 #pragma warning restore 0649
 
         private CompositionContainer _container;

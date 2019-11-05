@@ -39,17 +39,17 @@
 		<Reference Include="System.Data"/>
     <Reference Include="System.Net.Http"/>
     <Reference Include="System.Xml"/>
-    <Reference Include="Vrh.ApplicationContainer, Version=3.0.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.ApplicationContainer.3.0.3\lib\net451\Vrh.ApplicationContainer.dll</HintPath>
+    <Reference Include="Vrh.ApplicationContainer, Version=3.0.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.ApplicationContainer.3.0.4\lib\net451\Vrh.ApplicationContainer.dll</HintPath>
     </Reference>
     <Reference Include="Vrh.ApplicationContainer.ConsoleHost, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.ApplicationContainer.3.0.3\lib\net451\Vrh.ApplicationContainer.ConsoleHost.exe</HintPath>
+      <HintPath>..\packages\Vrh.ApplicationContainer.3.0.4\lib\net451\Vrh.ApplicationContainer.ConsoleHost.exe</HintPath>
     </Reference>
     <Reference Include="Vrh.ApplicationContainer.WindowsServiceHost, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.ApplicationContainer.3.0.3\lib\net451\Vrh.ApplicationContainer.WindowsServiceHost.exe</HintPath>
+      <HintPath>..\packages\Vrh.ApplicationContainer.3.0.4\lib\net451\Vrh.ApplicationContainer.WindowsServiceHost.exe</HintPath>
     </Reference>
     <Reference Include="InstanceFactory.FromXML, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.ApplicationContainer.3.0.3\lib\net451\InstanceFactory.FromXML.dll</HintPath>
+      <HintPath>..\packages\Vrh.ApplicationContainer.3.0.4\lib\net451\InstanceFactory.FromXML.dll</HintPath>
     </Reference>
     <Reference Include="VRH.Common, Version=2.10.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\VRH.Common.2.10.0\lib\net45\VRH.Common.dll</HintPath>

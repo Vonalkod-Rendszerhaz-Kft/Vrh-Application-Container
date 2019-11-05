@@ -11,8 +11,8 @@
     <description>$description$</description>
     <copyright>$copyright$</copyright>
     <releaseNotes>
-      v3.0.3 (2019.10.28):
-      - Fejlesztőkörnyezet működőképesség (custom VS projecttemplate) és nuget csomag frissítés utáni működőképesség visszaállítása
+      v3.0.4 (2019.11.05):
+      - Kódtisztításnál hibásan readonly-ra állított field javítása (MEF Import, csak nem érti meg a Roslyn...)
     </releaseNotes>
     <projectUrl>http://redmine.vonalkod.hu/projects/vrh-applicationcontainer</projectUrl>
     <iconUrl>http://nuget.vonalkod.hu/content/projectavatars/applicationcontainer.png</iconUrl>
