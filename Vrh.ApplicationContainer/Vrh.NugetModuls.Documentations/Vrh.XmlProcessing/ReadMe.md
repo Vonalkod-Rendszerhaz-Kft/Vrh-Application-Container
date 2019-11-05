@@ -75,15 +75,38 @@ ERR_PARSETOTYPE|"The '{0}' string is not {1} type! Place='{2}'"|Típus konvertá
 
 
 ## VariableDictionary
-Egy ```System.Collections.Generic.Dictionary<string,string>``` alapú osztály, 
-mely kiterjesztésre került abból a célból, hogy alkalmas legyen Név és Érték kulcspárok 
-tárolására, és azok behelyettesítésére egy megadott cél szövegben. 
-Az osztály példányosításakor szükséges megadni egy érvényes nyelvi kódot (LCID).
-A példányosításkor egyből létrejönnek a rendszer változók is a ...BACK változók
-kivételével, azok ugyanis behelyettesítéskor értékelődnek ki. A [rendszerváltozók](####A-rendszervaltozok) nevei
-a ```SystemVariableNames``` statikus osztályban érhetőek el. A behelyettesítéskor a változókat
-az osztály NameSeparator tulajdonság közé illesztve keresi. A NameSeparator tulajdonság 
-alapértelmezett értéke "@@", de átállítható, ha a környezetben más használatos. 
+Egy ```System.Collections.Generic.Dictionary<string,string>``` alapú osztály, mely kiterjesztésre került abból a célból, hogy alkalmas legyen Név és Érték 
+kulcspárok tárolására, és azok behelyettesítésére egy megadott cél szövegben. Az osztály létrehozható úgy , hogy tartalmazza a rendszerváltozókat.
+A [rendszerváltozók](####A-rendszervaltozok) nevei a ```SystemVariableNames``` statikus osztályban érhetőek el. Ha engedélyezve van, akkor
+példányosításkor egyből létrejönnek a rendszer változók is a ...BACK változók kivételével, azok ugyanis behelyettesítéskor értékelődnek ki, 
+nem is szerepelnek a szótárban. A ...BACK változók kiértékelése csak akkor következik be behelyettesítéskor, ha a rendszerváltozók engedélyezve vannak.
+Behelyettesítéskor a változókat az osztály NameSeparator tulajdonság közé illesztve keresi. A NameSeparator tulajdonság 
+alapértelmezett értéke "@@", de átállítható, ha a környezetben más használatos.
+
+#### Konstruktorok
+##### ```new VariableDictionary()```
+E konstruktor hatására egy olyan példány jön létre, mely a változónevek tekintetében betűérzékeny, nem tartalmazza a rendszerváltozókat, és az alapértelmezett
+("@@") névelválasztó állítódik be.
+
+##### ```new VariableDictionary(string lcid, string userName)```
+E konstruktor hatására egy olyan példány jön létre, mely a változónevek tekintetében betűérzékeny, tartalmazza a rendszerváltozókat, és az alapértelmezett
+("@@") névelválasztó állítódik be. A két paraméter az LCID és USERNAME rendszerváltozók értékét állítja be. Az ```lcid``` paraméter kötelező, 
+és érvényes nyelvi kódnak kell lennie.
+
+##### ```new VariableDictionary(VariableDictionary.Configuration configuration)```
+E konstruktor esetén a  ```configuration``` paraméterben található tulajdonságok határozzák meg az osztály illetve a konstruktor viselkedését.
+###### Variable.Configuration osztály
+Tulajdonság|Típus|Leírás
+:----|:----|:----
+IsCaseSensitive|```bool```|Ha true, akkor a kis és nagy betűk különbözőnek számítanak a változóneveknél. Alapértelmezett érték: true.
+IsIncludeSystemVariables|```bool```|Ha true, akkor a példányosításkor automatikusan létrejönnek a rendszerváltozók. Alapértelmezett érték: false.
+LCID|```string```|Ha ebben az osztályban az <c>IsIncludeSystemVariables</c> értéke igaz, akkor ez az érték inicializálja az "LCID" rendszerváltozót. Alapértelmezett érték: null.
+NameSeparator|```string```|A változónevek elválasztó jelei, mely felülírja  az alapértelmezett "@@" értéket. Alapértelmezett értéke: "@@"
+UserName|```string```|Ha ebben az osztályban az <c>IsIncludeSystemVariables</c> értéke igaz, akkor ez az érték inicializálja a "USERNAME" rendszerváltozót.
+
+Ha a rendszer változók létrehozása engedélyezett, akkor az LCID értékének érvényes nyelvi kódnak kell lennie, egyébként hiba keletkezik.
+
+#### Tulajdonságok és metódusok
 
 > A táblázatokban csak a ```System.Collections.Generic.Dictionary<string,string>```
 osztályt kiterjesztő elemeket mutatjuk be.
@@ -92,6 +115,8 @@ Tulajdonságok|Leírás
 :----|:----
 CurentCultureInfo|Az LCID változó beállításakor kap értéket. Csak olvasható.
 NameSeparator|A változó neveket e separátorok közé illesztve keresi a szövegben.
+IsCaseSensitive|A változónevek kis/nagybetű érzékenyek, vagy sem.Csak konstruktoron keresztül állítható, egyébként olvasható.
+IncludeSystemVariables|Felismeri-e a rendszer változók neveit, vagy sem.Csak konstruktoron keresztül állítható, egyébként olvasható.
 
 Ha a NameSeparator hossza 1, akkor a változót keretező kezdő és befejező karakter azonos, egyébként a 
 2. karakter lesz a befejező jel. Alapértelmezett értéke "@@". Amennyiben szükség van egy alternatív
@@ -749,12 +774,14 @@ Ha hibaérzékenység nem, de például logolás szükséges, akkor ezt a Config
 ***
 ## Version History:
 
-### 1.5.8 (2019.10.25)
-#### Patches:
-1. Lemaradt Install.ps1 script pótlása a Nuget csomagban
+### 1.6.0 (2019.10.30) Compatible changes:
+- VariableDictionary osztályban alapértelmezett (paraméter nélküli) konstruktor bevezetése. Az osztály betűérzékeny lesz, rendszerváltozók nélkül, az alapértelmezett "@@" név szeparátorral.
+- VariableDictionary osztályban új konstruktor bevezetése, mely a beépített Configuration osztályt várja paraméternek, mely meghatározza a betűérzékenységet, rendszerváltozók létrejöttét, a név elválasztót, és két rendszerváltozó (LCID,USERNAME) értékét.
 
-### 1.5.7 (2019.10.25)
-#### Patches:
+### 1.5.8 (2019.10.25) Patches:
+- Lemaradt Install.ps1 script pótlása a Nuget csomagban
+
+### 1.5.7 (2019.10.25) Patches:
 - A nuget csomag telepítéskor elkészíti azt a minimális konfigurációt, ami a telepítés helyén való instant működőképességhez szükséges. (**Minden Nuget csomagnak ez lenne a célja a belézárt komponenst illetően: A telepítés teljes automatizálása, ami azonnali használatbavételt tesz lehetővé a telepítés helyén a komponens mélyebb ismerete (pl. konfigurálás módja) nélkül!**)
 
 #### 1.5.6 (2019.10.01) Patches:

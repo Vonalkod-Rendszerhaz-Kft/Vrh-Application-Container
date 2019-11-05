@@ -2,6 +2,6 @@
 <configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
   <appSettings xdt:Transform="InsertIfMissing">
     <add key="Vrh.ApplicationContainer:ConfigurationFile" value="file=~Plugins.Config.xml" xdt:Transform="InsertIfMissing" xdt:Locator="Match(key)"/>
-    <add key="Vrh.ApplicationContainer.InstanceFactory.FromXML:ConfigurationFile" value="file=~Plugins.Config.xml" xdt:Transform="InsertIfMissing" xdt:Locator="Match(key)"/>
+    <add key="Vrh.ApplicationContainer.InstanceFactory.FromXML:ConfigurationFile" value="file=~Plugins.Config.xml" xdt:Transform="InsertIfMissing" xdt:Locator="Match(key)"/>        
   </appSettings>
 </configuration>

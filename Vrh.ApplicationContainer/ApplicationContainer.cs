@@ -65,7 +65,8 @@ namespace Vrh.ApplicationContainer
                     }
                 }
             }
-            StartService();
+            string wcfbaseaddresslistconnectionstringName = ConfigurationManager.AppSettings[GetApplicationConfigName(WCFBASEADDRESS_ELEMENT_NAME)];
+            StartService(wcfbaseaddresslistconnectionstringName);
             _lastStartupCost = DateTime.UtcNow.Subtract(_startupTimeStamp);
             Dictionary<string, string> data = new Dictionary<string, string>()
                     {
@@ -1083,14 +1084,45 @@ namespace Vrh.ApplicationContainer
             }
         }
 
-        private void StartService()
+        /// <summary>
+        /// Elindítja a szolgáltatást
+        /// </summary>
+        /// <param name="wcfBaseAddressListConnectionStringName">egy connectionstring store elem neve</param>
+        private void StartService(string wcfBaseAddressListConnectionStringName)
         {
             try
             {
                 lock (_instanceLocker)
                 {
-                    StoptService();
-                    _service = new ServiceHost(_wcfServiceInstance);
+                    StopService();
+
+                    List<Uri> wcfbaseaddressList = new List<Uri>();
+                    if (!string.IsNullOrWhiteSpace(wcfBaseAddressListConnectionStringName))
+                    {
+                        string cs = "";
+                        try 
+                        { 
+                            cs = Vrh.XmlProcessing.ConnectionStringStore.GetWCFUri(wcfBaseAddressListConnectionStringName); 
+                        }
+                        catch
+                        { 
+                            cs = wcfBaseAddressListConnectionStringName; 
+                        }
+                        char[] csep = { ';',','};
+                        List<string> wcfbaseaddressstringList = cs.Split(csep, StringSplitOptions.RemoveEmptyEntries).ToList();
+                        foreach (var uristring in wcfbaseaddressstringList)
+                        {
+                            wcfbaseaddressList.Add(new Uri(uristring));
+                        }
+                    }
+                    if (wcfbaseaddressList.Count == 0)
+                    {
+                        _service = new ServiceHost(_wcfServiceInstance);
+                    }
+                    else
+                    {
+                        _service = new ServiceHost(_wcfServiceInstance, wcfbaseaddressList.ToArray());
+                    }
                     _service.Open();
                     StringBuilder sb = new StringBuilder();
                     foreach (var baseAddress in _service.BaseAddresses)
@@ -1111,7 +1143,7 @@ namespace Vrh.ApplicationContainer
             }
         }
 
-        private void StoptService()
+        private void StopService()
         {
             try
             {
@@ -1249,7 +1281,12 @@ namespace Vrh.ApplicationContainer
         /// A hazsnált config fájlt definiáló app settings elem neve
         /// </summary>
         internal const string CONFIGURATIONFILE_ELEMENT_NAME = "ConfigurationFile";
-        
+
+        /// <summary>
+        /// A WCF alapcímét definiáló appsettings kulcs
+        /// </summary>
+        internal const string WCFBASEADDRESS_ELEMENT_NAME = "WCFBaseAddressList";
+
         /// <summary>
         /// Visszadja az application config kulcs nevet (modul prefix + kulcs)
         /// </summary>
@@ -1274,7 +1311,7 @@ namespace Vrh.ApplicationContainer
             {
                 if (disposing)
                 {
-                    StoptService();
+                    StopService();
                     // TODO: dispose managed state (managed objects).
                     if (_config != null)
                     {

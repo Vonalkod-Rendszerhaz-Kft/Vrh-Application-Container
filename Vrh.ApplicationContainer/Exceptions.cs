@@ -17,19 +17,19 @@ namespace Vrh.ApplicationContainer
         /// <param name="message">hibaüzenet</param>
         /// <param name="innerException">belső exception</param>
         /// <param name="datas">kiegészítő adatok</param>
-        public FatalException(String message, Exception innerException = null, params KeyValuePair<string, string>[] datas)
-            : base(String.Format("{0}: {1}", fatalPrefix, message), innerException)
+        public FatalException(string message, Exception innerException = null, params KeyValuePair<string, string>[] datas)
+            : base($"{fatalPrefix}:{message}", innerException)
         {
             if (datas != null)
             {
                 foreach (var data in datas)
                 {
-                    this.Data.Add(data.Key, data.Value);
+                    Data.Add(data.Key, data.Value);
                 }
             }
         }
 
         // TODO: ML
-        static private string fatalPrefix = "Fatal error occured!";
+        private static readonly string fatalPrefix = "Fatal error occured!";
     }
 }

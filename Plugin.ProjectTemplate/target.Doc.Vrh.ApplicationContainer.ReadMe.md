@@ -249,6 +249,11 @@ Minden ApplicationContainer plugin kötelezően a PluginAncestor leszármazott, 
 <hr></hr>
 
 # Version History:
+
+## 3.1.0 (2019.11.05):
+### Compatibility API changes:
+1. Új WCF cím konfiguráció megadási lehetőség beépítése (konfiguráció: új appsettings kulcs lehetőség: WCFBaseAddressList)
+
 ## 3.0.4 (2019.11.05):
 ### Patches:
 1. Kódtisztításnál hibásan readonly-ra állított field javítása (MEF Import, csak nem érti meg a Roslyn...)
@@ -274,3 +279,4 @@ Initial release version
 
 ## 1.0.0-alpha (2017.02.21)
 Working prototype
+
