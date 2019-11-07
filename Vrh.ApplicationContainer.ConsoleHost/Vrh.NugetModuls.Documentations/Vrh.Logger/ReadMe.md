@@ -517,6 +517,11 @@ Az alábbi szabályok és elvek elvárások a Pluginnal szemben:
 <hr></hr>
 
 # Version History:
+## 2.0.3 (2019.11.06)
+### Patches:
+1. Webes környezetben való működésképtelenség (path felvételek miatt) hibamentessé tétele
+2. None a defult loglevel, ha config error van
+3. Nem ír Fatal logot sem, ha none a loglevel
 ## v2.0.2 (2019.11.04)
 ### Patches:
 1. Load error információk megjelenésének javítása (Error log txt-ben)
