@@ -32,6 +32,8 @@ namespace Vrh.ApplicationContainer
         /// <param name="args">indítási argumentumok</param>
         public ApplicationContainer(string[] args)
         {
+            _wcfServiceInstance = new ApplicationContainerService();
+            _wcfServiceInstance.ApplicationContainerReference = this;
             string inuseby = "TRUE";
             string dummyString = CommandLine.GetCommandLineArgument(args, "-INUSEBY");
             if (dummyString != null) 
@@ -39,7 +41,6 @@ namespace Vrh.ApplicationContainer
                 inuseby = dummyString.ToUpper(); 
             }
             _startupTimeStamp = DateTime.UtcNow;
-            _wcfServiceInstance.ApplicationContainerReference = this;
             string configFile = ConfigurationManager.AppSettings[GetApplicationConfigName(CONFIGURATIONFILE_ELEMENT_NAME)];
             if (string.IsNullOrEmpty(configFile))
             {
@@ -65,8 +66,8 @@ namespace Vrh.ApplicationContainer
                     }
                 }
             }
-            string wcfbaseaddresslistconnectionstringName = ConfigurationManager.AppSettings[GetApplicationConfigName(WCFBASEADDRESS_ELEMENT_NAME)];
-            StartService(wcfbaseaddresslistconnectionstringName);
+            //string wcfbaseaddresslistconnectionstringName = ConfigurationManager.AppSettings[GetApplicationConfigName(WCFBASEADDRESS_ELEMENT_NAME)];
+            StartService(_config.WCFHost(_wcfServiceInstance));
             _lastStartupCost = DateTime.UtcNow.Subtract(_startupTimeStamp);
             Dictionary<string, string> data = new Dictionary<string, string>()
                     {
@@ -1087,42 +1088,15 @@ namespace Vrh.ApplicationContainer
         /// <summary>
         /// Elindítja a szolgáltatást
         /// </summary>
-        /// <param name="wcfBaseAddressListConnectionStringName">egy connectionstring store elem neve</param>
-        private void StartService(string wcfBaseAddressListConnectionStringName)
+        /// <param name="wcfhostdescriptor">egy connectionstring store elem neve</param>
+        private void StartService(ConnectionStringStore.WCFHostDescriptor wcfhostdescriptor)
         {
             try
             {
                 lock (_instanceLocker)
                 {
                     StopService();
-
-                    List<Uri> wcfbaseaddressList = new List<Uri>();
-                    if (!string.IsNullOrWhiteSpace(wcfBaseAddressListConnectionStringName))
-                    {
-                        string cs = "";
-                        try 
-                        { 
-                            cs = Vrh.XmlProcessing.ConnectionStringStore.GetWCFUri(wcfBaseAddressListConnectionStringName); 
-                        }
-                        catch
-                        { 
-                            cs = wcfBaseAddressListConnectionStringName; 
-                        }
-                        char[] csep = { ';',','};
-                        List<string> wcfbaseaddressstringList = cs.Split(csep, StringSplitOptions.RemoveEmptyEntries).ToList();
-                        foreach (var uristring in wcfbaseaddressstringList)
-                        {
-                            wcfbaseaddressList.Add(new Uri(uristring));
-                        }
-                    }
-                    if (wcfbaseaddressList.Count == 0)
-                    {
-                        _service = new ServiceHost(_wcfServiceInstance);
-                    }
-                    else
-                    {
-                        _service = new ServiceHost(_wcfServiceInstance, wcfbaseaddressList.ToArray());
-                    }
+                    _service = wcfhostdescriptor.WcfHost;
                     _service.Open();
                     StringBuilder sb = new StringBuilder();
                     foreach (var baseAddress in _service.BaseAddresses)
@@ -1254,7 +1228,7 @@ namespace Vrh.ApplicationContainer
         private ServiceHost _service;
 #pragma warning restore IDE0069 // Disposable fields should be disposed
 
-        private readonly ApplicationContainerService _wcfServiceInstance = new ApplicationContainerService();
+        private readonly ApplicationContainerService _wcfServiceInstance;
 
         private readonly object _instanceLocker = new object();
 

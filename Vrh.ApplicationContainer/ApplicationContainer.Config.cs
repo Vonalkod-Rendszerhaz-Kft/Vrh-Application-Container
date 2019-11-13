@@ -1,10 +1,13 @@
 ﻿using System;
+using System.ServiceModel;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Xml;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Vrh.XmlProcessing;
+using System.Xml.Linq;
 
 namespace Vrh.ApplicationContainer
 {
@@ -104,9 +107,26 @@ namespace Vrh.ApplicationContainer
                 return GetElementValue<ushort>(GetXElement(CONFIG_ELEMENT_NAME, MESSAGESTACKSIZE_ELEMENT_NAME), 50);
             }
         }
+
+        #region WCFClientMode properties
+        /// <summary>
+        /// A definiált wcf végpontok paramétereit tartalmazza
+        /// </summary>
+        public ConnectionStringStore.WCFHostDescriptor WCFHost(ApplicationContainerService service)
+        {
+            if (m_WCFHost == null)
+            {
+                var wcfhostelement = GetXElement(CONFIG_ELEMENT_NAME, WCFSERVICE_ELEMENT_NAME);
+                m_WCFHost = ConnectionStringStore.GetWCFHost(service, wcfhostelement);
+            }
+            return m_WCFHost;
+        }
+        private ConnectionStringStore.WCFHostDescriptor m_WCFHost = null;
+        #endregion WCFClientMode properties
+
         #endregion
 
-        #region Defination of namming rules in XML
+        #region Definition of naming rules in XML
         // A szabályok:
         //  - Mindig konstansokat használj, hogy az element és az attribútum neveket azon át hivatkozd! 
         //  - Az elnevezések feleljenek meg a konstansokra vonatkozó elnevetési szabályoknak!
@@ -118,6 +138,7 @@ namespace Vrh.ApplicationContainer
         private const string INSTANCEFACTORYTYPE_ELEMENT_NAME = "InstanceFactoryType";
         private const string INSTANCEFACTORYVERSION_ELEMENT_NAME = "InstanceFactoryVersion";
         private const string MESSAGESTACKSIZE_ELEMENT_NAME = "MessageStackSize";
+        private const string WCFSERVICE_ELEMENT_NAME = "WCFService";
 
         #endregion
     }

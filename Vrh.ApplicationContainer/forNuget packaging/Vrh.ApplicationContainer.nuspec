@@ -11,9 +11,10 @@
     <description>$description$</description>
     <copyright>$copyright$</copyright>
     <releaseNotes>
-      v3.1.0 (2019.11.05):
+      v3.2.0 (2019.11.13):
       Compatibility API changes:
-      - Új WCF cím konfiguráció megadási lehetőség beépítése (konfiguráció: új appsettings kulcs lehetőség: WCFBaseAddressList)
+      - Új WCF cím konfiguráció megadási lehetőség beépítése, illetve az előző verzióban megalapozott fejlesztés átdolgozása és megerősítése
+      - Az XmlProcessing-be beépített WCFService xml elem és connectionstring kezelés használata
     </releaseNotes>
     <projectUrl>http://redmine.vonalkod.hu/projects/vrh-applicationcontainer</projectUrl>
     <iconUrl>http://nuget.vonalkod.hu/content/projectavatars/applicationcontainer.png</iconUrl>
