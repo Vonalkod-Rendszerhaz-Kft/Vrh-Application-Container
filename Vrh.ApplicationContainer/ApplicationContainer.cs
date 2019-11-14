@@ -41,7 +41,7 @@ namespace Vrh.ApplicationContainer
                 inuseby = dummyString.ToUpper(); 
             }
             _startupTimeStamp = DateTime.UtcNow;
-            string configFile = ConfigurationManager.AppSettings[GetApplicationConfigName(CONFIGURATIONFILE_ELEMENT_NAME)];
+            string configFile = ConfigurationManager.AppSettings[BuildApplicationConfigName(CONFIGURATIONFILE_ELEMENT_NAME)];
             if (string.IsNullOrEmpty(configFile))
             {
                 configFile = @"ApplicationContainer.Config.xml";
@@ -67,7 +67,7 @@ namespace Vrh.ApplicationContainer
                 }
             }
             //string wcfbaseaddresslistconnectionstringName = ConfigurationManager.AppSettings[GetApplicationConfigName(WCFBASEADDRESS_ELEMENT_NAME)];
-            StartService(_config.WCFHost(_wcfServiceInstance));
+            StartService();
             _lastStartupCost = DateTime.UtcNow.Subtract(_startupTimeStamp);
             Dictionary<string, string> data = new Dictionary<string, string>()
                     {
@@ -1089,13 +1089,16 @@ namespace Vrh.ApplicationContainer
         /// Elindítja a szolgáltatást
         /// </summary>
         /// <param name="wcfhostdescriptor">egy connectionstring store elem neve</param>
-        private void StartService(ConnectionStringStore.WCFHostDescriptor wcfhostdescriptor)
+        private void StartService()
         {
             try
             {
                 lock (_instanceLocker)
                 {
+                    WCF.HostDescriptor wcfhostdescriptor = _config.WCFHost;
+                    wcfhostdescriptor.InitService(_wcfServiceInstance);
                     StopService();
+                    //wcfhostdescriptor.InitService(;
                     _service = wcfhostdescriptor.WcfHost;
                     _service.Open();
                     StringBuilder sb = new StringBuilder();
@@ -1266,7 +1269,7 @@ namespace Vrh.ApplicationContainer
         /// </summary>
         /// <param name="key">beállítás kulcs</param>
         /// <returns>erős név kulcs</returns>
-        internal static string GetApplicationConfigName(string key)
+        internal static string BuildApplicationConfigName(string key)
         {
             return $"{ApplicationContainer.MODULEPREFIX}:{key}";           
         }

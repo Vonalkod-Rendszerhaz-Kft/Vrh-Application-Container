@@ -47,7 +47,7 @@ namespace Vrh.ApplicationContainer
         {
             get
             {
-                string value = ConfigurationManager.AppSettings[ApplicationContainer.GetApplicationConfigName(INSTANCEFACTORYASSEMBLY_ELEMENT_NAME)];
+                string value = ConfigurationManager.AppSettings[ApplicationContainer.BuildApplicationConfigName(INSTANCEFACTORYASSEMBLY_ELEMENT_NAME)];
                 if (string.IsNullOrEmpty(value))
                 {
                     value = GetElementValue(GetXElement(CONFIG_ELEMENT_NAME, INSTANCEFACTORYASSEMBLY_ELEMENT_NAME), string.Empty);
@@ -63,7 +63,7 @@ namespace Vrh.ApplicationContainer
         {
             get
             {
-                string value = ConfigurationManager.AppSettings[ApplicationContainer.GetApplicationConfigName(INSTANCEFACTORYTYPE_ELEMENT_NAME)];
+                string value = ConfigurationManager.AppSettings[ApplicationContainer.BuildApplicationConfigName(INSTANCEFACTORYTYPE_ELEMENT_NAME)];
                 if (string.IsNullOrEmpty(value))
                 {
                     value = GetElementValue(GetXElement(CONFIG_ELEMENT_NAME, INSTANCEFACTORYTYPE_ELEMENT_NAME), string.Empty);
@@ -79,7 +79,7 @@ namespace Vrh.ApplicationContainer
         {
             get
             {
-                string value = ConfigurationManager.AppSettings[ApplicationContainer.GetApplicationConfigName(INSTANCEFACTORYVERSION_ELEMENT_NAME)];
+                string value = ConfigurationManager.AppSettings[ApplicationContainer.BuildApplicationConfigName(INSTANCEFACTORYVERSION_ELEMENT_NAME)];
                 if (string.IsNullOrEmpty(value))
                 {
                     value = GetElementValue(GetXElement(CONFIG_ELEMENT_NAME, INSTANCEFACTORYVERSION_ELEMENT_NAME), string.Empty);
@@ -95,7 +95,7 @@ namespace Vrh.ApplicationContainer
         {
             get
             {
-                string strValue = ConfigurationManager.AppSettings[ApplicationContainer.GetApplicationConfigName(MESSAGESTACKSIZE_ELEMENT_NAME)];
+                string strValue = ConfigurationManager.AppSettings[ApplicationContainer.BuildApplicationConfigName(MESSAGESTACKSIZE_ELEMENT_NAME)];
                 if (!string.IsNullOrEmpty(strValue))
                 {
                     int intValue = GetValue<int>(strValue, -1);
@@ -112,16 +112,21 @@ namespace Vrh.ApplicationContainer
         /// <summary>
         /// A definiált wcf végpontok paramétereit tartalmazza
         /// </summary>
-        public ConnectionStringStore.WCFHostDescriptor WCFHost(ApplicationContainerService service)
+        public WCF.HostDescriptor WCFHost
         {
-            if (m_WCFHost == null)
+            get
             {
-                var wcfhostelement = GetXElement(CONFIG_ELEMENT_NAME, WCFSERVICE_ELEMENT_NAME);
-                m_WCFHost = ConnectionStringStore.GetWCFHost(service, wcfhostelement);
+                if (m_WCFHost == null)
+                {
+                    XElement wcfhostelement = null;
+                    string value = ConfigurationManager.AppSettings[ApplicationContainer.BuildApplicationConfigName(WCFSERVICE_ELEMENT_NAME)];
+                    if (!string.IsNullOrEmpty(value)) { m_WCFHost = (new WCF.HostDescriptor(value)); }
+                    else { m_WCFHost = (new WCF.HostDescriptor(GetXElement(CONFIG_ELEMENT_NAME, WCFSERVICE_ELEMENT_NAME))); }
+                }
+                return m_WCFHost;
             }
-            return m_WCFHost;
         }
-        private ConnectionStringStore.WCFHostDescriptor m_WCFHost = null;
+        private WCF.HostDescriptor m_WCFHost = null;
         #endregion WCFClientMode properties
 
         #endregion

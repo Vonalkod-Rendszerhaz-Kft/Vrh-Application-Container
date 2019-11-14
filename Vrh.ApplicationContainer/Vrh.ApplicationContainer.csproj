@@ -64,8 +64,8 @@
     <Reference Include="Vrh.Logger, Version=2.0.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Vrh.Logger.2.0.3\lib\net451\Vrh.Logger.dll</HintPath>
     </Reference>
-    <Reference Include="Vrh.XmlProcessing, Version=1.8.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.XmlProcessing.1.8.2\lib\net45\Vrh.XmlProcessing.dll</HintPath>
+    <Reference Include="Vrh.XmlProcessing, Version=1.9.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.XmlProcessing.1.9.1\lib\net45\Vrh.XmlProcessing.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
