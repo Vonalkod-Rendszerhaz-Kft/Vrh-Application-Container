@@ -47,7 +47,7 @@ namespace Vrh.ApplicationContainer
         {
             get
             {
-                string value = ConfigurationManager.AppSettings[ApplicationContainer.BuildApplicationConfigName(INSTANCEFACTORYASSEMBLY_ELEMENT_NAME)];
+                string value = ConfigurationManager.AppSettings[ApplicationContainer.MODULEPREFIX + INSTANCEFACTORYASSEMBLY_ELEMENT_NAME];
                 if (string.IsNullOrEmpty(value))
                 {
                     value = GetElementValue(GetXElement(CONFIG_ELEMENT_NAME, INSTANCEFACTORYASSEMBLY_ELEMENT_NAME), string.Empty);
@@ -63,7 +63,7 @@ namespace Vrh.ApplicationContainer
         {
             get
             {
-                string value = ConfigurationManager.AppSettings[ApplicationContainer.BuildApplicationConfigName(INSTANCEFACTORYTYPE_ELEMENT_NAME)];
+                string value = ConfigurationManager.AppSettings[ApplicationContainer.MODULEPREFIX+INSTANCEFACTORYTYPE_ELEMENT_NAME];
                 if (string.IsNullOrEmpty(value))
                 {
                     value = GetElementValue(GetXElement(CONFIG_ELEMENT_NAME, INSTANCEFACTORYTYPE_ELEMENT_NAME), string.Empty);
@@ -79,7 +79,7 @@ namespace Vrh.ApplicationContainer
         {
             get
             {
-                string value = ConfigurationManager.AppSettings[ApplicationContainer.BuildApplicationConfigName(INSTANCEFACTORYVERSION_ELEMENT_NAME)];
+                string value = ConfigurationManager.AppSettings[ApplicationContainer.MODULEPREFIX + INSTANCEFACTORYVERSION_ELEMENT_NAME];
                 if (string.IsNullOrEmpty(value))
                 {
                     value = GetElementValue(GetXElement(CONFIG_ELEMENT_NAME, INSTANCEFACTORYVERSION_ELEMENT_NAME), string.Empty);
@@ -95,10 +95,10 @@ namespace Vrh.ApplicationContainer
         {
             get
             {
-                string strValue = ConfigurationManager.AppSettings[ApplicationContainer.BuildApplicationConfigName(MESSAGESTACKSIZE_ELEMENT_NAME)];
-                if (!string.IsNullOrEmpty(strValue))
+                string Value = ConfigurationManager.AppSettings[ApplicationContainer.MODULEPREFIX + MESSAGESTACKSIZE_ELEMENT_NAME];
+                if (!string.IsNullOrEmpty(Value))
                 {
-                    int intValue = GetValue<int>(strValue, -1);
+                    int intValue = GetValue<int>(Value, -1);
                     if (intValue > 0)
                     {
                         return intValue > ushort.MaxValue ? ushort.MaxValue : (ushort)intValue;
@@ -119,7 +119,7 @@ namespace Vrh.ApplicationContainer
                 if (m_WCFHost == null)
                 {
                     XElement wcfhostelement = null;
-                    string value = ConfigurationManager.AppSettings[ApplicationContainer.BuildApplicationConfigName(WCFSERVICE_ELEMENT_NAME)];
+                    string value = ConfigurationManager.AppSettings[ApplicationContainer.MODULEPREFIX + WCFSERVICE_ELEMENT_NAME];
                     if (!string.IsNullOrEmpty(value)) { m_WCFHost = (new WCF.HostDescriptor(value)); }
                     else { m_WCFHost = (new WCF.HostDescriptor(GetXElement(CONFIG_ELEMENT_NAME, WCFSERVICE_ELEMENT_NAME))); }
                 }

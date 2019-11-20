@@ -41,7 +41,7 @@ namespace Vrh.ApplicationContainer
                 inuseby = dummyString.ToUpper(); 
             }
             _startupTimeStamp = DateTime.UtcNow;
-            string configFile = ConfigurationManager.AppSettings[BuildApplicationConfigName(CONFIGURATIONFILE_ELEMENT_NAME)];
+            string configFile = ConfigurationManager.AppSettings[ApplicationContainer.MODULEPREFIX + CONFIGURATIONFILE_ELEMENT_NAME];
             if (string.IsNullOrEmpty(configFile))
             {
                 configFile = @"ApplicationContainer.Config.xml";
@@ -1252,7 +1252,7 @@ namespace Vrh.ApplicationContainer
         /// <summary>
         /// Modul azonosító
         /// </summary>
-        internal const string MODULEPREFIX = "Vrh.ApplicationContainer";
+        internal const string MODULEPREFIX = "Vrh.ApplicationContainer:";
         
         /// <summary>
         /// A hazsnált config fájlt definiáló app settings elem neve
@@ -1263,17 +1263,6 @@ namespace Vrh.ApplicationContainer
         /// A WCF alapcímét definiáló appsettings kulcs
         /// </summary>
         internal const string WCFBASEADDRESS_ELEMENT_NAME = "WCFBaseAddressList";
-
-        /// <summary>
-        /// Visszadja az application config kulcs nevet (modul prefix + kulcs)
-        /// </summary>
-        /// <param name="key">beállítás kulcs</param>
-        /// <returns>erős név kulcs</returns>
-        internal static string BuildApplicationConfigName(string key)
-        {
-            return $"{ApplicationContainer.MODULEPREFIX}:{key}";           
-        }
-
 
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
