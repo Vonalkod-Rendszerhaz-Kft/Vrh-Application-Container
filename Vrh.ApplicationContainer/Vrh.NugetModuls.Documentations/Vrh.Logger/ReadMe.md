@@ -1,5 +1,5 @@
 ﻿# Vrh.Logger
-Ez a leírás a komponens **v1.4.0** kiadásáig bezáróan naprakész. (1.5.0 nincs benne)
+Ez a leírás a komponens **v2.1.0** kiadásáig bezáróan naprakész.
 Igényelt minimális framework verzió: **4.0**
 Teljes funkcionalitás és hatékonyság kihasználásához szükséges legalacsonyabb framework verzió: **4.5**
 ### A komponens arra szolgál, hogy egységes és egyszerű megvalósítása legyen a Logolásnak.
@@ -257,7 +257,7 @@ public static string BytesToHexBlock(byte[] data, bool header = true, bool foote
 ### Konfiguráció:
 A Vrh.Logger konfigurációjának megadásához kétféle módszert támogat:
 1. Vagy egy az alkalmazástér konfigurációjából vesz fel appSettings kulcsokat.
-2. Vagy egy XML fájlból olvassa ki a működési paramétereket.
+2. Vagy egy XML struktúrából olvassa ki a működési paramétereket.
  
 #### Config XML használata:
 Az alábbi XML-t érti meg, mint konfigurációt:
@@ -268,24 +268,25 @@ Az alábbi XML-t érti meg, mint konfigurációt:
   <EnableDebuggerLogging>True</EnableDebuggerLogging>
   <EnableFileLogging LogDirectory="Log" LogFile="Vrh.Logger.TxtLog.log">True</EnableFileLogging>
   <UsedLogger>DefaultLogger</UsedLogger>
+  <UsedLoggerConfig>tetszőleges xml szabványos tartalom</UsedLoggerConfig>
   <LoggerErrorLogDirectory>Log</LoggerErrorLogDirectory>
   <LoggerErrorLogFile>Vrh.Logger.Errors.log</LoggerErrorLogFile>
 </Vrh.Logger>
 ```
-Az XML-t alapesetben az alkalmazástér futási könyvtárában keresi LogConfig.xml néven.
+Az XML struktúrát az XmlProcessing modulon keresztül kapja meg. Alapértelmezett XmlParser connection string: **file=~LogConfig.xml**, azaz az alapértelmezett xml struktúrát az alkalmazás könyvtárában levő LogConfig.xml file tartalmazza.
+
 Ha ettől el akarunk térni, akkor erre két lehetőségünk van:
-1. Meghívjuk a felhasználás helyén, még az első Log hívás előtt, a Logger class LoadLoggerPlugin() metódusát, paraméternek pedig átadjuk a használandó XML fájlt specifikáló stringet.
-2. Az alklamazás standard (App.config, Web.config) konfigurációjában definiálunk egy Vrh.Logger:Config kulcsú appSettings kulcsot és az értékének a használandó XML fájlt specifikáló stringet adjuk.
+1. Meghívjuk a felhasználás helyén, még az első Log hívás előtt, a Logger class LoadLoggerPlugin() metódusát, paraméternek pedig átadjuk a használandó XmlParser connectionstring-et.
+2. Az alklamazás standard (App.config, Web.config) konfigurációjában definiálunk egy **Vrh.Logger:Config** kulcsú appSettings kulcsot és az értékének a használandó XmlParser connectionstring-et adjuk.
 ```xml
 <appSettings>      
-    <add key="Vrh.Logger:Config" value="LogConfig.xml/Vrh.Logger"/>
+    <add key="Vrh.Logger:Config" value="file=~LogConfig.xml;element=Vrh.Logger;"/>
 </appSettings>
 ```
-Mindkét esetben a "használandó XML fájlt specifikáló string"-re az alábbi szabályok vonatkoznak:
-* Ha a stringet @ karakterrel kezdjük, akkor ezzel azt jelezzük, hogy a fájl teljes elérési útját specifikáljuk. (*Pl.: "@D:\ApplicationDirectory\Config.XML"*)
-* Ha a string nem @ karakterrel kezdődik, akkor a beírt fájlnév az alaklamazás környezet könyvtárában van, vagy az attól értelmezett megadott relatív útvonalon. (*Pl.: LogConfigDir\Config.xml*)   
-* Az útvonalban a szokásos módon **\\** jellel választjuk el egymástól az elemeket. 
-* A definició kijelölhet egy XML tag útvonalat, amely azt adja meg, hogy az XML-en belül milyen tag-okon át jutunk el addig a tagig, amely ténylegesen tartalmazza a konfigurációt definiáló xml tag-eket. Ezeket a fájl név után attól is, és egymástól is **/** jellel kell elválasztani. Pl.: Config.xml\ComponentConfiguration\LoggerConfiguration egy ilyesmi XML-t dolgoz fel:
+A fenti példában az xml struktúrát az alkalmazás könyvtárában levő LogConfig.xml file gyökér eleme alatt található Vrh.Logger xml elem tartalmazza.
+
+A következő legyen az alkalmazás könyvtárában levő AppCfg.xml file szerkezete, amelyben a struktúra belsejében található LoggerConfiguration elem tartalmazza a Vrh.Logger paramétereit.
+Ennek a következő XmlParser connectionstring felel meg: **file=~Config.xml;element=ComponentConfiguration\LoggerConfiguration;**
 ```xml
 <ApplicationConfiguration>
     <ComponentConfiguration>
@@ -301,10 +302,22 @@ Mindkét esetben a "használandó XML fájlt specifikáló string"-re az alábbi
     </ComponentConfiguration>
 </ApplicationConfiguration>
 ```
+Ha a file csak a Vrh.Logger paramétereit tartalmazza, akkor pedig: **file=~Config.xml;**
+```xml
+<LoggerConfiguration>
+    <LogLevel>Warning</LogLevel>
+    <EnableConsoleLogging>True</EnableConsoleLogging>
+    <EnableDebuggerLogging>True</EnableDebuggerLogging>
+    <EnableFileLogging LogDirectory="Log" LogFile="Vrh.Logger.TxtLog.log">True</EnableFileLogging>
+    <UsedLogger>DefaultLogger</UsedLogger>
+    <LoggerErrorLogDirectory>Log</LoggerErrorLogDirectory>
+    <LoggerErrorLogFile>Vrh.Logger.Errors.log</LoggerErrorLogFile>
+</LoggerConfiguration>
+```
 * Megfigyelhetőek az alábbiak:
->* Az XML-en belüli megadásban a Root elemet nem definiáljuk, csak az azon belüli útvonalat. 
->* Ha nem adunk meg semmit akkor a beállítások tagjeit a root elem alatt keresi.
->* A root elem lenevezése tetszőleges lehet a configurációt tartalmazó XML-ben.
+>* Az element tagban a struktúrán belüli kijelölésben a Root elemet nem definiáljuk, csak az azon belüli útvonalat. 
+>* Ha nem adunk meg element tagot, akkor a beállítások tagjeit a root elem alatt keresi.
+>* A root elem elnevezése tetszőleges lehet a configurációt tartalmazó XML-ben.
 
 #### Szabvány app settings kulcsok használata:
 Ekkor a szabványos config állomáynban szabványos appSettings kulcsok megadásával specifikáljuk a fenti négy beállítást:
@@ -341,6 +354,8 @@ A fenti beállítások konkrét értelmezése:
 * **LogDirectory**: Ha a txt log file írás engedélyezve van, akkor az itt megadott könyvtárat használja a Log file célkönyvtáraként. Ha a könyvtár nem létezik, akkor létrehozza. Ha nincs megadva, akkor az alkalmazás futási könyvtárában keletkezik a fájl.
 * **LogFile**: Segítségével lehet definiálni, hogy a fent leírt text log fájlt milyen néven hozza létre a Vrh.Logger. Ha nincs megadva, akkor a fájl Vrh.Logger.TxtLog.log néven jön létre.
 * **UsedLogger**: Ha a Vrh.Logger működési környezetében több Logger plugin is található. Akkor ennek segítségével írhatjuk elő, hogy ezek közül melyiket használja  a konfiguráció logolásra. Ha ez a beállítás nincs jelen, akkor mindig azt a plugint használja maleiket először megtalál a működési környezetben. Így egyetlen plugin jelenléte esetén a beállítást nem szükséges megadni. Az értéknek  a használandó plugin pontos osztály nevét, vagy teljes (névterekkel együtt) osztálynevét kell megadni, ezt mindig az adott Plugin dokumentációjából derül ki.
+* **UsedLoggerConfig**: A UsedLogger elemben megadott plugin publikus "Init" metódusának XElement típusú paraméterében átadott xml elem, aminek beltartalmát teljes egészében a betöltött plugin dolgozza fel. **Ezt a paramétert nem lehet az appSettings elemeken keresztül átadni!**
+
 * **LoggerErrorLogDirectory**: Ha a Vrh.Logger működésében valami hiba lép fel, amely meggátolja a logolást, akkor egy saját text fájlba írja a hiba tényét, és az üzenet segítségével a hiba oka kideríthető. Magasabb logolási szinteken bejegyzéseket készít egyéb információkról is ide, a Logger indulásáról, leállásáról, a használt plugin betöltéséről. Ez a beállítás mondja, meg, hogy melyik könyvtárba kerüljön ez a txt Log. Ha nincs megadva, akkor az alkalmazás futási könyvtárában keletkezik a fájl. 
 * **LoggerErrorLogFile**: Segítségével lehet definiálni, hogy a fent leírt saját hiba text fájlt milyen néven hozza létre a Vrh.Logger. Ha nincs megadva, akkor a fájl Vrh.Logger.Errors.log néven jön létre.
 ## Információk Plugin fejlesztéshez
@@ -517,6 +532,14 @@ Az alábbi szabályok és elvek elvárások a Pluginnal szemben:
 <hr></hr>
 
 # Version History:
+## 2.1.0 (2019.11.14)
+### Compatibility API changes:
+1. A betöltendő logger modulnak a LogConfig xml struktúra UsedLoggerConfig xml elemét átadja paraméterként; ennek tartalmát csak a betöltött logger elemzi és használja;
+2. A fenti xml struktúrát a logger betöltése után annak "Init" nevű publikus metódusán keresztül adja át, amelynek egyetlen paramétere egy XElement típus.;
+3. Az "Init" metódus nem kötelező, ha nem létezik, akkor nem okoz hibát.
+4. Az iLoggerLogger kliens kiegészítésre került az "Init" metódussal, amelyben megkapja a WcfCliens xml struktúrát, ami alapján az XmlProcessing.WCF osztály eszközeivel inicializálja az iLogger szervizhez csatlakozó kliensét, így megadható a connectionstringstore-on keresztül az iLogger szerviz címe.
+5. Ha nincs UsedLoggerConfig vagy benne WCFClient elem, vagy abban nincsenek megadva adatok, akkor a működés a korábbiak szerinti.
+
 ## 2.0.3 (2019.11.06)
 ### Patches:
 1. Webes környezetben való működésképtelenség (path felvételek miatt) hibamentessé tétele
