@@ -61,8 +61,8 @@
     <Reference Include="VRH.Common, Version=2.10.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\VRH.Common.2.10.0\lib\net45\VRH.Common.dll</HintPath>
     </Reference>
-    <Reference Include="Vrh.Logger, Version=2.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.Logger.2.2.0\lib\net451\Vrh.Logger.dll</HintPath>
+    <Reference Include="Vrh.Logger, Version=2.3.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.Logger.2.3.1\lib\net451\Vrh.Logger.dll</HintPath>
     </Reference>
     <Reference Include="Vrh.XmlProcessing, Version=1.11.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Vrh.XmlProcessing.1.11.0\lib\net45\Vrh.XmlProcessing.dll</HintPath>
@@ -111,12 +111,12 @@
     <None Include="forNuget packaging\ApplicationContainer.Config.xml" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="LogConfig.xml">
+    <None Include="XmlParser.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="XmlParser.xml">
+    <None Include="LogConfig.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

@@ -1120,53 +1120,9 @@ namespace Vrh.ApplicationContainer
             }
         }
 
-        private void StopService()
-        {
-            try
-            {
-                if (_service != null)
-                {
-                    _service.Close();
-                    _service = null;
-                }
-            }
-            catch (Exception ex)
-            {
-                LogThis("Error occured in stop Application host service!", null, ex, LogLevel.Error);
-            }
-        }
-
-        private void GetPartInfo(ComposablePartCatalog catalog)
-        {
-            Console.WriteLine("No of parts: {0}", catalog.Count());
-            int i = 0;
-            foreach (var part in catalog)
-            {
-                //Console.WriteLine(JsonConvert.SerializeObject(part));
-                i++;
-                Console.WriteLine("Part {0}:", i);
-                Console.WriteLine("\tNo of Exports in this parts: {0}", part.ExportDefinitions.Count());
-
-                int j = 0;
-                foreach (var export in part.ExportDefinitions)
-                {
-                    j++;
-                    Console.WriteLine("\t\tExport {0}:", j);
-                    Console.WriteLine("\t\t{0}", (export.Metadata["ConcrateType"] as Type).FullName);
-                    Console.WriteLine("\t\t{0}", FileVersionInfo.GetVersionInfo((export.Metadata["ConcrateType"] as Type).Assembly.Location).ProductVersion);
-                    Console.WriteLine("\t\t{0}", (export.Metadata["ConcrateType"] as Type).Assembly.Location);
-                    Console.WriteLine("\t\t{0}", JsonConvert.SerializeObject(export));
-                    Console.WriteLine("\t\t{0}", Assembly.GetAssembly((export.Metadata["ConcrateType"] as Type)).CodeBase);
-
-                    //Console.WriteLine(Assembly.Load(export..ContractName).GetType());                    
-                    //Console.WriteLine(JsonConvert.SerializeObject(exp));
-                }
-            }
-        }
-
         private void LogThis(string message, Dictionary<string, string> data, Exception ex, LogLevel level, [CallerMemberName]string caller = "", [CallerLineNumber]int line = 0)
         {
-            VrhLogger.Log<string>(message, data, ex, level, this.GetType(), caller, line);
+            VrhLogger.LogNested<string>(message, data, ex, level, this.GetType(), caller, line, stacklevel: 2);
             MessageStackEntry e = new MessageStackEntry()
             {
                 Body = message,
@@ -1209,6 +1165,50 @@ namespace Vrh.ApplicationContainer
                     break;
                 default:
                     return;
+            }
+        }
+
+        private void StopService()
+        {
+            try
+            {
+                if (_service != null)
+                {
+                    _service.Close();
+                    _service = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogThis("Error occured in stop Application host service!", null, ex, LogLevel.Error);
+            }
+        }
+
+        private void GetPartInfo(ComposablePartCatalog catalog)
+        {
+            Console.WriteLine("No of parts: {0}", catalog.Count());
+            int i = 0;
+            foreach (var part in catalog)
+            {
+                //Console.WriteLine(JsonConvert.SerializeObject(part));
+                i++;
+                Console.WriteLine("Part {0}:", i);
+                Console.WriteLine("\tNo of Exports in this parts: {0}", part.ExportDefinitions.Count());
+
+                int j = 0;
+                foreach (var export in part.ExportDefinitions)
+                {
+                    j++;
+                    Console.WriteLine("\t\tExport {0}:", j);
+                    Console.WriteLine("\t\t{0}", (export.Metadata["ConcrateType"] as Type).FullName);
+                    Console.WriteLine("\t\t{0}", FileVersionInfo.GetVersionInfo((export.Metadata["ConcrateType"] as Type).Assembly.Location).ProductVersion);
+                    Console.WriteLine("\t\t{0}", (export.Metadata["ConcrateType"] as Type).Assembly.Location);
+                    Console.WriteLine("\t\t{0}", JsonConvert.SerializeObject(export));
+                    Console.WriteLine("\t\t{0}", Assembly.GetAssembly((export.Metadata["ConcrateType"] as Type)).CodeBase);
+
+                    //Console.WriteLine(Assembly.Load(export..ContractName).GetType());                    
+                    //Console.WriteLine(JsonConvert.SerializeObject(exp));
+                }
             }
         }
 
