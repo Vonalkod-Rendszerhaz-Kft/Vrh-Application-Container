@@ -150,7 +150,7 @@ namespace InstanceFactory.FromXML
         /// <param name="line">Hivási hely (forrássor)</param>
         private void LogThis(string message, Dictionary<string, string> data, Exception ex, LogLevel level, [CallerMemberName]string caller = "", [CallerLineNumber]int line = 0)
         {
-            VrhLogger.Log<string>(message, data, ex, level, this.GetType(), caller, line);
+            VrhLogger.LogNested<string>(message, data, ex, level, this.GetType(), caller, line,stacklevel:2);
             MessageStackEntry e = new MessageStackEntry()
             {
                 Body = message,

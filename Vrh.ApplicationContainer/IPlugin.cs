@@ -210,7 +210,7 @@ namespace Vrh.ApplicationContainer
                     data.Add(item.Key, item.Value);   
                 }    
             }
-            VrhLogger.Log<string>(message, data, ex, level, type ?? this.GetType(), caller, line);
+            VrhLogger.LogNested<string>(message, data, ex, level, type ?? this.GetType(), caller, line,stacklevel: 2);
             Dictionary<string, string> data2 = new Dictionary<string, string>();
             if (dataIn != null) 
             { 

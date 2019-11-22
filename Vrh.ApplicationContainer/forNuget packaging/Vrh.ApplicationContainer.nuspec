@@ -11,6 +11,8 @@
     <description>$description$</description>
     <copyright>$copyright$</copyright>
     <releaseNotes>
+      v3.3.2 (2019.11.22):
+      - InstanceFactoryXML és a PluginAncestor osztályokban levő LogThis metódusok javítása
       v3.3.1 (2019.11.20):
       v3.3.0 (2019.11.20):
       - LogThis metódusban a VrhLogger egy újabb paraméterének használata, ami értelmesebb log bejegyzéseket eredményez
