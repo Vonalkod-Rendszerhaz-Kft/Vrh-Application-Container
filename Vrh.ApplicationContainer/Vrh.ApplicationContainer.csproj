@@ -58,6 +58,9 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="Vrh.ApplicationContainer.Control.Contract, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.ApplicationContainer.Control.Contract.0.1.0\lib\net451\Vrh.ApplicationContainer.Control.Contract.dll</HintPath>
+    </Reference>
     <Reference Include="VRH.Common, Version=2.10.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\VRH.Common.2.10.0\lib\net45\VRH.Common.dll</HintPath>
     </Reference>
@@ -110,12 +113,6 @@
     <None Include="LogConfig.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Vrh.ApplicationContainer.Control.Contract\Vrh.ApplicationContainer.Control.Contract.csproj">
-      <Project>{ef540874-5714-4d58-b6f6-cc9b595f37bb}</Project>
-      <Name>Vrh.ApplicationContainer.Control.Contract</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="XmlParser.xml">

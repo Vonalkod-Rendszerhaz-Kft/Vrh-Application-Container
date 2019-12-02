@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>$title$</id>
+    <version>$version$</version>
+    <title></title>
+    <authors>Görcsös Zoltán</authors>
+    <owners>Vonalkód Rendszerház Kft.</owners>
+    <tags>VRH, Log4Pro™, Application Container™, High Avability, Microservice</tags>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <copyright>$copyright$</copyright>
+    <releaseNotes>
+      v0.1.0
+      - Compatibility pre-release
+        - Not included Contract definition for EventHub
+    </releaseNotes>
+    <projectUrl>http://redmine.vonalkod.hu/projects/vrh-applicationcontainer</projectUrl>
+    <iconUrl>http://nuget.vonalkod.hu/content/projectavatars/applicationcontainer.png</iconUrl>
+  </metadata>
+  <files>    
+  </files>
+</package>

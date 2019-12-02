@@ -249,6 +249,9 @@ Minden ApplicationContainer plugin kötelezően a PluginAncestor leszármazott, 
 <hr></hr>
 
 # Version History:
+## 4.0.1 (2019.12.02):
+### Patches:
+- Vrh.ApplicationContainer.Control.Contract v0.1.0 Nuget referencia hozzáadása
 
 ## 4.0.0 (2019.12.02):
 ### Projekt rendezése továbbfejlesztésre (solution mappák kialakítása, névterek auditja, contzract kiszervezése, az  EventHub beépítéshez)
@@ -289,3 +292,4 @@ Initial release version
 
 ## 1.0.0-alpha (2017.02.21)
 Working prototype
+

@@ -5,7 +5,7 @@
     <Description>A project for creating an ApplicationContainer Plugin</Description>
     <Icon>Plugin.ProjectTemplate.ico</Icon>
     <ProjectType>CSharp</ProjectType>
-    <RequiredFrameworkVersion>2.0</RequiredFrameworkVersion>
+    <RequiredFrameworkVersion>4.5</RequiredFrameworkVersion>
     <SortOrder>1000</SortOrder>
     <TemplateID>c68e492f-8f81-4754-843f-b1bd28dd9a64</TemplateID>
     <CreateNewFolder>true</CreateNewFolder>
@@ -34,7 +34,7 @@
     </Project>
   </TemplateContent>
   <WizardExtension>
-    <Assembly>Plugin.ProjectTemplate.Install, Version=1.0.0.0, Culture=Neutral, PublicKeyToken=353d4499111b7e11</Assembly>
+    <Assembly>Plugin.ProjectTemplate.Install, Version=4.0.0.0, Culture=Neutral, PublicKeyToken=353d4499111b7e11</Assembly>
     <FullClassName>Plugin.ProjectTemplate.Install.WizardImplementation</FullClassName>
   </WizardExtension>
 </VSTemplate>

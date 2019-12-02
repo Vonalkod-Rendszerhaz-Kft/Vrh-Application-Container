@@ -39,6 +39,9 @@
 		<Reference Include="System.Data"/>
     <Reference Include="System.Net.Http"/>
     <Reference Include="System.Xml"/>
+    <Reference Include="Vrh.ApplicationContainer.Control.Contract, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.ApplicationContainer.Control.Contract.0.1.0\lib\net451\Vrh.ApplicationContainer.Control.Contract.dll</HintPath>
+    </Reference>
     <Reference Include="Vrh.ApplicationContainer, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Vrh.ApplicationContainer.4.0.0\lib\net451\Vrh.ApplicationContainer.dll</HintPath>
     </Reference>
