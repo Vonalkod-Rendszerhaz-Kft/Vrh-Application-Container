@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
-using System.Linq;
-using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ServiceProcess;
 
 namespace Vrh.ApplicationContainer.WindowsServiceHost
 {
@@ -26,7 +18,7 @@ namespace Vrh.ApplicationContainer.WindowsServiceHost
                 _applicationContainer.Dispose();
                 _applicationContainer = null;
             }
-            _applicationContainer = new ApplicationContainer(args);
+            _applicationContainer = new Core.ApplicationContainer(args);
         }
 
         protected override void OnStop()
@@ -34,7 +26,7 @@ namespace Vrh.ApplicationContainer.WindowsServiceHost
             _applicationContainer.Dispose();    
         }
 
-        private ApplicationContainer _applicationContainer = null;
+        private Core.ApplicationContainer _applicationContainer = null;
         private string[] commandlinearguments;
     }
 }

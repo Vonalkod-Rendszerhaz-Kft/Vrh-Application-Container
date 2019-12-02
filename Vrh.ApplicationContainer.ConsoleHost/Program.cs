@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Vrh.ApplicationContainer;
+using Vrh.ApplicationContainer.Core;
 using Vrh.Logger;
 using System.Messaging;
 using System.IO;
@@ -27,10 +27,10 @@ namespace Vrh.ApplicationContainer.ConsoleHost
                 Console.WriteLine("Attach the debugger now if need and press a key here to continue...");
                 Console.ReadLine();
             }
-            ApplicationContainer appC = null;
+            Core.ApplicationContainer appC = null;
             try
             {
-                appC = new ApplicationContainer(args);
+                appC = new Core.ApplicationContainer(args);
             }
             catch (FatalException ex)
             {

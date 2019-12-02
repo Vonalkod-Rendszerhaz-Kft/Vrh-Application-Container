@@ -45,11 +45,11 @@
     <Reference Include="VRH.Common, Version=2.10.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\VRH.Common.2.10.0\lib\net45\VRH.Common.dll</HintPath>
     </Reference>
-    <Reference Include="Vrh.Logger, Version=2.3.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.Logger.2.3.1\lib\net451\Vrh.Logger.dll</HintPath>
+    <Reference Include="Vrh.Logger, Version=2.3.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.Logger.2.3.2\lib\net451\Vrh.Logger.dll</HintPath>
     </Reference>
-    <Reference Include="Vrh.XmlProcessing, Version=1.11.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.XmlProcessing.1.11.0\lib\net45\Vrh.XmlProcessing.dll</HintPath>
+    <Reference Include="Vrh.XmlProcessing, Version=1.12.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.XmlProcessing.1.12.0\lib\net45\Vrh.XmlProcessing.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -58,16 +58,20 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Vrh.ApplicationContainer.Control.Contract\Vrh.ApplicationContainer.Control.Contract.csproj">
+      <Project>{ef540874-5714-4d58-b6f6-cc9b595f37bb}</Project>
+      <Name>Vrh.ApplicationContainer.Control.Contract</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Vrh.ApplicationContainer\Vrh.ApplicationContainer.csproj">
       <Project>{0f167592-dcc8-4cf5-9737-6f0b86d0f76f}</Project>
       <Name>Vrh.ApplicationContainer</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Vrh.NugetModuls.Documentations\Vrh.Logger\ReadMe.md" />
     <None Include="XmlParser.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Vrh.NugetModuls.Documentations\Vrh.Logger\ReadMe.md" />
     <None Include="forNuget packaging\Plugins.Config.xml.transform" />
     <None Include="LogConfig.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

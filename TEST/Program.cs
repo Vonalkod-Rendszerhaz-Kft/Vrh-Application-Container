@@ -10,7 +10,7 @@ namespace TEST
     class Program
     {
         static void Main(string[] args)
-        {
+        {           
             IDatabase redisDb=null;
             ConnectionMultiplexer cm=null;
             while (true)

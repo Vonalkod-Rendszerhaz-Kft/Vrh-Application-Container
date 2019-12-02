@@ -6,20 +6,19 @@
     <title></title>
     <authors>Görcsös Zoltán</authors>
     <owners>Vonalkód Rendszerház Kft.</owners>
-    <tags>VRH, Log4Pro, Application Container, High Avability</tags>
+    <tags>VRH, Log4Pro™, Application Container™, High Avability, Microservice</tags>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
     <copyright>$copyright$</copyright>
     <releaseNotes>
-      v3.3.2 (2019.11.22):
-      - InstanceFactoryXML és a PluginAncestor osztályokban levő LogThis metódusok javítása
-      v3.3.1 (2019.11.20):
-      v3.3.0 (2019.11.20):
-      - LogThis metódusban a VrhLogger egy újabb paraméterének használata, ami értelmesebb log bejegyzéseket eredményez
-      v3.2.0 (2019.11.13):
-      Compatibility API changes:
-      - Új WCF cím konfiguráció megadási lehetőség beépítése, illetve az előző verzióban megalapozott fejlesztés átdolgozása és megerősítése
-      - Az XmlProcessing-be beépített WCFService xml elem és connectionstring kezelés használata
+      v4.0.0
+      Projekt rendezése továbbfejlesztésre (solution mappák kialakítása, névterek auditja, contzract kiszervezése, az  EventHub beépítéshez)
+      - Incompatibility changes:
+        - Névtér változások miatt:
+          - A WCF contract, és a szerviz implementáció megváltozott, ezt a WCF configokban után kell igazítani:
+              Vrh.ApplicationContainer.ApplicationContainerService -> Vrh.ApplicationContainer.Control.ApplicationContainerWCFService
+              Vrh.ApplicationContainer.IApplicationContainer  Vrh.ApplicationContainer.Control.IApplicationContainer
+          - A Pluginokban a Vrh.ApplicationContainer usingot Vrh.ApplicationContainer.Core-ra kell módosítani, mert az ApplicationContainer core megvalósítása átkerült ebbe a névtérbe
     </releaseNotes>
     <projectUrl>http://redmine.vonalkod.hu/projects/vrh-applicationcontainer</projectUrl>
     <iconUrl>http://nuget.vonalkod.hu/content/projectavatars/applicationcontainer.png</iconUrl>

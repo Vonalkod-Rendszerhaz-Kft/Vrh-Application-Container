@@ -61,26 +61,23 @@
     <Reference Include="VRH.Common, Version=2.10.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\VRH.Common.2.10.0\lib\net45\VRH.Common.dll</HintPath>
     </Reference>
-    <Reference Include="Vrh.Logger, Version=2.3.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.Logger.2.3.1\lib\net451\Vrh.Logger.dll</HintPath>
+    <Reference Include="Vrh.Logger, Version=2.3.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.Logger.2.3.2\lib\net451\Vrh.Logger.dll</HintPath>
     </Reference>
-    <Reference Include="Vrh.XmlProcessing, Version=1.11.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.XmlProcessing.1.11.0\lib\net45\Vrh.XmlProcessing.dll</HintPath>
+    <Reference Include="Vrh.XmlProcessing, Version=1.12.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.XmlProcessing.1.12.0\lib\net45\Vrh.XmlProcessing.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ApplicationContainer.cs" />
-    <Compile Include="ApplicationContainer.Config.cs" />
-    <Compile Include="ApplicationContainerService.cs" />
-    <Compile Include="Exceptions.cs" />
-    <Compile Include="IApplicationContainer.cs" />
-    <Compile Include="IInstanceFactory.cs" />
-    <Compile Include="InstanceDefinition.cs" />
-    <Compile Include="IPlugin.cs" />
-    <Compile Include="MessageStackEntry.cs" />
-    <Compile Include="PluginDefinition.cs" />
-    <Compile Include="PluginEventHandlers.cs" />
-    <Compile Include="PluginStatus.cs" />
+    <Compile Include="Core\ApplicationContainer.cs" />
+    <Compile Include="Core\ApplicationContainer.Config.cs" />
+    <Compile Include="Control\ApplicationContainerWCFService.cs" />
+    <Compile Include="Core\Exceptions.cs" />
+    <Compile Include="Control\IApplicationContainer.cs" />
+    <Compile Include="Core\IInstanceFactory.cs" />
+    <Compile Include="Core\IPlugin.cs" />
+    <Compile Include="Core\PluginAncestor.cs" />
+    <Compile Include="Core\PluginEventHandlers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -105,10 +102,20 @@
     <None Include="ApplicationContainer.Config.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="_CreateNewNuGetPackage\DoNotModify\NuGet.exe" />
   </ItemGroup>
   <ItemGroup>
     <None Include="forNuget packaging\ApplicationContainer.Config.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="LogConfig.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Vrh.ApplicationContainer.Control.Contract\Vrh.ApplicationContainer.Control.Contract.csproj">
+      <Project>{ef540874-5714-4d58-b6f6-cc9b595f37bb}</Project>
+      <Name>Vrh.ApplicationContainer.Control.Contract</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="XmlParser.xml">
@@ -116,9 +123,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="LogConfig.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <None Include="_CreateNewNuGetPackage\DoNotModify\NuGet.exe" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
@@ -128,7 +133,12 @@
 REM Create a NuGet package for this project and place the .nupkg file in the project's output directory.
 REM If you see this in Visual Studio's Error List window, check the Output window's Build tab for the actual error.
 ECHO Creating NuGet package in Post-Build event...
-PowerShell -NoProfile -ExecutionPolicy Bypass -Command "&amp; '$(ProjectDir)_CreateNewNuGetPackage\DoNotModify\CreateNuGetPackage.ps1' -ProjectFilePath '$(ProjectPath)' -OutputDirectory '$(TargetDir)' -BuildConfiguration '$(ConfigurationName)' -BuildPlatform '$(PlatformName)' -Verbose"</PostBuildEvent>
+PowerShell -NoProfile -ExecutionPolicy Bypass -Command "&amp; '$(ProjectDir)_CreateNewNuGetPackage\DoNotModify\CreateNuGetPackage.ps1' -ProjectFilePath '$(ProjectPath)' -OutputDirectory '$(TargetDir)' -BuildConfiguration '$(ConfigurationName)' -BuildPlatform '$(PlatformName)' -Verbose"
+
+REM Create a NuGet package for this project and place the .nupkg file in the project's output directory.
+REM If you see this in Visual Studio's Error List window, check the Output window's Build tab for the actual error.
+ECHO Creating NuGet package in Post-Build event...
+PowerShell -NoProfile -ExecutionPolicy Bypass -Command "&amp; '$(ProjectDir)_CreateNewNuGetPackage\DoNotModify\CreateNuGetPackage.ps1' -ProjectFilePath '$(ProjectPath)' -OutputDirectory '$(TargetDir)' -BuildConfiguration '$(ConfigurationName)' -BuildPlatform '$(PlatformName)'"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

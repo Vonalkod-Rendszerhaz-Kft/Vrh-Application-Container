@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Vrh.ApplicationContainer;
+using Vrh.ApplicationContainer.Control.Contract;
+using Vrh.ApplicationContainer.Core;
 
 namespace InstanceFactory.Fake
 {

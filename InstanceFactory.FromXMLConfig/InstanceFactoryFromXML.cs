@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Vrh.ApplicationContainer;
 using System.ComponentModel.Composition;
-using System.Reflection;
-using System.Diagnostics;
 using System.Configuration;
 using VRH.Common;
 using System.Runtime.CompilerServices;
 using Vrh.Logger;
 using Vrh.XmlProcessing;
+using Vrh.ApplicationContainer.Control.Contract;
+using Vrh.ApplicationContainer.Core;
 
 namespace InstanceFactory.FromXML
 {
@@ -169,7 +166,7 @@ namespace InstanceFactory.FromXML
                         }
                         e.Data.Add("Exception", Vrh.Logger.LogHelper.GetExceptionInfo(ex));
                     }
-                    e.Type = level == Vrh.Logger.LogLevel.Warning ? Level.Warning : Level.Info;
+                    e.Level = level == Vrh.Logger.LogLevel.Warning ? MessageStackEntryLevel.Warning : MessageStackEntryLevel.Info;
                     lock (_infos)
                     {
                         _infos.DropItem(e);
@@ -182,7 +179,7 @@ namespace InstanceFactory.FromXML
                         e.Data = new Dictionary<string, string>();
                     }
                     e.Data.Add("Exception", Vrh.Logger.LogHelper.GetExceptionInfo(ex));
-                    e.Type = level == Vrh.Logger.LogLevel.Fatal ? Level.FatalError : Level.Error;
+                    e.Level = level == Vrh.Logger.LogLevel.Fatal ? MessageStackEntryLevel.FatalError : MessageStackEntryLevel.Error;
                     lock (_errors)
                     {
                         _errors.DropItem(e);

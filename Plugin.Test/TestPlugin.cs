@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using Vrh.ApplicationContainer;
+using Vrh.ApplicationContainer.Control.Contract;
+using Vrh.ApplicationContainer.Core;
 
 namespace Plugin.Test
 {
@@ -65,7 +63,7 @@ namespace Plugin.Test
             var instance = new TestPlugin();
             instance._myData = instanceDefinition;
             instance._myData.InstanceData = data;
-            return instance;          
+            return instance;
         }
 
         public override void Start()

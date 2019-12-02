@@ -250,6 +250,16 @@ Minden ApplicationContainer plugin kötelezően a PluginAncestor leszármazott, 
 
 # Version History:
 
+## 4.0.0 (2019.12.02):
+### Projekt rendezése továbbfejlesztésre (solution mappák kialakítása, névterek auditja, contzract kiszervezése, az  EventHub beépítéshez)
+#### Incompatibility changes:
+- Névtér változások miatt:
+>- A WCF contract, és a szerviz implementáció megváltozott, ezt a WCF configokban után kell igazítani:
+>>- Vrh.ApplicationContainer.ApplicationContainerService -> Vrh.ApplicationContainer.Control.ApplicationContainerWCFService
+>>- Vrh.ApplicationContainer.IApplicationContainer  Vrh.ApplicationContainer.Control.IApplicationContainer
+>- A Pluginokban a Vrh.ApplicationContainer usingot Vrh.ApplicationContainer.Core-ra kell módosítani, mert az ApplicationContainer core megvalósítása átkerült ebbe a névtérbe
+
+
 ## 3.1.0 (2019.11.05):
 ### Compatibility API changes:
 1. Új WCF cím konfiguráció megadási lehetőség beépítése (konfiguráció: új appsettings kulcs lehetőség: WCFBaseAddressList)

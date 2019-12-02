@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 using Vrh.XmlProcessing;
-using Vrh.ApplicationContainer;
 using Vrh.Logger;
+using Vrh.ApplicationContainer.Control.Contract;
 
 namespace InstanceFactory.FromXML
 {

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" ?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="5c53c382-b6b4-42c1-b39c-07d73055789f" Version="3.0.1" Language="en-US" Publisher="Görcsös Zoltán" />
+        <Identity Id="5c53c382-b6b4-42c1-b39c-07d73055789f" Version="4.0.0" Language="en-US" Publisher="Görcsös Zoltán" />
         <DisplayName>VRH ApplicationContainer Plugin Template</DisplayName>
         <Description xml:space="preserve">A project for creating an ApplicationContainer Plugin</Description>
         <Icon>PluginTemplateInstall.ico</Icon>
