@@ -8,10 +8,6 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("ApplicationContainer.Plugin.ProjectTemplate")]
 [assembly: AssemblyDescription("VRH Application Container plugin project template")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Vonalkód Rendszerház Kft.")]
-[assembly: AssemblyProduct("VRH.Application.Container")]
-[assembly: AssemblyCopyright("Copyright © Vonalkód Rendszerház Kft. 2018")]
-[assembly: AssemblyTrademark("VRH, Log4Pro, Application Container")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
@@ -21,17 +17,3 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("3ad51da8-d45b-4c20-8495-1fbcfb9eee50")]
-
-// Version information for an assembly consists of the following four values:
-//
-//      Major Version
-//      Minor Version 
-//      Build Number
-//      Revision
-//
-// You can specify all the values or you can default the Build and Revision Numbers 
-// by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("4.0.0")]
-[assembly: AssemblyFileVersion("4.0.0.0")]
-[assembly: AssemblyInformationalVersion("4.0.0")]
