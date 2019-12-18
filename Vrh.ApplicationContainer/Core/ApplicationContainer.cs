@@ -27,164 +27,175 @@ namespace Vrh.ApplicationContainer.Core
     /// </summary>
     public class ApplicationContainer : IDisposable
     {
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="args">indítási argumentumok</param>
-        public ApplicationContainer(string[] args)
-        {
-            _wcfServiceInstance = new ApplicationContainerWCFService();
-            _wcfServiceInstance.ApplicationContainerReference = this;
-            string inuseby = "TRUE";
-            string dummyString = CommandLine.GetCommandLineArgument(args, "-INUSEBY");
-            if (dummyString != null) 
-            { 
-                inuseby = dummyString.ToUpper(); 
-            }
-            _startupTimeStamp = DateTime.UtcNow;
-            string configFile = ConfigurationManager.AppSettings[ApplicationContainer.MODULEPREFIX + CONFIGURATIONFILE_ELEMENT_NAME];
-            if (string.IsNullOrEmpty(configFile))
-            {
-                configFile = @"ApplicationContainer.Config.xml";
-            }
-            _config = new ApplicationContainerConfig(configFile);
-            _config.ConfigProcessorEvent += Config_ConfigProcessorEvent;
-            
-            _errorStack.Capacity = _config.MessageStackSize;
-            _infoStack.Capacity = _config.MessageStackSize;
-            LoadInstanceFactoryPlugin();
-            if (_usedInstanceFactory != null)
-            {
-                _loadedPluginDefinitions = GetAllPluginDefinition();
-                foreach (var pluginType in _loadedPluginDefinitions)
-                {
-                    foreach (var instance in GetAllDefinedInstances(pluginType))
-                    {
-                        if (instance.InuseBy.ToUpper() == inuseby || (inuseby == "TRUE" && instance.InuseBy.ToUpper() != "FALSE"))
-                        {
-                            Task.Run(() => StartUpInstance(instance));
-                        }
-                    }
-                }
-            }
-            //string wcfbaseaddresslistconnectionstringName = ConfigurationManager.AppSettings[GetApplicationConfigName(WCFBASEADDRESS_ELEMENT_NAME)];
-            StartService();
-            _lastStartupCost = DateTime.UtcNow.Subtract(_startupTimeStamp);
-            Dictionary<string, string> data = new Dictionary<string, string>()
-                    {
-                        { "Used Config file", configFile },
-                        { "Full startup time (second)", _lastStartupCost.TotalSeconds.ToString() },
-                        { "Location", this.GetType().Assembly.Location },
-                        { "Used InstanceFactory", _usedInstanceFactory?.GetType().FullName },
-                        { "InstanceFactory version", _usedInstanceFactory?.GetType().Assembly.Version() },
-                        { "IntsanceFactory config", _usedInstanceFactory?.Config },
-                    };
-            LogThis($"Vrh.ApplicationContainer {this.GetType().Assembly.Version()} started.", data, null, LogLevel.Information);
-        }
+		/// <summary>
+		/// Constructor
+		/// </summary>
+		/// <param name="args">indítási argumentumok</param>
+		public ApplicationContainer() { }
+		/// <summary>
+		/// Erre szükség van a Topshelf használata miatt
+		/// </summary>
+		public void Start(string[] args)
+		{
+			VRH.Common.CommandLine.SetAppConfigFile(VRH.Common.CommandLine.GetCommandLineArgument(args, "-APPCONFIG"));
+			string dummyString = CommandLine.GetCommandLineArgument(args, "-INUSEBY");
 
-        //private void TestDiagnostic()
-        //{
-        //    ulong address = 0;
-        //    unsafe
-        //    {
-        //        Object o = (Object)_pluginContainer.FirstOrDefault().Value;
-        //        TypedReference tr = __makeref(o);
-        //        IntPtr ptr = **(IntPtr**)(&tr);
-        //        address = (ulong)ptr;
-        //    }
-        //    using (DataTarget target = DataTarget.AttachToProcess(
-        //        Process.GetCurrentProcess().Id, 5000, AttachFlag.Passive))
-        //    {
-        //        ClrRuntime runtime = target.ClrVersions.First().CreateRuntime();
-        //        //foreach (var item in runtime.AppDomains)
-        //        //{
-        //        //    Console.WriteLine("Appdomain info:");
-        //        //    Console.WriteLine("Name: {0}\nAddress: {1}\n {2},ApplicationBase: {3}\nId: {4}",
-        //        //    item.Name, item.Address, item.ApplicationBase, item.ConfigurationFile, item.Id);
-        //        //    foreach (var module in item.Modules)
-        //        //    {
-        //        //        //Console.WriteLine(module.AssemblyName);
-        //        //    }
-        //        //}
-        //        ClrHeap heap = runtime.GetHeap();
-        //        foreach (var item in runtime.Threads)
-        //        {
-        //            Console.WriteLine(item.OSThreadId);
-        //        }
-        //        var c = Process.GetCurrentProcess();
-        //        var t = c.Threads;
-        //        foreach (ProcessThread item in t)
-        //        {
-        //            if (item.TotalProcessorTime == new TimeSpan(0, 0, 0))
-        //            {
-        //                continue;
-        //            }
-        //            Console.WriteLine("__________________________________");
-        //            ClrThread clrT = runtime.Threads.FirstOrDefault(x => x.OSThreadId == item.Id);
-        //            if (clrT != null)
-        //            {
-        //                Console.WriteLine(clrT.EnumerateStackTrace().FirstOrDefault()?.DisplayString);
-        //                Console.WriteLine(clrT.EnumerateStackTrace().LastOrDefault()?.DisplayString);
-        //            }
-        //            //Console.WriteLine();
-        //            Console.WriteLine("ID: {0} StartTime: {1} State: {2} TotalPT: {3} UserPT: {4}, PrivilegedPT: {5} WR: {6}"
-        //                , item.Id, item.StartTime, item.ThreadState, item.TotalProcessorTime, item.UserProcessorTime, item.PrivilegedProcessorTime, item.ThreadState == System.Diagnostics.ThreadState.Wait ? item.WaitReason.ToString() : "");
-        //        }
-        //        Console.WriteLine(heap.TotalHeapSize);
-        //        ClrType type = heap.GetObjectType(address);
-        //        foreach (var item in type.Fields)
-        //        {
-        //            Console.WriteLine("{0}: {1}", item.Name, item.GetAddress(address));
-        //        }
+			_wcfServiceInstance = new ApplicationContainerWCFService
+			{
+				ApplicationContainerReference = this
+			};
+			string inuseby = "TRUE";
+			if (dummyString != null)
+			{
+				inuseby = dummyString.ToUpper();
+			}
+			_startupTimeStamp = DateTime.UtcNow;
+			string configFile = ConfigurationManager.AppSettings[ApplicationContainer.MODULEPREFIX + CONFIGURATIONFILE_ELEMENT_NAME];
+			if (string.IsNullOrEmpty(configFile))
+			{
+				configFile = @"ApplicationContainer.Config.xml";
+			}
+			_config = new ApplicationContainerConfig(configFile);
+			_config.ConfigProcessorEvent += Config_ConfigProcessorEvent;
 
-        //        Console.WriteLine("{0}: {1}, {2}", type.Name, type.GetSize(address), type.IsFinalizable);
+			_errorStack.Capacity = _config.MessageStackSize;
+			_infoStack.Capacity = _config.MessageStackSize;
+			LoadInstanceFactoryPlugin();
+			if (_usedInstanceFactory != null)
+			{
+				_loadedPluginDefinitions = GetAllPluginDefinition();
+				foreach (var pluginType in _loadedPluginDefinitions)
+				{
+					foreach (var instance in GetAllDefinedInstances(pluginType))
+					{
+						if (instance.InuseBy.ToUpper() == inuseby || (inuseby == "TRUE" && instance.InuseBy.ToUpper() != "FALSE"))
+						{
+							Task.Run(() => StartUpInstance(instance));
+						}
+					}
+				}
+			}
+			//string wcfbaseaddresslistconnectionstringName = ConfigurationManager.AppSettings[GetApplicationConfigName(WCFBASEADDRESS_ELEMENT_NAME)];
+			StartService();
+			_lastStartupCost = DateTime.UtcNow.Subtract(_startupTimeStamp);
+			Dictionary<string, string> data = new Dictionary<string, string>()
+					{
+						{ "Used Config file", configFile },
+						{ "Full startup time (second)", _lastStartupCost.TotalSeconds.ToString() },
+						{ "Location", this.GetType().Assembly.Location },
+						{ "Used InstanceFactory", _usedInstanceFactory?.GetType().FullName },
+						{ "InstanceFactory version", _usedInstanceFactory?.GetType().Assembly.Version() },
+						{ "IntsanceFactory config", _usedInstanceFactory?.Config },
+					};
+			LogThis($"Vrh.ApplicationContainer {this.GetType().Assembly.Version()} started.", data, null, LogLevel.Information);
+		}
+		/// <summary>
+		/// Erre szükség van a Topshelf használata miatt
+		/// </summary>
+		public void Stop() { }
+		//private void TestDiagnostic()
+		//{
+		//    ulong address = 0;
+		//    unsafe
+		//    {
+		//        Object o = (Object)_pluginContainer.FirstOrDefault().Value;
+		//        TypedReference tr = __makeref(o);
+		//        IntPtr ptr = **(IntPtr**)(&tr);
+		//        address = (ulong)ptr;
+		//    }
+		//    using (DataTarget target = DataTarget.AttachToProcess(
+		//        Process.GetCurrentProcess().Id, 5000, AttachFlag.Passive))
+		//    {
+		//        ClrRuntime runtime = target.ClrVersions.First().CreateRuntime();
+		//        //foreach (var item in runtime.AppDomains)
+		//        //{
+		//        //    Console.WriteLine("Appdomain info:");
+		//        //    Console.WriteLine("Name: {0}\nAddress: {1}\n {2},ApplicationBase: {3}\nId: {4}",
+		//        //    item.Name, item.Address, item.ApplicationBase, item.ConfigurationFile, item.Id);
+		//        //    foreach (var module in item.Modules)
+		//        //    {
+		//        //        //Console.WriteLine(module.AssemblyName);
+		//        //    }
+		//        //}
+		//        ClrHeap heap = runtime.GetHeap();
+		//        foreach (var item in runtime.Threads)
+		//        {
+		//            Console.WriteLine(item.OSThreadId);
+		//        }
+		//        var c = Process.GetCurrentProcess();
+		//        var t = c.Threads;
+		//        foreach (ProcessThread item in t)
+		//        {
+		//            if (item.TotalProcessorTime == new TimeSpan(0, 0, 0))
+		//            {
+		//                continue;
+		//            }
+		//            Console.WriteLine("__________________________________");
+		//            ClrThread clrT = runtime.Threads.FirstOrDefault(x => x.OSThreadId == item.Id);
+		//            if (clrT != null)
+		//            {
+		//                Console.WriteLine(clrT.EnumerateStackTrace().FirstOrDefault()?.DisplayString);
+		//                Console.WriteLine(clrT.EnumerateStackTrace().LastOrDefault()?.DisplayString);
+		//            }
+		//            //Console.WriteLine();
+		//            Console.WriteLine("ID: {0} StartTime: {1} State: {2} TotalPT: {3} UserPT: {4}, PrivilegedPT: {5} WR: {6}"
+		//                , item.Id, item.StartTime, item.ThreadState, item.TotalProcessorTime, item.UserProcessorTime, item.PrivilegedProcessorTime, item.ThreadState == System.Diagnostics.ThreadState.Wait ? item.WaitReason.ToString() : "");
+		//        }
+		//        Console.WriteLine(heap.TotalHeapSize);
+		//        ClrType type = heap.GetObjectType(address);
+		//        foreach (var item in type.Fields)
+		//        {
+		//            Console.WriteLine("{0}: {1}", item.Name, item.GetAddress(address));
+		//        }
+
+		//        Console.WriteLine("{0}: {1}, {2}", type.Name, type.GetSize(address), type.IsFinalizable);
 
 
 
-        //        //if (!heap.CanWalkHeap)
-        //        //{
-        //        //    Console.WriteLine("Cannot walk the heap!");
-        //        //}
-        //        //else
-        //        //{
-        //        //    foreach (var item in heap.Segments)
-        //        //    {
-        //        //        Console.WriteLine(item.Length);
-        //        //        foreach (ulong obj in item.EnumerateObjectAddresses())
-        //        //        {                                
-        //        //            ClrType type = heap.GetObjectType(obj);
-        //        //            if (type == null)
-        //        //                continue;
-        //        //            if (type.Name.Contains("System.Collections.Generic.Dictionary<Vrh.ApplicationContainer.InstanceDefinition,Vrh.ApplicationContainer.IPlugin"))
-        //        //            {                                    
-        //        //                Console.WriteLine("{0}: {1}", type.Name, type.GetSize(obj));
-        //        //            }
-        //        //        }
-        //        //    }
-        //        //    //foreach (ClrType item in heap.EnumerateTypes().OrderBy(x => x.Name))
-        //        //    //{
-        //        //    //    if (item.Name.Contains("Plugin"))
-        //        //    //        Console.WriteLine(item.Name);
-        //        //    //}
-        //        //    //foreach (ulong obj in heap.EnumerateObjectAddresses())
-        //        //    //{
-        //        //    //    get type = heap.GetObjectType(obj);
+		//        //if (!heap.CanWalkHeap)
+		//        //{
+		//        //    Console.WriteLine("Cannot walk the heap!");
+		//        //}
+		//        //else
+		//        //{
+		//        //    foreach (var item in heap.Segments)
+		//        //    {
+		//        //        Console.WriteLine(item.Length);
+		//        //        foreach (ulong obj in item.EnumerateObjectAddresses())
+		//        //        {                                
+		//        //            ClrType type = heap.GetObjectType(obj);
+		//        //            if (type == null)
+		//        //                continue;
+		//        //            if (type.Name.Contains("System.Collections.Generic.Dictionary<Vrh.ApplicationContainer.InstanceDefinition,Vrh.ApplicationContainer.IPlugin"))
+		//        //            {                                    
+		//        //                Console.WriteLine("{0}: {1}", type.Name, type.GetSize(obj));
+		//        //            }
+		//        //        }
+		//        //    }
+		//        //    //foreach (ClrType item in heap.EnumerateTypes().OrderBy(x => x.Name))
+		//        //    //{
+		//        //    //    if (item.Name.Contains("Plugin"))
+		//        //    //        Console.WriteLine(item.Name);
+		//        //    //}
+		//        //    //foreach (ulong obj in heap.EnumerateObjectAddresses())
+		//        //    //{
+		//        //    //    get type = heap.GetObjectType(obj);
 
-        //        //    //    // If heap corruption, continue past this object.
-        //        //    //    if (type == null)
-        //        //    //        continue;
+		//        //    //    // If heap corruption, continue past this object.
+		//        //    //    if (type == null)
+		//        //    //        continue;
 
-        //        //    //    ulong size = type.GetSize(obj);
-        //        //    //    Console.WriteLine("{0,12:X} {1,8:n0} {2,1:n0} {3}", obj, size, heap.GetObjectGeneration(obj), type.Name);
-        //        //    //}
-        //        //}
-        //    }
-        //}
+		//        //    //    ulong size = type.GetSize(obj);
+		//        //    //    Console.WriteLine("{0,12:X} {1,8:n0} {2,1:n0} {3}", obj, size, heap.GetObjectGeneration(obj), type.Name);
+		//        //    //}
+		//        //}
+		//    }
+		//}
 
-        /// <summary>
-        /// Az Application contaner keret állapotleíróját adja vissza
-        /// </summary>
-        public ApplicationContainerInfo MyInfo
+		/// <summary>
+		/// Az Application contaner keret állapotleíróját adja vissza
+		/// </summary>
+		public ApplicationContainerInfo MyInfo
         {
             get
             {
@@ -1089,7 +1100,6 @@ namespace Vrh.ApplicationContainer.Core
         /// <summary>
         /// Elindítja a szolgáltatást
         /// </summary>
-        /// <param name="wcfhostdescriptor">egy connectionstring store elem neve</param>
         private void StartService()
         {
             try
@@ -1231,21 +1241,21 @@ namespace Vrh.ApplicationContainer.Core
 
         private CompositionContainer _container;
 
-        private readonly ApplicationContainerConfig _config;
+        private ApplicationContainerConfig _config;
 
         private readonly Dictionary<InstanceDefinition, IPlugin> _pluginContainer = new Dictionary<InstanceDefinition, IPlugin>();
 
-        private readonly List<PluginDefinition> _loadedPluginDefinitions = new List<PluginDefinition>();
+        private List<PluginDefinition> _loadedPluginDefinitions = new List<PluginDefinition>();
 
 #pragma warning disable IDE0069 // Disposable fields should be disposed: This is a mistaken Warning. This is sisposed across multiple methathesis... 
         private ServiceHost _service;
 #pragma warning restore IDE0069 // Disposable fields should be disposed
 
-        private readonly ApplicationContainerWCFService _wcfServiceInstance;
+        private ApplicationContainerWCFService _wcfServiceInstance;
 
         private readonly object _instanceLocker = new object();
 
-        private readonly DateTime _startupTimeStamp;
+        private DateTime _startupTimeStamp;
 
         private TimeSpan _lastStartupCost;
 

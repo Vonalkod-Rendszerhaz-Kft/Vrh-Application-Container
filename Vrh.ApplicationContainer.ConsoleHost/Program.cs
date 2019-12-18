@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Vrh.ApplicationContainer.Core;
+using Vrh.ApplicationContainer;
 using Vrh.Logger;
 using System.Messaging;
 using System.IO;
@@ -21,7 +22,7 @@ namespace Vrh.ApplicationContainer.ConsoleHost
     {
         static void Main(string[] args)
         {
-            VRH.Common.CommandLine.SetAppConfigFile(VRH.Common.CommandLine.GetCommandLineArgument(args, "-APPCONFIG"));
+			VRH.Common.CommandLine.SetAppConfigFile(VRH.Common.CommandLine.GetCommandLineArgument(args, "-APPCONFIG"));
             if (!Debugger.IsAttached)
             {
                 Console.WriteLine("Attach the debugger now if need and press a key here to continue...");
@@ -30,7 +31,8 @@ namespace Vrh.ApplicationContainer.ConsoleHost
             Core.ApplicationContainer appC = null;
             try
             {
-                appC = new Core.ApplicationContainer(args);
+                appC = new Core.ApplicationContainer();
+				appC.Start(args);
             }
             catch (FatalException ex)
             {
