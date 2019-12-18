@@ -50,8 +50,8 @@
     <Reference Include="Topshelf.StartParameters, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Topshelf.StartParameters.1.0.2\lib\net462\Topshelf.StartParameters.dll</HintPath>
     </Reference>
-    <Reference Include="VRH.Log4Pro.TopshelfStarter, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\VRH.Log4Pro.TopshelfStarter.1.0.2\lib\net462\VRH.Log4Pro.TopshelfStarter.dll</HintPath>
+    <Reference Include="VRH.Log4Pro.TopshelfStarter, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\VRH.Log4Pro.TopshelfStarter.1.0.3\lib\net462\VRH.Log4Pro.TopshelfStarter.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
