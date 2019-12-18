@@ -35,7 +35,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Hosts", "Hosts", "{3ADD76E0
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SandBox", "SandBox", "{ADC8EBFC-38AC-4D87-B026-3BE8A23D616D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vrh.Application.Container.Topshelf", "Vrh.Application.Container.Topshelf\Vrh.Application.Container.Topshelf.csproj", "{28370CB1-0DE2-4F42-88C9-2859258532B0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vrh.ApplicationContainer.Topshelf", "Vrh.ApplicationContainer.Topshelf\Vrh.ApplicationContainer.Topshelf.csproj", "{28370CB1-0DE2-4F42-88C9-2859258532B0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

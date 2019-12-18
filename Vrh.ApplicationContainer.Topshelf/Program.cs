@@ -8,7 +8,7 @@ using Topshelf;
 using Vrh.ApplicationContainer.Core;
 using VRH.Log4Pro.TopshelfStarter;
 
-namespace Vrh.Application.Container.Topshelf
+namespace Vrh.ApplicationContainer.Topshelf
 {
 	class Program
 	{

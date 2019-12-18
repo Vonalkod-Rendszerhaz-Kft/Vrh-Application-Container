@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{28370CB1-0DE2-4F42-88C9-2859258532B0}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Vrh.Application.Container.Topshelf</RootNamespace>
-    <AssemblyName>Vrh.Application.Container.Topshelf</AssemblyName>
+    <RootNamespace>Vrh.ApplicationContainer.Topshelf</RootNamespace>
+    <AssemblyName>Vrh.ApplicationContainer.Topshelf</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
