@@ -25,7 +25,7 @@ $releaseNotes = ""
 # Specify a specific Configuration and/or Platform to only create a NuGet package when building the project with this Configuration and/or Platform.
 #	e.g. $configuration = "Release"
 #		 $platform = "AnyCPU"
-$configuration = ""
+$configuration = "Release"
 $platform = ""
 
 # Specify any NuGet Pack Properties to pass to MsBuild.
@@ -47,7 +47,7 @@ $packOptions = ""
 # Specify $true if the generated .nupkg file should be renamed to include the Configuration and Platform that was used to build the project, $false if not.
 #	e.g. If $true, MyProject.1.1.5.6.nupkg might be renamed to MyProject.1.1.5.6.Debug.AnyCPU.nupkg
 #	e.g. If $true, MyProject.1.1.5.6-beta1.nupkg might re renamed to MyProject.1.1.5.6-beta1.Release.x86.nupkg
-$appendConfigurationAndPlatformToNuGetPackageFileName = $true
+$appendConfigurationAndPlatformToNuGetPackageFileName = $false
 
 
 #------------------------------------------------
