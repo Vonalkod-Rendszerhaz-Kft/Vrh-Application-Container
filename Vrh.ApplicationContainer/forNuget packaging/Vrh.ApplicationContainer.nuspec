@@ -11,6 +11,8 @@
     <description>$description$</description>
     <copyright>$copyright$</copyright>
     <releaseNotes>
+			v4.0.2-noexe
+			- ApplicationContainerTopshelf.exe hozzáadása a nuget-hez
 			v4.0.2
 			- ApplicationContainerTopshelf.exe hozzáadása a nuget-hez
 			v4.0.1
@@ -23,15 +25,17 @@
   <files>    
     <file src="ApplicationContainer.Config.xml" target="content" />
     <file src="app.config.install.xdt" target="content" />
+		<!--
 		<file src="..\..\Vrh.ApplicationContainer.Topshelf\forNuGet packaging\Vrh.ApplicationContainer.Topshelf.exe.config" target="content" />
 		<file src="..\..\Vrh.ApplicationContainer.Topshelf\bin\Release\Vrh.ApplicationContainer.Topshelf.exe" target="lib\net451" />
 		<file src="..\..\Vrh.ApplicationContainer.ConsoleHost\forNuGet packaging\Vrh.ApplicationContainer.ConsoleHost.exe.config" target="content" />
     <file src="..\..\Vrh.ApplicationContainer.ConsoleHost\bin\Release\Vrh.ApplicationContainer.ConsoleHost.exe" target="lib\net451" />
     <file src="..\..\Vrh.ApplicationContainer.WindowsServiceHost\forNuGet packaging\Vrh.ApplicationContainer.WindowsServiceHost.exe.config" target="content" />
     <file src="..\..\Vrh.ApplicationContainer.WindowsServiceHost\bin\Release\Vrh.ApplicationContainer.WindowsServiceHost.exe" target="lib\net451" />
-    <file src="..\..\InstanceFactory.FromXMLConfig\bin\Release\InstanceFactory.FromXML.dll" target="lib\net451" />
+		-->
+		<file src="..\..\InstanceFactory.FromXMLConfig\bin\Release\InstanceFactory.FromXML.dll" target="lib\net451" />
     <file src="..\..\InstanceFactory.FromXMLConfig\bin\Release\InstanceFactory.FromXML.xml" target="lib\net451" />
-    <file src="..\..\InstanceFactory.FromXMLConfig\forNuget packaging\Plugins.Config.xml.transform" target="content" />    
+    <file src="..\..\InstanceFactory.FromXMLConfig\forNuget packaging\Plugins.Config.xml.transform" target="content" />
     <file src="..\Documentation\ReadMe.md" target="content\Vrh.NugetModuls.Documentations\Vrh.ApplicationContainer" />
     <file src="Install.ps1" target="tools"/>
   </files>
