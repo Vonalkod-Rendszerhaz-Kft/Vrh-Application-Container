@@ -16,9 +16,9 @@ using System.ServiceModel;
 using VRH.Common;
 using System.Runtime.CompilerServices;
 using Newtonsoft.Json;
-using Vrh.XmlProcessing;
 using Vrh.ApplicationContainer.Control.Contract;
 using Vrh.ApplicationContainer.Control;
+using Vrh.XmlProcessing;
 
 namespace Vrh.ApplicationContainer.Core
 {

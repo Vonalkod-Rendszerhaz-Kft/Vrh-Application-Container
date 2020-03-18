@@ -773,6 +773,46 @@ Ha hibaérzékenység nem, de például logolás szükséges, akkor ezt a Config
 
 ***
 ## Version History:
+### 1.15.1 (2020.01.22) Patches:
+- Vissza lett téve az XmlLinqBase osztályba a GetXmlPath metódus.
+
+### 1.15.0 (2020.01.20)
+#### ConnectionStringStore: 
+- Több connectionString xml elem lehet, mindegyikben több connectionString elemmel; funkciója mindössze annyi, hogy a ConnectionStringStore 
+Xml file-ban a connection string-ek ezáltal csoportosítva írhatók be, a blokkok-ban levő connections string-ek végül is egy közös listába kerülnek, ahogy eddig is.
+- Az appconfig file-ok másolása funkció kibővült azzal, hogy meg lehet adni a másolandó file-ok nevét a ConnectionStringStore xml file
+appconfigFileDistribution elemében (az elem értéke vesszővel elválasztott név lista, és/vagy az appconfigFileDistribution elemen belüli
+File elemek sorozatában megadott nevek (a File elemek mindegyike csak egy file nevet tartalmazhat); eddig ezek a nevek be voltak drótozva, 
+ezért ez a funkció inkább főverzió-szám emelést igényelne, de spóroljunk a számokkal...
+- A másolás csak akkor történik meg, ha az appconfigFileDistribution/Enable= attributuma true értékű.
+- A másolás csak az app domain indulása utáni első ConnectionStringStore híváskor történik meg (ez web-es hívások esetén különösen "praktikus"),
+kivéve, ha az appconfigFileDistribution/Force= attributum értéke is true, mert ebben az esetben mindenképpen másol, tehát akkor is, ha a 
+file-ok már ott vannak. Azt, hogy a file-ok ott vannak-e, a file-ok összehasonlításával dönti el, majd az összehasonlítás eredményét egy 
+appdomain változóban meg is jegyzi.
+v1.14.xxx: kimaradt
+
+### 1.13.1 (2020.01.19)
+- hiba javítása
+- xml connectionstringet, amiben csak file, vagy file+element tagok vannak le lehet írni "@c:\F1\F2\xmlfile.xml/xmltag1/xmltag2" formában
+ami egyenértékű a "file=c:\F1\F2\xmlfile.xml; element=xmltag1/xmltag2;" leírással;
+- ezen leírás esetén a root elemet az appconfigból veszi, az egyéb xml parser tagok nem használhatók.
+
+### 1.13.0 (2020.01.02)
+- Az XmlParser alapú xml feldolgozásba a LinqXMLProcessorBase-zel azonos funkcionalitású (de nem teljesen azonos nevű)
+újabb metódusok beépítése: GetRootElement, GetAllXelement, GetExtendedStringValue, GetExtendedBoolValue
+
+### 1.12.0 (2019.11.28)
+- wcf uri connectionstring elemben a distributecfgfiles tag bevezetése, alapértelmezés true
+
+### 1.11.0 (2019.11.20)
+- WCF osztály változtatása / Kialakításra került az a funkció, amely a központi helyen (a ConnectionStringStore-t tartalmazó
+könyvtárból) a futó alkalmazás aktív appconfig file-ja mellé másolja a WCFServices.config,WCFClients.config,WCFBindings.config
+és WCFBehaviors.config file-okat, amelyek a nevüknek megfelelő xml struktúrákat tartalmazzák. Ezeknek a file-oknak a
+használatához szükséges, hogy az appconfig file-ban a Service.Model elemen belül a Services, Clients, Bindings és Behaviors
+elemek ezekre a külső fileokra hivatkozzanak,
+- WCF osztály változtatása / public static bool EnableDistributeWCFConfigFiles property bevezetése. Alalpértelmezése true.
+Ennek értékével lehet szabályozni, hogy a WCF inicializáló hívások a központi WCF konfigurációs file-okat bemásolják-e a web
+alkalmazás web.config file-ja mellé.
 
 ### 1.6.0 (2019.10.30) Compatible changes:
 - VariableDictionary osztályban alapértelmezett (paraméter nélküli) konstruktor bevezetése. Az osztály betűérzékeny lesz, rendszerváltozók nélkül, az alapértelmezett "@@" név szeparátorral.

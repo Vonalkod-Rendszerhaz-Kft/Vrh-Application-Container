@@ -63,14 +63,14 @@
     <Reference Include="Vrh.ApplicationContainer.Control.Contract, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Vrh.ApplicationContainer.Control.Contract.0.1.0\lib\net451\Vrh.ApplicationContainer.Control.Contract.dll</HintPath>
     </Reference>
-    <Reference Include="VRH.Common, Version=2.11.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\VRH.Common.2.11.3\lib\net45\VRH.Common.dll</HintPath>
+    <Reference Include="VRH.Common, Version=2.12.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\VRH.Common.2.12.1\lib\net45\VRH.Common.dll</HintPath>
     </Reference>
     <Reference Include="Vrh.Logger, Version=2.3.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Vrh.Logger.2.3.3\lib\net451\Vrh.Logger.dll</HintPath>
     </Reference>
-    <Reference Include="Vrh.XmlProcessing, Version=1.13.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vrh.XmlProcessing.1.13.1\lib\net45\Vrh.XmlProcessing.dll</HintPath>
+    <Reference Include="Vrh.XmlProcessing, Version=1.17.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Vrh.XmlProcessing.1.17.0\lib\net45\Vrh.XmlProcessing.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

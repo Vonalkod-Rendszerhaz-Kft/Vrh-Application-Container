@@ -11,6 +11,8 @@
     <description>$description$</description>
     <copyright>$copyright$</copyright>
     <releaseNotes>
+			v4.0.4 - nuget
+			- beépülő csomagok frissítése
 			v4.0.3
 			- host exe-k visszahelyezése és felesleges beépülő csomag referenciák törlése
 			v4.0.2-noexe
