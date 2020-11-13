@@ -185,14 +185,41 @@ public class SelectListGroup
 ```
 
 
-# Version History:
+## Version History:
+#### 2.13.2 (2020.03.27) Patches:    
+- NuGet csomag módosítása úgy, hogy a modul ReadMe.md "Build Action" tulajdonsága "None" legyen a telepítés után. Install.ps1 hozzáadása.
 
-## 2.10.0 (2019.10.08):      
-### Compatibility API changes:      
+#### 2.13.1 (2020.03.26) Patches:    
+- Felesleges függések törlése.
+- XML comment dokumentáció pontosítása.
+
+#### 2.13.0 (2020.03.19) Compatible changes:    
+- Vrh.Web.Common.Lib egyes elemeinek átemelése ide
+
+#### 2.12.1 (2020.02.13) Patches:    
+- SelectListJSON egyenlőség vizsgálat javítása
+
+#### 2.12.0 (2020.02.13) Compatible changes:    
+- SelectListJSON struktúrába beépítésre került egy speciális egyenlőség vizsgálat, amely a Value, a Text és a Group mezők értékének egyenlősége
+esetén ad igaz értéket; a Disabled és a Selected mezők értéke az egyenlőség vizsgálatban nem játszik szerepet
+- CheckListJSON és ReturnInfoJSON strukturákhoz analóg módon, mely ugyanezekkel a feltételekkel dolgozik.
+
+#### 2.11.1-3 (2019.12.19) Compatible changes:    
+- CommandLine class hibák javítása.
+
+#### 2.11.0 (2019.12.17) Compatible changes:    
+- Topshelf formátumú parancssori paraméterek kezelése: -NAME:value
+ 
+#### 2.10.1 (2019.12.17) Patches:    
+- CommandLine osztályban egy javítás
+
+#### 2.10.1 (2019.12.05) Patches:    
+- SerializeObject metódusban a string-ek külön kezelése.
+
+#### 2.10.0 (2019.10.08) Compatible changes:      
 - ToEnum string extension hozzáadása, amelyik egy stringből megadott tipusú enumra konvertál, vagy a típus (Enum) defaultját adja
 
-## 2.9.0 (2019.09.12):      
-### Compatibility API changes:      
+#### 2.9.0 (2019.09.12) Compatible changes:      
 - EntryAsseblyFixer static class hozzáadása, ami beállítja  amegfelelő EntryAssembly-t, ha az alakalmazás tér dinamikus hostolású, ahol null, vagy dynamic az EntryAssembly
 - EntryAsseblyFixer egység tesztjei
 

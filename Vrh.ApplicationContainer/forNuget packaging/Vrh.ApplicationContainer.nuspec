@@ -11,18 +11,20 @@
     <description>$description$</description>
     <copyright>$copyright$</copyright>
     <releaseNotes>
-			v4.0.4 - nuget
-			- beépülő csomagok frissítése
-			v4.0.3
-			- host exe-k visszahelyezése és felesleges beépülő csomag referenciák törlése
-			v4.0.2-noexe
-			- host exe-k eltávolítása a nugetből
-			v4.0.2
-			- ApplicationContainerTopshelf.exe hozzáadása a nuget-hez
-			v4.0.1
-			- Patches:
-			- Vrh.ApplicationContainer.Control.Contract v0.1.0 Nuget referencia hozzáadása
-		</releaseNotes>
+	  v4.0.5 - Patch (2020.11.13,nuget)
+	  - beépülő modulok frissítése
+	  v4.0.4 - nuget
+	  - beépülő csomagok frissítése
+	  v4.0.3
+	  - host exe-k visszahelyezése és felesleges beépülő csomag referenciák törlése
+	  v4.0.2-noexe
+	  - host exe-k eltávolítása a nugetből
+	  v4.0.2
+	  - ApplicationContainerTopshelf.exe hozzáadása a nuget-hez
+	  v4.0.1
+	  - Patches:
+	  - Vrh.ApplicationContainer.Control.Contract v0.1.0 Nuget referencia hozzáadása
+	</releaseNotes>
     <projectUrl>http://redmine.vonalkod.hu/projects/vrh-applicationcontainer</projectUrl>
     <iconUrl>http://nuget.vonalkod.hu/content/projectavatars/applicationcontainer.png</iconUrl>
   </metadata>
