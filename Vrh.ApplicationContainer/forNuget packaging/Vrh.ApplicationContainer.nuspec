@@ -11,7 +11,9 @@
     <description>$description$</description>
     <copyright>$copyright$</copyright>
     <releaseNotes>
-	  v4.0.6 - Patch (2020.11.13,nuget)
+	  v4.0.8 - Patch (2020.11.20,nuget)
+	  - beépülő modulok frissítése
+	  v4.0.7 - Patch (2020.11.13,nuget)
 	  - host exe-k eltávolítása
 	  - beépülő modulok frissítése
 	  v4.0.4 - nuget

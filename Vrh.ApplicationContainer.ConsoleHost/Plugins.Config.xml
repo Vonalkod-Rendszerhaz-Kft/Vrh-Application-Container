@@ -1,15 +1,8 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<Plugins.Config>
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Plugins.Config StackSize="50">
   <Plugins StackSize="50">
     
-	  <Plugin Description="Scheduler Monitor" 
-            Assembly="iSchedulerMonitor.dll" 
-			      Type="iSchedulerMonitor.MonitorPlugin" 
-            Version="1.0.0-alpha" 
-            Singletone="false" 
-            AutoStart ="true" 
-            PluginDirectory="iSchedulerMonitor"
-            PluginConfig="" Factory="">
+	  <Plugin Description="Scheduler Monitor" Assembly="iSchedulerMonitor.dll" Type="iSchedulerMonitor.MonitorPlugin" Version="1.0.0-alpha" Singletone="false" AutoStart="true" PluginDirectory="iSchedulerMonitor" PluginConfig="" Factory="">
       
       <!-- ANTI: Ha nem azonos gépen fut a WebServer és a plugin, akkor az 
                InstanceConfig a plugint futtató gépen az xml helye; InstanceData a távoli gépen az xml helye. 
@@ -24,11 +17,7 @@
       </Instance>-->
 
       <!-- ANTIDELL AppContainer-re állítva az Instance -->
-      <Instance	Id="Monitor1" Inuse="APP"
-                Name="SchedulerMonitor_for_LearALM"
-                Description="Időzített feladatok figyelése a LearALM-ben."
-                InstanceConfig="d:\!Dev\VRH\application.container\Vrh.ApplicationContainer.ConsoleHost\bin\Debug\iSchedulerMonitor\iScheduler\iScheduler.xml"
-                InstanceData="d:\!Dev\VRH\application.container\Vrh.ApplicationContainer.ConsoleHost\bin\Debug\iSchedulerMonitor\iScheduler\iScheduler.xml">
+      <Instance Id="Monitor1" Inuse="APP" Name="SchedulerMonitor_for_LearALM" Description="Időzített feladatok figyelése a LearALM-ben." InstanceConfig="d:\!Dev\VRH\application.container\Vrh.ApplicationContainer.ConsoleHost\bin\Debug\iSchedulerMonitor\iScheduler\iScheduler.xml" InstanceData="d:\!Dev\VRH\application.container\Vrh.ApplicationContainer.ConsoleHost\bin\Debug\iSchedulerMonitor\iScheduler\iScheduler.xml">
       </Instance>
 
       <!--VRH-->
@@ -90,4 +79,6 @@
     </Plugin>
     -->        
   </Plugins>
-</Plugins.Config>
+<Plugin Assembly="Vrh.ApplicationContainer.ConsoleHost.dll" Type="Vrh.ApplicationContainer.ConsoleHost.Vrh.ApplicationContainer.ConsoleHostPlugin" Version="1.0.0" Singletone="false" AutoStart="true" PluginDirectory="">
+    <Instance Id="instance1" Name="Vrh.ApplicationContainer.ConsoleHostPlugin instance 1" />
+  </Plugin></Plugins.Config>

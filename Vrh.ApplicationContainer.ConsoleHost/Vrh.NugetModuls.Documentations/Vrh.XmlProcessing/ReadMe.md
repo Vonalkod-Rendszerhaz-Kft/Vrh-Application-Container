@@ -773,6 +773,73 @@ Ha hibaérzékenység nem, de például logolás szükséges, akkor ezt a Config
 
 ***
 ## Version History:
+### 1.18.4 (2020.10.26) Patch:
+- Az XmlConnection példányt nem írhatjuk felül büntetlenül, hiszen bizonyos alkalmazások meg pont arra számítanak, hogy ott az általuk ismert érték marad benne. 
+Az XmlParser.Configuration protected tulajdonság pont arra való, hogy az XmlParser származtatott osztályaiban a feloldott értékeket el lehessen érni.
+- Bevezetésre került az XmlParser.Configuration-ben a "Root" tulajdonság, így minden XmlConnection-ban is megadható tulajdonság feloldott értéke elérhető a típusban.
+
+### 1.18.3 (2020.04.30) Patch:
+- Annak a hibának a javítása, hogy a config=xxxx; típusú connectionstring-ek esetén az XmlConnection példány File és Element mezői nem kerültek
+kitöltésre, és ez a LinqXMLProcessingBase osztályon belül hibát okozott; a hiba javítása csak a megtapasztalt Exception elhárítására szorítkozik,
+de szerintem a teljes javítás igényelné, hogy az XmlConnection példány konstruktorai a connectionstring-et teljesen feloldják és ezeket a mezőket is kitöltsék!
+
+### 1.18.2 (2020.03.30) Patch:
+- Apró javítás a "nuspec" és az "AddToTestNuGetPackages.ps1" fájlban.
+ 
+### 1.18.1 (2020.03.30) Patch:
+- NameSpace használatának kivétele az XmlLinqBase osztályból.
+
+### 1.18.0 (2020.03.28) Compatible changes:
+- XmlParser osztály kiegészült a publikus "RootElementName" tulajdonsággal, mely a megnyitott fájl gyökér elemének nevét tartalmazza.
+Egy XPath kifejezés összeállításához használható, mert ott szükséges a gyökér nevét is megadni egy elem vagy attribútum eléréséhez.
+- Most már kap értéket a publikus "CurrentXmlConnectionString" tulajdonság abban az esetben is, ha XmlConnection típussal példányosítottak. 
+- Frissítés az MSTest.TestAdapter 2.1.0 változatára. (Ez csak a Test projektet érinti!)
+- Frissítés az MSTest.TestFramework 2.1.0 változatára. (Ez csak a Test projektet érinti!)
+- NuGet csomag módosítása úgy, hogy a modul ReadMe.md "Build Action" tulajdonsága "None" legyen a telepítés után. Install.ps1 hozzáadása.
+
+### 1.17.0 (2020.02.14) Compatible change:
+- XmlParser osztály kiegészült a publikus CurrentXmlConnectionString-gel, ami a konstruktornak átadott xml connectionstring-et tartalmazza.
+
+### 1.16.0 (2020.02.10) Compatible change:
+- Az eddig m_BaseFolder privát field átalakítása BaseFolder public attributummá.
+
+### 1.15.4 (2020.02.04) Patches:
+- A ConnectionStringStore exception-ök sztenderdizálása, plusz info beillesztése a szövegekbe
+
+### 1.15.4 (2020.01.31) Patches:
+Ha nincs megadva az AppPath paraméter, akkor alapértelmezést használt, ami azonban bizonyos esetekben nem működött,
+mert a "System.Reflection.Assembly.GetEntryAssembly()" metódus null értékkel tért vissza (pl. amikor a WebALM-et hívtuk a LearALMNew-ból).
+Ez a kód volt:
+```javascript
+if (string.IsNullOrEmpty(xmlparserapppath))
+{
+    this._AppPath = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly()?.Location);
+}
+else 
+{ 
+    this._AppPath = xmlparserapppath; 
+}
+```
+És ez kellett helyette (nem biztos, hogy ez a tökéletes megoldás, lehet, hogy egyes esetekben még így is problémás,
+ha pl. ha nem webalkalmazások esetén fordul elő a fenti null értékes hívás!!!!!!!!!)
+```javascript
+if (string.IsNullOrEmpty(xmlparserapppath))
+{
+    this._AppPath = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly()?.Location);
+    if (this._AppPath == null) this._AppPath = HttpContext.Current.Server.MapPath("~");
+}
+else 
+{ 
+    this._AppPath = xmlparserapppath; 
+}
+```
+
+### 1.15.3 (2020.01.31) Patches:
+- LinqXMLProcessorBaseCommonOrInstance osztályban a GetXElement és GetAllXElement metódusokban hiba javítása.
+
+### 1.15.3 (2020.01.23) Patches:
+- LinqXMLProcessorBaseCommonOrInstance osztályban a GetXElement és GetAllXElement metódusokból a felesleges generikus kivétele
+
 ### 1.15.1 (2020.01.22) Patches:
 - Vissza lett téve az XmlLinqBase osztályba a GetXmlPath metódus.
 

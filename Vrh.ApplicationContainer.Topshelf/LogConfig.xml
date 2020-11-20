@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Vrh.Logger>
+  <!-- Posible LogLevel values: Debug, Verbose, Information, Warning, Error, Fatal, None -->
+  <LogLevel>Debug</LogLevel>
+  <!-- True: All log entry are redirecting to console too. -->
+  <EnableConsoleLogging>True</EnableConsoleLogging>
+  <!-- True: All log entry are redirecting to attached debug output window too. -->
+  <EnableDebuggerLogging>True</EnableDebuggerLogging>
+  <!-- True: All log entry are redirecting to Default (file) logger. (Only DefaultLogger use.) -->
+  <EnableFileLogging LogDirectory="Log" LogFile="Vrh.Logger.TxtLog.log">True</EnableFileLogging>
+  <!-- Posible used logger Values: DefaultLogger, iLoggerLogger -->
+  <UsedLogger>DefaultLogger</UsedLogger>
+  <!-- Legger Error loging directory-->
+  <LoggerErrorLogDirectory>Log</LoggerErrorLogDirectory>
+  <!-- Legger Error logging file. -->
+  <LoggerErrorLogFile>Vrh.Logger.Errors.log</LoggerErrorLogFile>
+</Vrh.Logger>

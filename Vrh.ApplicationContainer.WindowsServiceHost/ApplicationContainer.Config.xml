@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Vrh.ApplicationContainer>
+  <Config>
+    <InstanceFactoryAssembly>InstanceFactory.FromXML.dll</InstanceFactoryAssembly>
+    <InstanceFactoryType>InstanceFactory.FromXML.InstanceFactoryFromXML</InstanceFactoryType>
+    <InstanceFactoryVersion>1.1.1</InstanceFactoryVersion>
+    <MessageStackSize>100</MessageStackSize>
+  </Config>
+</Vrh.ApplicationContainer>
