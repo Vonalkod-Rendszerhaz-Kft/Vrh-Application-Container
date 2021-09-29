@@ -773,6 +773,78 @@ Ha hibaérzékenység nem, de például logolás szükséges, akkor ezt a Config
 
 ***
 ## Version History:
+### 1.29.0  (2021.08.29) Compatible changes
+- ResponseTargets enum áthelyezése a Vrh.Web.Menu projektből ide.
+
+### 1.28.1 Patch (2021.07.02), nuget
+
+### 1.28.0 Compatible change (2021.07.01), nuget
+- SetThrowException és SetEnable FileWatcher metódudsok publikussá tétele, hogy azokkal a konstruktorokkal
+is lehessen használni ezeket a funkciókat, amelyekben nincs ilyen paraméter
+
+### 1.27.1 Patch (2021.05.02), nuget
+- LinqXMLProcessorBaseCommonOrInstance: ha az instance xml nem létezett, akkor exception-t dobott; javítva lett, hogy ilyenkor a common xml-t használja
+
+### 1.27.0 Compatible change (2021.04.27)
+- xml connection stringben a changesensitive,generatexmlerrorevent és throwexception elemek bevezetése
+- ezeket csak a LinqXMLProcessorBase alapú feldolgozás használja a korábban is meglévő, azonos nevű paraméterekkel szabályozott funkcióiban
+- mindegyik alapértelmezése false
+- switch típusú elemek, tehát nem kell név=érték formát ölteniük, elég csak a nevet szerepeltetni, amely egyenértékű a név=true; formával
+- továbbra is megmaradt, hogy ezeket az értékeket az appsettings blokkban is meg lehet adni, az ott megadott érték és a connection string-ben megadott értékek vagy kapcsolatban vannak
+- az XmlParser root file Configuration xml elemében bevezetésre került a Switches attributum, amelyben a fenti értékeket pontosvesszővel elválasztva meg lehet adni.
+- ha egy érték az xml connectionstring-ben is szerepel, meg az általa hivatkozott konfigurációs elemben is, akkor a connectionstring-ben megadott érték lesz érvényben
+
+### 1.26.1 Patch (2021.02.03)
+- UrlElement/IsRelative property setter public-ra állítva
+
+### 1.26.0 Compatible change (2021.01.27)
+- Bevezetésre került az url leíróban az IsRelativ field és a UrlRoot field, valamint a GetUrlAbsolute metódus csoport.
+Az IsRelativ true, ha az xml elemek egy relatív url-t eredményeznek; A GetUrlAbsolut metódusokban meg lehet adni egy urlroot
+string paramétert, amely a rooturl-t tartalmazza és hozzáfűzésre kerl a relatív url elé. Ha az url abszolut, akkor nem
+fűzi hozzá; Ha a rooturl paraméter üres, akkor a UrlRoot mező tartalmát fűzi a relatív url elé.
+
+### 1.25.1 Patch (2021.01.27)
+
+### 1.25.0 Compatible change (2021.01.27)
+- Bevezetésre került az url leíróban az url xml elem. Ha ez megadásra kerül, akkor a GetUrl metódusok a protocol,
+hostname,appname,area,controller és action xml elemeket nem használják, bár az UrlElement típusba az ott megadott
+értékek is bekerülnek. Az url xml elem tartalmazhat input paraméter elemeket is, de ebben azt esetben az url xml
+elem értékét az (és/ampersand) karakterrel kell zárni, ami jelzi, hogy a megadott inputparameter xml elemek
+kiegészítő paramétereket tartalmaznak; ha az url xml elem értékét nem az (és/ampersand) karakter zárja,
+akkor a megadott inputparameter xml elemek a ?(kérdőjel) karakterrel felvezetve kerülnek az url elemhez hozzáfűzésre!
+
+### 1.24.0 Compatible change (2021.01.05, nuget):
+- Több Configurations elem is lehet az XmlParser root file-ban, ezek tartalmát összefűzi egy listába a feldolgozás előtt
+
+### 1.23.0 Compatible change (2020.12.08, nuget):
+- A LinqXMLProcessorBase-hez a nyelvkód megadását biztosító konstruktorok hozzáadása
+
+### 1.22.0 Compatible change (2020.12.08, nuget):
+- A GetValue függvény most már képes enum értékek közvetlen visszaadására
+
+### 1.21.0 Compatible change (2020.11.30, nuget):
+- @THISFILE@ rendszerváltozó hozzáadása, amelyet az xmlparser az aktuális file teljes elérési útjára cserél le
+
+### 1.20.0 Compatible change (2020.11.25, nuget):
+- Az xml parser element connection string nem csak egy xml elem felsorolást, hanem egy szabályos XPath kifejezést tartalmazhat.
+- Az eddigi xml elem felsorolás a leggyakrabban alkalmazott / szeparátor karakterrel egy xpath kifejezés is egyben, így a kompatibilitás ezekkel megmarad.
+- A fejlesztés feleslegessé teszi az xmlparser connectionstring-ben az id elemet, hisz a funkció xpath kifejezéssel leírható, ennek ellenére az id is megmaradt,
+és használható. Példa: "file=x.xml;element=A/B/C;id=id1;" helyettesíthető ezzel: "file=x.xml;element=A/B/C[@id='id1'];"
+
+### 1.19.1 Patch:
+- hiba javítása, ami miatt a /-lel kezdődő element-ek esetén hibás működést eredményezett
+
+### 1.19.0 Compatible changes:
+- a kapcsolatleírók Merge-elésében levő logikai hiba kijavítása
+- a Configuration elemben nem lehet Id és Preset attributum
+- ha a connectionstring-ben a config és az element együtt szerepelnek, akkor az element-ben megadott XPath a config definícióban levő element-hez képest relatív
+- ha egy XmlConnection-t mergelek egy second connection string-gel, akkor a second-ban levő element első karakterétől függően lecseréli az XmlConnection-ben levő
+element értéket (első karakter = "/" esetén), vagy hozzáfűzi ahhoz; a fentiek alapján a configban megadott file és element értékek által meghatározott xml elemből
+a connectionstring-ben megadott kiegészítő adatokkal nem lehet kijönni!
+
+### 1.18.5 Patch:
+- csomagok frissítése
+
 ### 1.18.4 (2020.10.26) Patch:
 - Az XmlConnection példányt nem írhatjuk felül büntetlenül, hiszen bizonyos alkalmazások meg pont arra számítanak, hogy ott az általuk ismert érték marad benne. 
 Az XmlParser.Configuration protected tulajdonság pont arra való, hogy az XmlParser származtatott osztályaiban a feloldott értékeket el lehessen érni.
